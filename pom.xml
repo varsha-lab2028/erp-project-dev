@@ -18,7 +18,6 @@
     </properties>
 
     <dependencies>
-
         <!-- UI -->
         <dependency>
             <groupId>com.mysql</groupId>

@@ -2,6 +2,8 @@ package edu.univ.erp.domain;
 import java.util.*;
 
 public class FinalGrade {
+    private long course_id;
+    private long section_id;
     private long enrollment_id; //linking the result to a particular student in the section, it is like an identification
     private LetterGrade gradeLetter; //getting an A, B
     private double course_cg;

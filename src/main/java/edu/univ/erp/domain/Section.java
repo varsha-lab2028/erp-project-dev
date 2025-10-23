@@ -1,28 +1,30 @@
 package edu.univ.erp.domain;
+
 import java.util.*;
 
 public class Section{
-    private final long id;
+    private final long section_id;
     private final String course_code;
-    private final long instructor_userid;
-    private final String day; //day when this section has a class
+    private final long instructor_id;
+    private final DayOfTheWeek day; //day when this section has a class
     private final String timings; //time when this section has class on that particular day
     private final String classroom;
     private final int capacity;
-    private final String semester;
+    private final int sem_no; //the number of the semester, like sem1, sem2
+    private final String sem_season; //winter sem, summer sem
     private final int year;
 
-    public Section(long id, String course_code, long instructor_userid,
+    public Section(long section_id, String course_code, long instructor_userid,
                    String day, String timings, String classroom, int capacity,
                    String semester, int year){
         //constructor
-        if(id<=0){
+        if(section_id<=0){
             throw new IllegalArgumentException("Appropriate ID should exist");
         }
         if(course_code == null || course_code.isBlank()){
             throw new IllegalArgumentException("Course code should be mentioned");
         }
-        if(instructor_userid <= 0){
+        if(instructor_id<= 0){
             throw new IllegalArgumentException("Appropriate User ID should be there");
         }
         if(day == null || day.isBlank()){
@@ -37,33 +39,37 @@ public class Section{
         if(capacity <= 0){
             throw new IllegalArgumentException("Capacity of students in the course should be appropriate");
         }
-        if(semester == null || semester.isBlank()){
-            throw new IllegalArgumentException("Semester number should be mentioned");
+        if(sem_no <= 0){
+            throw new IllegalArgumentException("Semester number field should be mentioned");
+        }
+        if(sem_season == null || sem_season.isBlank()){
+            throw new IllegalArgumentException("Semester season should be mentioned");
         }
         if(year <= 2000){
             throw new IllegalArgumentException("Capacity of students in the course should be appropriate");
         }
 
-        this.id = id;
+        this.section_id = section_id;
         this.course_code = course_code;
-        this.instructor_userid = instructor_userid;
+        this.instructor_id = instructor_userid;
         this.day = day;
         this.timings = timings;
         this.classroom = classroom;
         this.capacity = capacity;
-        this.semester = semester;
+        this.sem_no = sem_no;
+        this.sem_season = sem_season;
         this.year = year;
     }
 
     //getters
     public long getId(){
-        return id;
+        return section_id;
     }
     public String course_code(){
         return course_code;
     }
     public long getInstructor_userid(){
-        return instructor_userid;
+        return instructor_id;
     }
     public String getDay(){
         return day;
@@ -77,12 +83,13 @@ public class Section{
     public int getCapacity(){
         return capacity;
     }
-    public String getSemester(){
-        return semester;
+    public int getSemNumber(){
+        return sem_no;
+    }
+    public String getSemSeason() {
+        return sem_season;
     }
     public int getYear(){
         return year;
     }
-
-
 }
