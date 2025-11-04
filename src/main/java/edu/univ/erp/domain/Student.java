@@ -1,7 +1,7 @@
 package edu.univ.erp.domain;
 import java.util.*;
 
-//going to link this to Auth through userId
+//going to link this to Auth through user_id
 //keep program, year and status
 public class Student {
     private final long user_id;

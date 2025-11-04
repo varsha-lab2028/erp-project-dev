@@ -7,5 +7,10 @@ public enum DayOfTheWeek {
     THURSDAY,
     FRIDAY,
     SATURDAY,
-    SUNDAY
+    SUNDAY;
+
+    //added this method to check whether day of class has been entered or not
+    public boolean isBlank() {
+        return true;
+    }
 }

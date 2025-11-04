@@ -7,6 +7,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class ServerConnector {
     private static HikariDataSource auth_datasource;
@@ -45,6 +47,21 @@ public class ServerConnector {
     public static DataSource erp() {
         if (erp_datasource == null) erp_datasource = make("erp.jdbc.url","erp.jdbc.user","erp.jdbc.pass");
         return erp_datasource;
+    }
+
+    //getting one ERP connection directly
+    public static Connection ERPConnection() throws SQLException {
+        return erp().getConnection();
+    }
+
+    //closing pools at app shutdown
+    public static void closeAll() {
+        if (auth_datasource != null) {
+            auth_datasource.close();
+        }
+        if (erp_datasource  != null) {
+            erp_datasource.close();
+        }
     }
 
     private ServerConnector() {}

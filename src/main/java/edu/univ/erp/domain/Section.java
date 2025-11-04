@@ -1,7 +1,5 @@
 package edu.univ.erp.domain;
 
-import java.util.*;
-
 public class Section{
     private final long section_id;
     private final String course_code;
@@ -10,12 +8,12 @@ public class Section{
     private final String timings; //time when this section has class on that particular day
     private final String classroom;
     private final int capacity;
-    private final int sem_no; //the number of the semester, like sem1, sem2
-    private final String sem_season; //winter sem, summer sem
+    private int sem_no = 0; //the number of the semester, like sem1, sem2
+    private String sem_season = ""; //winter sem, summer sem
     private final int year;
 
-    public Section(long section_id, String course_code, long instructor_userid,
-                   String day, String timings, String classroom, int capacity,
+    public Section(long section_id, String course_code, long instructor_id,
+                   DayOfTheWeek day, String timings, String classroom, int capacity,
                    String semester, int year){
         //constructor
         if(section_id<=0){
@@ -51,7 +49,7 @@ public class Section{
 
         this.section_id = section_id;
         this.course_code = course_code;
-        this.instructor_id = instructor_userid;
+        this.instructor_id = instructor_id;
         this.day = day;
         this.timings = timings;
         this.classroom = classroom;
@@ -71,7 +69,7 @@ public class Section{
     public long getInstructor_userid(){
         return instructor_id;
     }
-    public String getDay(){
+    public DayOfTheWeek getDay(){
         return day;
     }
     public String getTimings(){
