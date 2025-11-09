@@ -26,7 +26,7 @@ public class EnrollmentDAO {
     }
 
     //returning the number of students in a course's section
-    public int findCapacitySection(long section_id) throws SQLException{
+    public int countEnrolledInSection(long section_id) throws SQLException{
         String command = "SELECT COUNT(*) FROM enrollments WHERE section_id=? AND e_status='REGISTERED'";
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {

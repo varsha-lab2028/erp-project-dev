@@ -8,13 +8,13 @@ public class Section{
     private final String timings; //time when this section has class on that particular day
     private final String classroom;
     private final int capacity;
-    private int sem_no = 0; //the number of the semester, like sem1, sem2
-    private String sem_season = ""; //winter sem, summer sem
+    private int sem_no; //the number of the semester, like 1, 2
+    private SemesterSeason sem_season; //winter sem, summer sem
     private final int year;
 
     public Section(long section_id, String course_code, long instructor_id,
                    DayOfTheWeek day, String timings, String classroom, int capacity,
-                   String semester, int year){
+                   int sem_no, SemesterSeason sem_season, int year){
         //constructor
         if(section_id<=0){
             throw new IllegalArgumentException("Appropriate ID should exist");
@@ -84,7 +84,7 @@ public class Section{
     public int getSemNumber(){
         return sem_no;
     }
-    public String getSemSeason() {
+    public SemesterSeason getSemSeason() {
         return sem_season;
     }
     public int getYear(){
