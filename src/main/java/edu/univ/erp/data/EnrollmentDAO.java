@@ -56,7 +56,7 @@ public class EnrollmentDAO {
     }
 
     //removing a student if they have dropped from the course's section
-    public void removeStudentEnrollment(long user_id, long section_id) throws SQLException{
+    public static void removeStudentEnrollment(long user_id, long section_id) throws SQLException{
         String command = """
             UPDATE enrollments
             SET e_status='DROPPED', dropped_when=NOW()

@@ -5,8 +5,8 @@ public enum LetterGrade {
     B_PLUS("B+"), B("B"), B_MINUS("B-"),
     C("C"), D("D"), F("F");
 
-    public final String gradeLetter;
-    LetterGrade(String gradeLetter) {
-        this.gradeLetter = gradeLetter;
+    public final String grade_letter;
+    LetterGrade(String grade_letter) {
+        this.grade_letter = grade_letter;
     }
 }

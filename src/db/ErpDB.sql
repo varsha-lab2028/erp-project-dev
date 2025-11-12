@@ -1,8 +1,11 @@
 
 
+--STUDENTS TABLE
+
+--altering table
 
 
--- SETTINGS TABLE
+-- settings table
 CREATE TABLE IF NOT EXISTS settings (k VARCHAR(64) PRIMARY KEY, v VARCHAR(256) NOT NULL);
 -- insert the default row for maintenance mode
 INSERT INTO settings (k, v) VALUES ('maintenance_on', 'false') ON DUPLICATE KEY UPDATE v = VALUES(v);

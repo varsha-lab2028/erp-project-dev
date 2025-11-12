@@ -1,5 +1,6 @@
 package edu.univ.erp.auth;
 import edu.univ.erp.data.ServerConnector;
+import edu.univ.erp.domain.OnlineStatus;
 
 //import javax.sql.DataSource;
 import java.sql.*;
@@ -14,12 +15,12 @@ public class SeedingUsers {
         try { dao.insertUser("student1",   "STUDENT", "stu1@123"); } catch (Exception ignored) {}
         try { dao.insertUser("student2",   "STUDENT", "stu2@123"); } catch (Exception ignored) {}
 
-        //adding minimal ERP profiles matching user_id from auth_db by username lookup:
+        //adding minimal ERP profiles matching user_id from auth_db by looking up the username
         linkErpProfiles("instructor1", "CSE");
         linkStudent("student1", "20240001", "B.Tech CSE", 2);
         linkStudent("student2", "20240002", "B.Tech CSE", 2);
 
-        // Seed a course + section
+        // Seed a course and section
         seedCourseAndSection();
         System.out.println("Seeding successful");
     }
@@ -41,14 +42,16 @@ public class SeedingUsers {
         }
     }
 
-    private static void linkStudent(String stuUsername, String rollNo, String program, int year) throws Exception {
-        int uid = userIdByUsername(stuUsername);
-        String sql = "INSERT IGNORE INTO erp_db.students(user_id, roll_no, program, year) VALUES(?,?,?,?)";
+    private static void linkStudent(String student_username, String roll_no, String degree, String branch, int term_year) throws Exception {
+        int uid = userIdByUsername(student_username);
+        String sql = "INSERT IGNORE INTO erp_db.students(user_id, roll_no, degree, branch, term_year, status) VALUES(?,?,?,?, ?, ?)";
         try (Connection c = ServerConnector.erp().getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, uid);
-            ps.setString(2, rollNo);
-            ps.setString(3, program);
-            ps.setInt(4, year);
+            ps.setString(2, roll_no);
+            ps.setString(3, degree);
+            ps.setString(4, branch);
+            ps.setInt(5, term_year);
+            ps.setString(6, "ACTIVE");
             ps.executeUpdate();
         }
     }
@@ -77,11 +80,11 @@ public class SeedingUsers {
             }
         }
 
-        int instUid = userIdByUsername("inst1");
+        int instUid = userIdByUsername("instructor1");
 
         try (Connection c = ServerConnector.erp().getConnection();
              PreparedStatement ps = c.prepareStatement(
-                     "INSERT INTO sections(course_id, instructor_id, day_time, room, capacity, semester, year) " +
+                     "INSERT INTO sections(course_id, instructor_id, day_time, room, capacity, sem_no, sem_season, year) " +
                              "VALUES(?,?,?,?,?,?,?)")) {
             ps.setInt(1, courseId);
             ps.setInt(2, instUid);

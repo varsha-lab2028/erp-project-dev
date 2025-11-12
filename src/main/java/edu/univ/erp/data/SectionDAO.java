@@ -9,7 +9,7 @@ import java.util.*;
 
 public class SectionDAO {
     //fetches all sections for a given course
-    public List<Section> listByCourse(String courseCode) throws SQLException {
+    public List<Section> listSections(String courseCode) throws SQLException {
         String sql = """
             SELECT section_id, course_code, instructor_id, day, timings, classroom,
                    capacity, sem_no, sem_season, year FROM sections WHERE course_code = ?
@@ -42,10 +42,9 @@ public class SectionDAO {
 
     //get the capacity, maximum number of students that can be a section
     public int capacityOfSection(long sectionId) throws SQLException {
-        String sql = "SELECT capacity FROM sections WHERE section_id = ?";
-
-        try (Connection conn = ServerConnector.ERPConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String command = "SELECT capacity FROM sections WHERE section_id = ?";
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(command)) {
             ps.setLong(1, sectionId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {

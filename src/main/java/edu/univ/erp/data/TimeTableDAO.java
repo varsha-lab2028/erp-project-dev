@@ -8,7 +8,9 @@ import java.sql.*;
 import java.util.*;
 
 public class TimeTableDAO {
-    public List<TimeTableRow> getTimetableForStudent(long student_id) throws SQLException {
+    //getTimetableForStudent has been kept as static
+    //this will retrieve the required info regarding the student's courses
+    public static List<TimeTableRow> getTimetableForStudent(long student_id) throws SQLException {
         String command = """
         SELECT s.day, s.timings, c.course_code, c.name, s.classroom
         FROM enrollments e
