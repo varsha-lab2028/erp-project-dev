@@ -4,7 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 
 import edu.univ.erp.ui.login.LoginPanel;
+import edu.univ.erp.ui.login.LoginController;
 import edu.univ.erp.ui.dashboard.DashboardPanel;
+import edu.univ.erp.auth.LoginManager;
 import edu.univ.erp.util.Theme;
 
 
@@ -37,11 +39,13 @@ public class MainApp {
     }
 
     private void initPanels() {
-        LoginPanel loginPanel = new LoginPanel(this);
-        DashboardPanel dashboardPanel = new DashboardPanel(this);
+        LoginManager loginManager = new LoginManager();
+        LoginController loginController = new LoginController(loginManager);
+        LoginPanel loginPanel = new LoginPanel(loginController);
+        DashboardPanel dashboardPanel = new DashboardPanel();
 
-        mainPanel.add(loginPanel, "login");
-        mainPanel.add(dashboardPanel, "dashboard");
+        mainPanel.add("login", loginPanel);
+        mainPanel.add("dashboard", dashboardPanel);
 
         cardLayout.show(mainPanel, "login"); // Show login first
     }

@@ -1,6 +1,7 @@
 package edu.univ.erp.util;
 
 import java.awt.*;
+import javax.swing.*;
 
 public final class Theme {
     private Theme() {}
@@ -13,4 +14,12 @@ public final class Theme {
     public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 22);
     public static final Font FONT_TEXT = new Font("Segoe UI", Font.PLAIN, 14);
     public static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 12);
+
+    public static void applyTheme() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

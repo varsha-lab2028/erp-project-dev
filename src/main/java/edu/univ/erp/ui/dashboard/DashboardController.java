@@ -1,16 +1,13 @@
 package edu.univ.erp.ui.dashboard;
 
-import edu.univ.erp.ui.util.*;
 import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class DashboardController implements PropertyChangeListener {
     private DashboardPanel dashboardPanel;
-    private DashboardViewModel dashboardViewModel;
 
     public DashboardController(DashboardViewModel viewModel) {
-        this.dashboardViewModel = viewModel;
         this.dashboardPanel = new DashboardPanel();
         
         // Listen for logout button events

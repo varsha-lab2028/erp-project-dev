@@ -10,6 +10,11 @@ public class LoginController {
     }
 
     public boolean authenticate(String username, String password) {
-        return loginManager.validateCredentials(username, password);
+        try {
+            loginManager.login(username, password);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

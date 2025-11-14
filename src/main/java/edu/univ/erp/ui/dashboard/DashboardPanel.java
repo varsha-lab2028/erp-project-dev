@@ -1,5 +1,9 @@
-import edu.univ.erp.ui.util.Theme;
-import edu.univ.erp.ui.util.RoundedButton;
+package edu.univ.erp.ui.dashboard;
+
+import javax.swing.*;
+import java.awt.*;
+import edu.univ.erp.util.Theme;
+import edu.univ.erp.util.RoundedButton;
 
 public class DashboardPanel extends JPanel {
 
