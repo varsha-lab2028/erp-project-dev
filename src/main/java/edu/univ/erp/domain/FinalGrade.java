@@ -1,5 +1,4 @@
 package edu.univ.erp.domain;
-import java.util.*;
 
 public class FinalGrade {
     private long course_id;

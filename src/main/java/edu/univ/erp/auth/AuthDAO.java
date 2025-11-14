@@ -56,6 +56,18 @@ public class AuthDAO {
         }
     }
 
+    //updates the password for a user
+    public boolean updatePassword(long user_id, String newPasswordHash) throws Exception {
+        String command = "UPDATE user_auth SET password_hash = ? WHERE user_id=?";
+        try (Connection connection = data_source.getConnection();
+             PreparedStatement ps = connection.prepareStatement(command)) {
+            ps.setString(1, newPasswordHash);
+            ps.setLong(2, user_id);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
+
     // converts AuthClass (from DB) → User (used in session/UI)
     public User toUser(AuthClass a) {
         Role r = Role.valueOf(a.role.toUpperCase());  // converts "student" → Role.STUDENT

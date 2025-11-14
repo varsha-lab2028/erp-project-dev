@@ -1,7 +1,7 @@
 /*this class is made to manage and reuse database connections safely
 across the whole project. and connects to the MySQL server (main)*/
 package edu.univ.erp.data;
-import java.util.*;
+
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

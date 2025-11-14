@@ -1,6 +1,5 @@
 package edu.univ.erp.auth;
 import edu.univ.erp.data.ServerConnector;
-import edu.univ.erp.domain.OnlineStatus;
 
 //import javax.sql.DataSource;
 import java.sql.*;
@@ -17,8 +16,8 @@ public class SeedingUsers {
 
         //adding minimal ERP profiles matching user_id from auth_db by looking up the username
         linkErpProfiles("instructor1", "CSE");
-        linkStudent("student1", "20240001", "B.Tech CSE", 2);
-        linkStudent("student2", "20240002", "B.Tech CSE", 2);
+        linkStudent("student1", "20240001", "B.Tech", "CSE", 2);
+        linkStudent("student2", "20240002", "B.Tech", "CSE", 2);
 
         // Seed a course and section
         seedCourseAndSection();
@@ -29,7 +28,7 @@ public class SeedingUsers {
         AuthDAO dao = new AuthDAO();
         var u = dao.findByUsername(username);
         if (u == null) throw new IllegalArgumentException("No such username: " + username);
-        return u.user_id;
+        return (int) u.user_id;
     }
 
     private static void linkErpProfiles(String instUsername, String department) throws Exception {
