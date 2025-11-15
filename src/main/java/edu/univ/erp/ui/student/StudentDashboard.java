@@ -1,13 +1,26 @@
 package edu.univ.erp.ui.student;
-import edu.univ.erp.access.AccessControl;
+import edu.univ.erp.domain.SemesterSeason;
 import edu.univ.erp.ui.common.BaseDashboard;
+import edu.univ.erp.service.StudentService;
+import edu.univ.erp.auth.session.Session;
 import javax.swing.*;
 import java.awt.*;
 
 public class StudentDashboard extends BaseDashboard{
-    private final JPanel actions = new JPanel(null);
+    private final StudentService student_flow_controls = new StudentService();
+
+    //the methods fetch data about the currently logged in student
+    private long studentId() { return Session.userId(); }
+    private SemesterSeason semSeason() { return Session.getSemesterSeason(); }
+    private int semNo() { return Session.getSemesterNumber(); }
+    private int year() { return Session.getTermYear(); }
+
+    JPanel actions = new JPanel(null);
+
+    //constructor
     public StudentDashboard(){
-        super("Student Dashboard");
+        super("ERP Student Dashboard");
+        actions.setBackground(new Color(0,0,82));
 
         actions.setPreferredSize(new Dimension(900, 60));
         JButton browse = new JButton("Browse Catalog");
@@ -27,7 +40,6 @@ public class StudentDashboard extends BaseDashboard{
         add(actions, BorderLayout.NORTH);
 
         // Default panel
-        /*
         setCenter(new StudentCatalogPanel());
 
         // Switchers
@@ -36,6 +48,5 @@ public class StudentDashboard extends BaseDashboard{
         timetable.addActionListener(e -> setCenter(new StudentTimetablePanel()));
         grades.addActionListener(e -> setCenter(new StudentGradesPanel()));
         transcript.addActionListener(e -> setCenter(new StudentTranscriptPanel()));
-         */
     }
 }

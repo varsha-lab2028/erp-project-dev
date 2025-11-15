@@ -61,7 +61,6 @@ public class BaseDashboard extends JFrame{
         content.repaint();
     }
 
-
     private void doLogout(){
         dispose();
         new edu.univ.erp.ui.auth.LoginFrame().setVisible(true);

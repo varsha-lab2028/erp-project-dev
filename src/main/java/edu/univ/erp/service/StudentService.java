@@ -5,10 +5,8 @@ import edu.univ.erp.data.*;
 import edu.univ.erp.domain.*;
 import java.sql.SQLException;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 
 public class StudentService {
     private final CourseDAO course_dao = new CourseDAO();
@@ -27,6 +25,7 @@ public class StudentService {
             return course_dao.search(q);
         }
     }
+
 
     //register = registering a student into a section
     public String registerForSection(long studentId, long sectionId) throws SQLException {
@@ -99,7 +98,7 @@ public class StudentService {
         return GradeDAO.listGradeComponents(studentId, semNo, semSeason, year);
     }
 
-    //getting transcript of the completed courses only, will be shown in UI
+    //getting transcript of the completed courses, will be shown in UI
     public List<FinalGrade> getTranscript(long studentId, int semNo, String semSeason, int year) throws SQLException {
         return GradeDAO.listFinalGrades(studentId, semNo, semSeason, year);
     }

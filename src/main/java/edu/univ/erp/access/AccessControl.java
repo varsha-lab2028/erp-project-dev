@@ -7,7 +7,6 @@ import edu.univ.erp.service.MaintenanceService;
 public class AccessControl {
     private static final MaintenanceService maintenance = new MaintenanceService();
 
-
     public static boolean isReadOnlyNow(){ return maintenance.isMaintenanceOn(); }
 
     public static boolean canAccess(String action){

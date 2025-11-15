@@ -26,6 +26,7 @@ public class SectionDAO {
                             rs.getLong("section_id"),
                             rs.getString("course_code"),
                             rs.getLong("instructor_id"),
+                            rs.getString("instructor_name"),
                             DayOfTheWeek.valueOf(rs.getString("day").toUpperCase()),
                             rs.getString("timings"),
                             rs.getString("classroom"),
