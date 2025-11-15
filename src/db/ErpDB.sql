@@ -11,7 +11,7 @@ ALTER TABLE instructors ADD COLUMN instructor_name VARCHAR(100) NOT NULL AFTER u
 
 --SECTIONS TABLE
 --altering table to accommodate the instructor name column
-
+ ALTER TABLE sections ADD COLUMN instructor_name VARCHAR(100) NOT NULL AFTER instructor_id;
 
 -- SETTINGS TABLE
 CREATE TABLE IF NOT EXISTS settings (k VARCHAR(64) PRIMARY KEY, v VARCHAR(256) NOT NULL);

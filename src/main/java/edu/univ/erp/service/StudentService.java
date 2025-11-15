@@ -1,5 +1,3 @@
-/*this acts as a business logic layer. to ensure that a clean design is maintained*/
-
 package edu.univ.erp.service;
 import edu.univ.erp.data.*;
 import edu.univ.erp.domain.*;
@@ -7,6 +5,9 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+
+/*Student service acts like an API to connect between the students table in Mysql
+* and the UI interfaces under student package*/
 
 public class StudentService {
     private final CourseDAO course_dao = new CourseDAO();
@@ -22,7 +23,7 @@ public class StudentService {
         }
         else {
             // If a keyword is entered, search by course code or name
-            return course_dao.search(q);
+            return course_dao.searchCourse(q);
         }
     }
 

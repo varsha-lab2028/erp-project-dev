@@ -10,11 +10,11 @@ import java.sql.SQLException;
 
 public class StudentCatalogPanel extends JPanel{
     //private final JTable table;
-    private final JTextField searchField = new JTextField();
-    private final JButton searchBtn = new JButton("Search");
-    private final JButton registerBtn = new JButton("Register Selected");
+    private final JTextField search_field = new JTextField();
+    private final JButton search_button = new JButton("Search");
+    private final JButton register_button = new JButton("Register Selected");
     private final JLabel status = new JLabel(" ");
-    private final StudentService studentFlowControls = new StudentService();
+    private final StudentService student_service = new StudentService();
 
 
     //constructor
@@ -26,11 +26,11 @@ public class StudentCatalogPanel extends JPanel{
         top.setPreferredSize(new Dimension(900, 44));
         JLabel lbl = new JLabel("Search:");
         lbl.setBounds(10, 10, 60, 24);
-        searchField.setBounds(70, 10, 260, 24);
-        searchBtn.setBounds(340, 10, 100, 24);
-        registerBtn.setBounds(460, 10, 160, 24);
-        registerBtn.setEnabled(AccessControl.canAccess("STU_REGISTER"));
-        top.add(lbl); top.add(searchField); top.add(searchBtn); top.add(registerBtn);
+        search_field.setBounds(70, 10, 260, 24);
+        search_button.setBounds(340, 10, 100, 24);
+        register_button.setBounds(460, 10, 160, 24);
+        register_button.setEnabled(AccessControl.canAccess("STU_REGISTER"));
+        top.add(lbl); top.add(search_field); top.add(search_button); top.add(register_button);
         add(top, BorderLayout.NORTH);
 
         // Table center
@@ -47,11 +47,11 @@ public class StudentCatalogPanel extends JPanel{
         add(south, BorderLayout.SOUTH);
          */
 
+        //for creating the course catalog in the catalog panel
         List<Course> tableList;
-        String[] column = {"code","title","credits"};
-
+        String[] column = {"COURSE CODE","COURSE NAME","COURSE CREDITS"};
         try {
-            tableList = studentFlowControls.browseCatalog("");
+            tableList = student_service.browseCatalog("");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -65,16 +65,9 @@ public class StudentCatalogPanel extends JPanel{
         JTable table = new JTable (data, column);
         table.setBackground(new Color(185, 227,223));
         JScrollPane sp = new JScrollPane(table);
-        sp.setBounds(10, 60, 880, 500);      // <── THIS IS YOUR ANSWER
+        sp.setBounds(10, 60, 880, 500);
         add(sp);
 
-        /*
-        // Dummy data (replace with DAO results later)
-        addRow(model, "CS101","Intro to CS",3, 60, 55, "Dr. Rao","Autumn 2025");
-        addRow(model, "MA102","Calculus II",4, 80, 80, "Dr. Sen","Autumn 2025");
-        addRow(model, "HS105","Ethics",2, 40, 33, "Dr. Iyer","Autumn 2025");
-        status.setText("3 courses");
-         */
 
         // Actions
         /*

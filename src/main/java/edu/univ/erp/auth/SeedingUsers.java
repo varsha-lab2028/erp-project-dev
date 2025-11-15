@@ -23,7 +23,7 @@ public class SeedingUsers {
         } catch (Exception ignored) {}
 
         //seeding in instructor and students in erp_db table
-        seedInstructors("instructor1", "CSE");
+        seedInstructors("instructor1", "Mr. Instructor 1","CSE");
         seedStudents("student1", "20250001", "B.Tech", "CSE", 1);
         seedStudents("student2", "20250002", "B.Tech", "CSE", 1);
 
@@ -31,8 +31,6 @@ public class SeedingUsers {
         seedCourses();
 
         //to seed in sections into the sections table
-
-
 
         System.out.println("Information has been seeded successfully");
     }
@@ -44,12 +42,13 @@ public class SeedingUsers {
         return u.user_id;
     }
 
-    private static void seedInstructors(String instUsername, String department) throws Exception {
-        long uid = findUserIdByUsername(instUsername);
-        String sql = "INSERT IGNORE INTO erp_db.instructors(user_id, department) VALUES(?,?)";
-        try (Connection c = ServerConnector.erp().getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+    private static void seedInstructors(String instructor_username, String instructor_name, String department) throws Exception {
+        long uid = findUserIdByUsername(instructor_username);
+        String command = "INSERT IGNORE INTO erp_db.instructors(user_id, instructor_name, department) VALUES(?,?,?)";
+        try (Connection c = ServerConnector.erp().getConnection(); PreparedStatement ps = c.prepareStatement(command)) {
             ps.setLong(1, uid);
-            ps.setString(2, department);
+            ps.setString(2, instructor_name);
+            ps.setString(3, department);
             ps.executeUpdate();
         }
     }
@@ -101,6 +100,7 @@ public class SeedingUsers {
         }
     }
 
+    /*
     private static void seedSections() throws Exception{
         String command = "INSERT IGNORE INTO sections " +
                 "(course_id, instructor_id, day_time, room, capacity, sem_no, sem_season, year) " +
@@ -111,15 +111,16 @@ public class SeedingUsers {
         try (Connection c = ServerConnector.erp().getConnection();
              PreparedStatement ps = c.prepareStatement(command)) {
             //for IP course, only a single section
-            ps.setString(1, "CSE101");                 // course_code
-            ps.setString(2, "prof_prog");              // TODO: replace with real instructor username
-            ps.setString(3, "Mon 09:00–10:30");        // day_time
-            ps.setString(4, "LHC-101");                // room
-            ps.setInt(5, 60);                          // capacity
-            ps.setInt(6, 1);                           // sem_no (1)
-            ps.setString(7, "Fall");                   // sem_season
-            ps.setInt(8, 2025);                        // year
+            ps.setString(1, "CSE101");
+            ps.setString(2, "prof_prog");
+            ps.setString(3, "Mon 09:00–10:30");
+            ps.setString(4, "LHC-C101");
+            ps.setInt(5, 60);
+            ps.setInt(6, 1);
+            ps.setString(7, "Fall");
+            ps.setInt(8, 2025);
             ps.executeUpdate();
         }
     }
+     */
 }

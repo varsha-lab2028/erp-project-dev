@@ -1,12 +1,10 @@
-//data access object for the 'courses' table in the ERP database
-//includes clean, reusable methods to fetch the data from the data without the need of writing MySQL code everywhere
-
 package edu.univ.erp.data;
 
 import edu.univ.erp.domain.Course;
 import java.util.*;
 import java.sql.*;
 
+//data access object for the 'courses' table in the ERP database
 public class CourseDAO {
     public List<Course> listAll() throws SQLException {
         String command = "SELECT course_id, name, course_code, credits FROM courses ORDER BY course_code";
@@ -28,7 +26,7 @@ public class CourseDAO {
     }
 
     //searching by course name or the course code
-    public List<Course> search(String keyword) throws SQLException {
+    public List<Course> searchCourse(String keyword) throws SQLException {
         String like = "%" + keyword + "%";
         String sql = """
             SELECT course_id, course_code, name, credits
