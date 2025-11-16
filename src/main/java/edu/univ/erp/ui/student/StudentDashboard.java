@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class StudentDashboard extends BaseDashboard{
-    private final StudentService student_flow_controls = new StudentService();
+    private final StudentService student_service = new StudentService();
 
     //the methods fetch data about the currently logged in student
     private long studentId() { return Session.userId(); }
@@ -32,12 +32,18 @@ public class StudentDashboard extends BaseDashboard{
 
         // Place with setBounds
         course_catalog.setBounds(10, 10, 150, 30);
+        section_catalog.setBounds(160, 10, 140, 30);
         regs.setBounds(170, 10, 150, 30);
         timetable.setBounds(330, 10, 150, 30);
         grades.setBounds(490, 10, 150, 30);
         transcript.setBounds(650, 10, 150, 30);
 
-        actions.add(course_catalog); actions.add(regs); actions.add(timetable); actions.add(grades); actions.add(transcript);
+        actions.add(course_catalog);
+        actions.add(section_catalog);
+        actions.add(regs);
+        actions.add(timetable);
+        actions.add(grades);
+        actions.add(transcript);
         add(actions, BorderLayout.NORTH);
 
         // Default panel
@@ -45,7 +51,7 @@ public class StudentDashboard extends BaseDashboard{
 
         // Switchers
         course_catalog.addActionListener(e -> setCenter(new StudentCoursePanel()));
-        //section_catalog.addActionListener(e -> setCenter(new StudentSectionPanel()));
+        section_catalog.addActionListener(e -> setCenter(new StudentSectionPanel()));
         regs.addActionListener(e -> setCenter(new StudentRegistrationsPanel()));
         timetable.addActionListener(e -> setCenter(new StudentTimetablePanel()));
         grades.addActionListener(e -> setCenter(new StudentGradesPanel()));

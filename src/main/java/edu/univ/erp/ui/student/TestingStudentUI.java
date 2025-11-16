@@ -1,7 +1,7 @@
 package edu.univ.erp.ui.student;
 import javax.swing.*;
 
-//just to test the student dashboards ui
+//for testing the StudentDashboard UI
 public class TestingStudentUI {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

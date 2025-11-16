@@ -13,9 +13,8 @@ public class StudentCoursePanel extends JPanel{
     private final JTextField search_field = new JTextField();
     private final JButton search_button = new JButton("Search");
     private final JButton register_button = new JButton("Register Selected");
-    private final JLabel status = new JLabel(" ");
+    private final JLabel status_label = new JLabel(" ");
     private final StudentService student_service = new StudentService();
-
 
     //constructor
     public StudentCoursePanel(){
@@ -49,7 +48,7 @@ public class StudentCoursePanel extends JPanel{
 
         //for creating the course catalog in the catalog panel
         List<Course> tableList;
-        String[] column = {"COURSE CODE","COURSE NAME","COURSE CREDITS"};
+        String[] columns = {"COURSE CODE","COURSE NAME","COURSE CREDITS"};
         try {
             tableList = student_service.browseCourseCatalog("");
         } catch (SQLException e) {
@@ -62,7 +61,7 @@ public class StudentCoursePanel extends JPanel{
             data[i][1]=course.getName();
             data[i][2]=course.getCredits();
         }
-        JTable table = new JTable (data, column);
+        JTable table = new JTable (data, columns);
         table.setBackground(new Color(185, 227,223));
         JScrollPane sp = new JScrollPane(table);
         sp.setBounds(10, 60, 880, 500);
@@ -89,7 +88,6 @@ public class StudentCoursePanel extends JPanel{
         String code = model.getValueAt(row, 0).toString();
         JOptionPane.showMessageDialog(this, "Registered for " + code + " (stub)");
     }
-
      */
 }
 

@@ -34,7 +34,7 @@ public class StudentService {
             return section_dao.listAllSections();
         }
         else {
-            // If a keyword is entered, search by course code or name
+            // if a keyword is entered, search the section
             return section_dao.searchSection(q);
         }
     }

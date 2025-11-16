@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class StudentRegistrationsPanel extends JPanel{
     private final JTable table;
-    private final JButton dropBtn = new JButton("Drop Selected");
+    private final JButton drop_button = new JButton("Drop Selected");
     private final JLabel status = new JLabel(" ");
 
     public StudentRegistrationsPanel(){
@@ -14,8 +14,8 @@ public class StudentRegistrationsPanel extends JPanel{
 
         JPanel top = new JPanel(null);
         top.setPreferredSize(new Dimension(900, 44));
-        dropBtn.setBounds(10, 10, 140, 24);
-        top.add(dropBtn);
+        drop_button.setBounds(10, 10, 140, 24);
+        top.add(drop_button);
         add(top, BorderLayout.NORTH);
 
         String[] cols = {"Course","Section","Day","Time","Room","Term"};
@@ -32,7 +32,7 @@ public class StudentRegistrationsPanel extends JPanel{
         model.addRow(new Object[]{"HS105","S02","Thu","14:00–15:00","B204","Autumn 2025"});
         status.setText("2 registrations");
 
-        dropBtn.addActionListener(e -> onDrop(model));
+        drop_button.addActionListener(e -> onDrop(model));
     }
     private void onDrop(DefaultTableModel model){
         int row = table.getSelectedRow();

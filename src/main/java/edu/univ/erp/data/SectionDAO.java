@@ -1,6 +1,6 @@
 package edu.univ.erp.data;
 
-import edu.univ.erp.domain.DayOfTheWeek;
+//import edu.univ.erp.domain.DayOfTheWeek;
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.domain.SemesterSeason;
 
@@ -11,7 +11,7 @@ public class SectionDAO {
     //fetches all sections for a given course
     public List<Section> listAllSections() throws SQLException {
         String command = """
-        SELECT section_id, course_code, instructor_id, day, timings, classroom,
+        SELECT section_id, course_code, instructor_id, instructor_name, day, timings, classroom,
                capacity, sem_no, sem_season, year
         FROM sections
         ORDER BY course_code, section_id
@@ -26,12 +26,12 @@ public class SectionDAO {
                             rs.getString("course_code"),
                             rs.getLong("instructor_id"),
                             rs.getString("instructor_name"),
-                            DayOfTheWeek.valueOf(rs.getString("day").toUpperCase()),
+                            rs.getString("day").toUpperCase(),
                             rs.getString("timings"),
                             rs.getString("classroom"),
                             rs.getInt("capacity"),
                             rs.getInt("sem_no"),
-                            SemesterSeason.valueOf(rs.getString("sem_season").toUpperCase()),
+                            rs.getString("sem_season").toUpperCase(),
                             rs.getInt("year")
                     ));
                 }
@@ -82,12 +82,12 @@ public class SectionDAO {
                             rs.getString("course_code"),
                             rs.getLong("instructor_id"),
                             rs.getString("instructor_name"),
-                            DayOfTheWeek.valueOf(rs.getString("day").toUpperCase()),
+                            rs.getString("day").toUpperCase(),
                             rs.getString("timings"),
                             rs.getString("classroom"),
                             rs.getInt("capacity"),
                             rs.getInt("sem_no"),
-                            SemesterSeason.valueOf(rs.getString("sem_season").toUpperCase()),
+                            rs.getString("sem_season").toUpperCase(),
                             rs.getInt("year")
                     ));
                 }

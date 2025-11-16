@@ -1,16 +1,12 @@
-/*this DAO has been made to perform student-section registration.
-* this includes reading the record, inserting into the record, deleting from the
-* record and checking the record*/
 package edu.univ.erp.data;
 
 import edu.univ.erp.domain.Enrollment;
 import edu.univ.erp.domain.EnrollmentStatus;
-
 import java.sql.*;
 import java.util.*;
 
 //user_id is the student's id here
-
+//this DAO has been made to perform student-section registration.
 public class EnrollmentDAO {
     //checking if a student has already been enrolled in the section
     public boolean checkRecordExistence(long user_id, long section_id) throws SQLException{

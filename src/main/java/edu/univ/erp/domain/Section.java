@@ -5,17 +5,17 @@ public class Section{
     private final String course_code;
     private final long instructor_id;
     private final String instructor_name;
-    private final DayOfTheWeek day; //day when this section has a class
+    private final String day; //day when this section has a class
     private final String timings; //time when this section has class on that particular day
     private final String classroom;
     private final int capacity;
     private int sem_no; //the number of the semester, like 1, 2
-    private SemesterSeason sem_season; //winter sem, summer sem
+    private String sem_season; //winter sem, summer sem
     private final int year;
 
     public Section(long section_id, String course_code, long instructor_id,
-                   String instructor_name, DayOfTheWeek day, String timings,
-                   String classroom, int capacity, int sem_no, SemesterSeason sem_season,
+                   String instructor_name, String day, String timings,
+                   String classroom, int capacity, int sem_no, String sem_season,
                    int year){
         //constructor
         if(section_id<=0){
@@ -69,14 +69,14 @@ public class Section{
     public long getId(){
         return section_id;
     }
-    public String course_code(){
+    public String getCourseCode(){
         return course_code;
     }
-    public long getInstructor_userid(){return instructor_id;}
-    public String getInstructor_name(){
+    public long getInstructorUserID(){return instructor_id;}
+    public String getInstructorName(){
         return instructor_name;
     }
-    public DayOfTheWeek getDay(){
+    public String getDay(){
         return day;
     }
     public String getTimings(){
@@ -91,7 +91,7 @@ public class Section{
     public int getSemNumber(){
         return sem_no;
     }
-    public SemesterSeason getSemSeason() {
+    public String getSemSeason() {
         return sem_season;
     }
     public int getYear(){
