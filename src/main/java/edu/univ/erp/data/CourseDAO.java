@@ -6,7 +6,7 @@ import java.sql.*;
 
 //data access object for the 'courses' table in the ERP database
 public class CourseDAO {
-    public List<Course> listAll() throws SQLException {
+    public List<Course> listCourses() throws SQLException {
         String command = "SELECT course_id, name, course_code, credits FROM courses ORDER BY course_code";
         //creating courses list for storing
         List<Course> courses = new ArrayList<>();

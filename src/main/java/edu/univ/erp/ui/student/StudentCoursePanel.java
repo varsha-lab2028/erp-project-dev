@@ -8,7 +8,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
 
-public class StudentCatalogPanel extends JPanel{
+public class StudentCoursePanel extends JPanel{
     //private final JTable table;
     private final JTextField search_field = new JTextField();
     private final JButton search_button = new JButton("Search");
@@ -18,7 +18,7 @@ public class StudentCatalogPanel extends JPanel{
 
 
     //constructor
-    public StudentCatalogPanel(){
+    public StudentCoursePanel(){
         setLayout(new BorderLayout());
 
         // Top bar (null layout to use setBounds inside a fixed-height panel)
@@ -51,7 +51,7 @@ public class StudentCatalogPanel extends JPanel{
         List<Course> tableList;
         String[] column = {"COURSE CODE","COURSE NAME","COURSE CREDITS"};
         try {
-            tableList = student_service.browseCatalog("");
+            tableList = student_service.browseCourseCatalog("");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

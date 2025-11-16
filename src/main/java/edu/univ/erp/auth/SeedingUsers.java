@@ -22,8 +22,35 @@ public class SeedingUsers {
             auth_dao.insertUser("student2", "STUDENT", "stu2@123");
         } catch (Exception ignored) {}
 
-        //seeding in instructor and students in erp_db table
+        //seeding IP profs in auth table
+        try {auth_dao.insertUser("md_shah",  "INSTRUCTOR", "mdshah@123"); } catch (Exception ignored) {}
+        try { auth_dao.insertUser("pankaj_jalote","INSTRUCTOR", "pankaj@123"); } catch (Exception ignored) {}
+        //seeding HCI profs in auth table
+        try {auth_dao.insertUser("sonal_keshwani","INSTRUCTOR", "sonal@123"); }catch (Exception ignored) {}
+        try {auth_dao.insertUser("pragma_kar","INSTRUCTOR", "pragma@123"); }catch (Exception ignored) {}
+        //seeding LA profs in auth table
+        try {auth_dao.insertUser("subhajit","INSTRUCTOR", "subhajit@123"); }catch (Exception ignored) {}
+        try {auth_dao.insertUser("prahlad_deb", "INSTRUCTOR", "prahlad@123"); }catch (Exception ignored) {}
+        //seeding COM prof in auth table
+        try {auth_dao.insertUser("payal", "INSTRUCTOR", "payalc@123"); }catch (Exception ignored) {}
+        //seeding DC prof in auth table
+        try {auth_dao.insertUser("pravesh_biyani", "INSTRUCTOR", "pravesh@123"); }catch (Exception ignored) {}
+        try {auth_dao.insertUser("tammam_tillo", "INSTRUCTOR", "tammam@123"); }catch (Exception ignored) {}
+
+
+        //seeding in instructor in erp table
         seedInstructors("instructor1", "Mr. Instructor 1","CSE");
+        seedInstructors("md_shah", "Md. Shah Akhtar", "CSE");
+        seedInstructors("pankaj_jalote", "Pankaj Jalote", "CSE");
+        seedInstructors("sonal_keshwani", "Sonal Keshwani", "DESIGN");
+        seedInstructors("pragma_kar", "Pragma Kar", "DESIGN");
+        seedInstructors("subhajit", "Subhajit Ghosechowdhury", "MATHEMATICS");
+        seedInstructors("prahlad_deb", "Prahlad Deb", "MATHEMATICS");
+        seedInstructors("payal", "Payal C Mukherjee", "COMMUNICATIONS");
+        seedInstructors("pravesh_biyani", "Pravesh Biyani", "ECE");
+        seedInstructors("tammam_tillo", "Tammam Tillo", "ECE");
+
+        //seeding students in erp table
         seedStudents("student1", "20250001", "B.Tech", "CSE", 1);
         seedStudents("student2", "20250002", "B.Tech", "CSE", 1);
 
@@ -31,8 +58,9 @@ public class SeedingUsers {
         seedCourses();
 
         //to seed in sections into the sections table
+        seedSections();
 
-        System.out.println("Information has been seeded successfully");
+        System.out.println("Everything seeded successfully");
     }
 
     private static long findUserIdByUsername(String username) throws Exception {
@@ -100,27 +128,140 @@ public class SeedingUsers {
         }
     }
 
-    /*
     private static void seedSections() throws Exception{
+        //getting the prof ids by finding through username
+        long ip_id1   = findUserIdByUsername("md_shah");
+        long ip_id2  = findUserIdByUsername("pankaj_jalote");
+        long hci_id1  = findUserIdByUsername("sonal_keshwani");
+        long hci_id2 = findUserIdByUsername("pragma_kar");
+        long la_id1  = findUserIdByUsername("subhajit");
+        long la_id2 = findUserIdByUsername("prahlad_deb");
+        long com_id1 = findUserIdByUsername("payal");
+        long dc_id1 = findUserIdByUsername("pravesh_biyani");
+        long dc_id2 = findUserIdByUsername("tammam_tillo");
+
         String command = "INSERT IGNORE INTO sections " +
-                "(course_id, instructor_id, day_time, room, capacity, sem_no, sem_season, year) " +
-                "VALUES ((SELECT course_id FROM courses WHERE course_code=?), " +
-                " (SELECT i.user_id FROM erp_db.instructors i " +
-                "JOIN auth_db.users_auth u ON u.user_id=i.user_id AND u.role='INSTRUCTOR' " +
-                "WHERE u.username=?), ?, ?, ?, ?, ?, ? )";
+                "(course_code, instructor_id, instructor_name, day, timings, classroom, capacity, sem_no, sem_season, year) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?)";
         try (Connection c = ServerConnector.erp().getConnection();
              PreparedStatement ps = c.prepareStatement(command)) {
-            //for IP course, only a single section
+
+            //IP Section A
             ps.setString(1, "CSE101");
-            ps.setString(2, "prof_prog");
-            ps.setString(3, "Mon 09:00–10:30");
-            ps.setString(4, "LHC-C101");
-            ps.setInt(5, 60);
-            ps.setInt(6, 1);
-            ps.setString(7, "Fall");
-            ps.setInt(8, 2025);
+            ps.setLong(2, ip_id1);
+            ps.setString(3, "Md. Shah Akhtar");
+            ps.setString(4, "MONDAY, WEDNESDAY");
+            ps.setString(5, "9:00 am - 10:30 am");
+            ps.setString(6, "LHC-C101");
+            ps.setInt(7, 300);
+            ps.setInt(8, 1);
+            ps.setString(9, "MONSOON");
+            ps.setInt(10, 2025);
+            ps.executeUpdate();
+
+            //IP section B
+            ps.setString(1, "CSE101");
+            ps.setLong(2, ip_id2);
+            ps.setString(3, "Pankaj Jalote");
+            ps.setString(4, "MONDAY, WEDNESDAY");
+            ps.setString(5, "9:00 am - 10:30 am");
+            ps.setString(6, "LHC-C201");
+            ps.setInt(7, 300);
+            ps.setInt(8, 1);
+            ps.setString(9, "MONSOON");
+            ps.setInt(10, 2025);
+            ps.executeUpdate();
+
+            //LA SECTION A
+            ps.setString(1, "MTH100");
+            ps.setLong(2, la_id1);
+            ps.setString(3, "Subhajit Ghosechowdhury");
+            ps.setString(4, "MONDAY, WEDNESDAY");
+            ps.setString(5, "10:45 am - 12:15 pm");
+            ps.setString(6, "LHC-C101");
+            ps.setInt(7, 300);
+            ps.setInt(8, 1);
+            ps.setString(9, "MONSOON");
+            ps.setInt(10, 2025);
+            ps.executeUpdate();
+
+            //LA SECTION B
+            ps.setString(1, "MTH100");
+            ps.setLong(2, la_id2);
+            ps.setString(3, "Prahlad Deb");
+            ps.setString(4, "MONDAY, WEDNESDAY");
+            ps.setString(5, "10:45 am - 12:15 pm");
+            ps.setString(6, "LHC-C201");
+            ps.setInt(7, 300);
+            ps.setInt(8, 1);
+            ps.setString(9, "MONSOON");
+            ps.setInt(10, 2025);
+            ps.executeUpdate();
+
+            //HCI SECTION A
+            ps.setString(1, "DES204");
+            ps.setLong(2, hci_id1);
+            ps.setString(3, "Sonal Keshwani");
+            ps.setString(4, "TUESDAY, THURSDAY");
+            ps.setString(5, "9:00 am - 10:30 am");
+            ps.setString(6, "LHC-C101");
+            ps.setInt(7, 300);
+            ps.setInt(8, 1);
+            ps.setString(9, "MONSOON");
+            ps.setInt(10, 2025);
+            ps.executeUpdate();
+
+            //HCI SECTION B
+            ps.setString(1, "DES204");
+            ps.setLong(2, hci_id2);
+            ps.setString(3, "Pragma Kar");
+            ps.setString(4, "TUESDAY, THURSDAY");
+            ps.setString(5, "9:00 am - 10:30 am");
+            ps.setString(6, "LHC-C201");
+            ps.setInt(7, 300);
+            ps.setInt(8, 1);
+            ps.setString(9, "MONSOON");
+            ps.setInt(10, 2025);
+            ps.executeUpdate();
+
+            //DC SECTION A
+            ps.setString(1, "ECE111");
+            ps.setLong(2, dc_id1);
+            ps.setString(3, "Pravesh Biyani");
+            ps.setString(4, "TUESDAY, THURSDAY");
+            ps.setString(5, "10:45 am - 12:15 pm");
+            ps.setString(6, "LHC-C101");
+            ps.setInt(7, 300);
+            ps.setInt(8, 1);
+            ps.setString(9, "MONSOON");
+            ps.setInt(10, 2025);
+            ps.executeUpdate();
+
+            //DC SECTION B
+            ps.setString(1, "ECE111");
+            ps.setLong(2, dc_id2);
+            ps.setString(3, "Tammam Tillo");
+            ps.setString(4, "TUESDAY, THURSDAY");
+            ps.setString(5, "10:45 am - 12:15 pm");
+            ps.setString(6, "LHC-C201");
+            ps.setInt(7, 300);
+            ps.setInt(8, 1);
+            ps.setString(9, "MONSOON");
+            ps.setInt(10, 2025);
+            ps.executeUpdate();
+
+            //COM, ONLY A SINGLE SECTION
+            ps.setString(1, "COM101");
+            ps.setLong(2, com_id1);
+            ps.setString(3, "Payal C Mukherjee");
+            ps.setString(4, "FRIDAY");
+            ps.setString(5, "3:00 pm - 6:00 pm");
+            ps.setString(6, "LHC-C102");
+            ps.setInt(7, 600);
+            ps.setInt(8, 1);
+            ps.setString(9, "MONSOON");
+            ps.setInt(10, 2025);
             ps.executeUpdate();
         }
     }
-     */
 }

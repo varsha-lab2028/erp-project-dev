@@ -15,11 +15,11 @@ public class StudentService {
     private final EnrollmentDAO enrollment_dao = new EnrollmentDAO();
     private final TimeTableDAO timetable_dao = new TimeTableDAO();
 
-    //Catalog = seeing the available courses during a particular semester
-    public List<Course> browseCatalog(String q) throws SQLException {
-        // If no search keyword is given, show the full catalog
+    //course catalog = seeing the available courses during a particular semester
+    public List<Course> browseCourseCatalog(String q) throws SQLException {
         if (q == null || q.isBlank()) {
-            return course_dao.listAll(); //fetches all the courses
+            //fetches all the available courses
+            return course_dao.listCourses();
         }
         else {
             // If a keyword is entered, search by course code or name
@@ -27,6 +27,17 @@ public class StudentService {
         }
     }
 
+    //section catalog = seeing the professors and other section information
+    public List<Section> browseSectionCatalog(String q) throws SQLException {
+        if (q == null || q.isBlank()) {
+            //fetches all the course sections
+            return section_dao.listAllSections();
+        }
+        else {
+            // If a keyword is entered, search by course code or name
+            return section_dao.searchSection(q);
+        }
+    }
 
     //register = registering a student into a section
     public String registerForSection(long studentId, long sectionId) throws SQLException {

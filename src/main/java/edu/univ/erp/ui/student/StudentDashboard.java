@@ -23,27 +23,29 @@ public class StudentDashboard extends BaseDashboard{
         actions.setBackground(new Color(0,0,82));
 
         actions.setPreferredSize(new Dimension(900, 60));
-        JButton browse = new JButton("Browse Catalog");
+        JButton course_catalog = new JButton("Course Catalog");
+        JButton section_catalog = new JButton("Section Catalog");
         JButton regs = new JButton("My Registrations");
         JButton timetable = new JButton("Timetable");
         JButton grades = new JButton("Grades");
         JButton transcript = new JButton("Transcript");
 
         // Place with setBounds
-        browse.setBounds(10, 10, 150, 30);
+        course_catalog.setBounds(10, 10, 150, 30);
         regs.setBounds(170, 10, 150, 30);
         timetable.setBounds(330, 10, 150, 30);
         grades.setBounds(490, 10, 150, 30);
         transcript.setBounds(650, 10, 150, 30);
 
-        actions.add(browse); actions.add(regs); actions.add(timetable); actions.add(grades); actions.add(transcript);
+        actions.add(course_catalog); actions.add(regs); actions.add(timetable); actions.add(grades); actions.add(transcript);
         add(actions, BorderLayout.NORTH);
 
         // Default panel
-        setCenter(new StudentCatalogPanel());
+        setCenter(new StudentCoursePanel());
 
         // Switchers
-        browse.addActionListener(e -> setCenter(new StudentCatalogPanel()));
+        course_catalog.addActionListener(e -> setCenter(new StudentCoursePanel()));
+        //section_catalog.addActionListener(e -> setCenter(new StudentSectionPanel()));
         regs.addActionListener(e -> setCenter(new StudentRegistrationsPanel()));
         timetable.addActionListener(e -> setCenter(new StudentTimetablePanel()));
         grades.addActionListener(e -> setCenter(new StudentGradesPanel()));
