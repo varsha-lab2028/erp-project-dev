@@ -41,17 +41,20 @@ public class StudentService {
     }
 
     //registering a student into a section
-    public String registerForSection(long student_id, long section_id) throws SQLException {
+    public void registerForSection(long student_id, long section_id) throws SQLException {
         if (enrollment_dao.checkRecordExistence(student_id, section_id)) {
-            return "You have already registered for this section";
+            throw new IllegalStateException("You are already registered in this section.");
         }
         int total_capacity = section_dao.capacityOfSection(section_id);
+        if(total_capacity <= 0){
+            throw new IllegalStateException("Section does not exist.");
+        }
         int current_capacity = enrollment_dao.countEnrolledInSection(section_id);
         if (current_capacity >= total_capacity) {
-            return "Section full";
+            throw new IllegalStateException("This section is full.");
         }
+        //if all checks passed, enrollment gets inserted
         enrollment_dao.insertStudentEnrollment(student_id, section_id);
-        return "Registered successfully";
     }
 
     //drop rule = only after registration ends
@@ -112,6 +115,18 @@ public class StudentService {
             if (s != null) result.add(s);
         }
         return result;
+    }
+
+    public List<Section> listRegisteredSections(long student_id) throws SQLException {
+        return getRegisteredSectionsList(student_id);
+    }
+
+    public void dropRegisteredSection(long studentId, long sectionId) throws SQLException {
+        String message = dropSection(studentId, sectionId);
+        if (!message.startsWith("Dropped successfully")) {
+            // let the UI decide whether to show this as warning
+            throw new IllegalStateException(message);
+        }
     }
 
     //to display and view the timetable

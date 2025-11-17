@@ -1,9 +1,7 @@
 package edu.univ.erp.data;
 
-//import edu.univ.erp.domain.DayOfTheWeek;
 import edu.univ.erp.domain.Section;
-import edu.univ.erp.domain.SemesterSeason;
-
+//import edu.univ.erp.domain.SemesterSeason;
 import java.sql.*;
 import java.util.*;
 
@@ -59,21 +57,19 @@ public class SectionDAO {
 
     //searching a section
     public List<Section> searchSection(String keyword) throws SQLException {
-        String sql = """
+        String command = """
         SELECT s.section_id, s.course_code, s.instructor_id, s.instructor_name, s.day, s.timings, s.classroom,
                s.capacity, s.sem_no, s.sem_season, s.year
         FROM sections s
-        JOIN instructors i ON s.instructor_id = i.instructor_id
-        WHERE s.course_code LIKE ? OR i.name LIKE ?
-        ORDER BY s.course_code
+        WHERE s.course_code LIKE ? ORDER BY s.course_code, s.section_id
     """;
         List<Section> searched_section = new ArrayList<>();
         try (Connection conn = ServerConnector.ERPConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(command)) {
 
+            //searching by just the course code
             String like = "%" + keyword + "%";
             ps.setString(1, like);
-            ps.setString(2, like);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

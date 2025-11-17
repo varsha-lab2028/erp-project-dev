@@ -1,14 +1,19 @@
 package edu.univ.erp.ui.student;
 import edu.univ.erp.access.AccessControl;
 import edu.univ.erp.domain.Section;
+import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.service.StudentService;
+
+import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
 
-public class StudentSectionPanel extends JPanel{
-    private JTable section_table; //for onRegister() method
+public class StudentSectionPanel extends JPanel {
+    private JTable section_table;
+    private List<Section> current_sections; //rows currently shown in the table
 
     private final JTextField search_field = new JTextField();
     private final JButton search_button = new JButton("Search");
@@ -17,7 +22,7 @@ public class StudentSectionPanel extends JPanel{
     private final StudentService student_service = new StudentService();
 
     //constructor
-    public StudentSectionPanel(){
+    public StudentSectionPanel() {
         setLayout(new BorderLayout());
 
         //top bar
@@ -27,8 +32,11 @@ public class StudentSectionPanel extends JPanel{
         search_label.setBounds(10, 10, 60, 24);
         search_field.setBounds(70, 10, 260, 24);
         search_button.setBounds(340, 10, 100, 24);
+
         register_button.setBounds(460, 10, 160, 24);
-        register_button.setEnabled(AccessControl.canAccess("STU_REGISTER"));
+        //register_button.setEnabled(AccessControl.canAccess("STU_REGISTER"));
+        register_button.setEnabled(true); //right now, it is temporary
+
 
         //adding these to the top bar
         top.add(search_label);
@@ -37,44 +45,24 @@ public class StudentSectionPanel extends JPanel{
         top.add(register_button);
         add(top, BorderLayout.NORTH);
 
-        //table center
-        section_table = new JTable();
-        section_table.setBackground(new Color(185, 227, 223));
-        JScrollPane sp = new JScrollPane(section_table);
-        sp.setBounds(10, 60, 880, 500);
-        add(sp, BorderLayout.CENTER);
-
-        //status bar placed in the south of the interface
-        JPanel south = new JPanel(new BorderLayout());
-        south.add(status_label, BorderLayout.WEST);
-        add(south, BorderLayout.SOUTH);
-
-        // initial load (no search filter)
-        loadSections("");
-
-        // Actions
-        search_button.addActionListener(e -> loadSections(search_field.getText().trim()));
-        // later you can wire register_button to a method using section_table selection
-    }
-
-    //loading sections and add them in the table
-    private void loadSections(String query) {
+        //loading the sections into the table
         List<Section> sectionTable_list;
+        String[] columns = {"COURSE CODE", "INSTRUCTOR NAME", "DAY", "TIMINGS", "CLASSROOM", "CAPACITY",};
         try {
-            sectionTable_list = student_service.browseSectionCatalog(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
+            sectionTable_list = student_service.browseSectionCatalog("");
+        } catch (SQLException sqlE) {
+            sqlE.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Failed to load sections: " + e.getMessage(),
+                    "Error loading sections: " + sqlE.getMessage(),
                     "Database Error",
                     JOptionPane.ERROR_MESSAGE
             );
-            return;
+            sectionTable_list = Collections.emptyList();
         }
 
-        // column names for the section catalog table
-        String[] columns = {"COURSE CODE", "INSTRUCTOR NAME", "DAY", "TIMINGS", "CLASSROOM", "CAPACITY",};
+        current_sections = sectionTable_list;
+
         Object[][] data = new Object[sectionTable_list.size()][columns.length];
         for (int i = 0; i < sectionTable_list.size(); i++) {
             Section s = sectionTable_list.get(i);
@@ -86,16 +74,100 @@ public class StudentSectionPanel extends JPanel{
             data[i][5] = s.getCapacity();
         }
 
-        // replace table model
-        section_table.setModel(new javax.swing.table.DefaultTableModel(
-                data,
-                columns
-        ) {
+        DefaultTableModel model = new DefaultTableModel(data, columns) {
             @Override
-            public boolean isCellEditable(int row, int col) {
+            public boolean isCellEditable(int r, int c) {
                 return false;
             }
-        });
+        };
+
+        //table center
+        section_table = new JTable(model);
+        section_table.setBackground(new Color(185, 227, 223));
+        JScrollPane sp = new JScrollPane(section_table);
+        //sp.setBounds(10, 60, 880, 500);
+        add(sp, BorderLayout.CENTER);
+
+        //status bar placed in the south of the interface
+        JPanel south = new JPanel(new BorderLayout());
+        south.add(status_label, BorderLayout.WEST);
+        add(south, BorderLayout.SOUTH);
         status_label.setText(sectionTable_list.size() + " sections");
+
+        //search action listener
+        search_button.addActionListener(e -> {
+            String keyword = search_field.getText().trim();
+            List<Section> search_list;
+            try {
+                search_list = student_service.browseSectionCatalog(keyword);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error loading sections.");
+                return;
+            }
+
+            current_sections = search_list;
+
+            Object[][] newData = new Object[search_list.size()][columns.length];
+            for (int i = 0; i < search_list.size(); i++) {
+                Section s = search_list.get(i);
+                newData[i][0] = s.getCourseCode();
+                newData[i][1] = s.getInstructorName();
+                newData[i][2] = s.getDay();
+                newData[i][3] = s.getTimings();
+                newData[i][4] = s.getClassroom();
+                newData[i][5] = s.getCapacity();
+            }
+
+            DefaultTableModel new_model = new DefaultTableModel(newData, columns) {
+                @Override public boolean isCellEditable(int row, int col) { return false; }
+            };
+            section_table.setModel(new_model);
+            status_label.setText(search_list.size() + " sections");
+        });
+
+        //register action listener
+        register_button.addActionListener(e -> registerSelectedSection());
+    }
+    private void registerSelectedSection(){
+        int row = section_table.getSelectedRow();
+        if(row < 0){
+            JOptionPane.showMessageDialog(this, "Please select a section first.");
+            return;
+        }
+
+        /* commenting this out for now cause we dont have login yet
+        if (!Session.isLoggedIn()) {
+            JOptionPane.showMessageDialog(this, "You must be logged in.");
+            return;
+        }
+        if (!AccessControl.canAccess("STU_REGISTER")) {
+            JOptionPane.showMessageDialog(this, "Registration disabled. ERP currently under maintenance");
+            return;
+        }
+         */
+
+        Section s = current_sections.get(row);
+        //long student_id = Session.user().getUserId();
+        long student_id = 3L; //just for testing right now
+
+        try {
+            student_service.registerForSection(student_id, s.getSectionId());
+            JOptionPane.showMessageDialog(this,
+                    "Successfully registered for " + s.getCourseCode());
+
+        } catch (IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Failed", JOptionPane.WARNING_MESSAGE);
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Database error: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
+
+
+
+
