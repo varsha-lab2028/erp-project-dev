@@ -9,7 +9,7 @@ import java.awt.*;
 public class StudentDashboard extends BaseDashboard{
     private final StudentService student_service = new StudentService();
 
-    //the methods fetch data about the currently logged in student
+    //these methods will fetch data about the currently logged in student
     private long studentId() { return Session.userId(); }
     private SemesterSeason semSeason() { return Session.getSemesterSeason(); }
     private int semNo() { return Session.getSemesterNumber(); }
@@ -30,7 +30,7 @@ public class StudentDashboard extends BaseDashboard{
         JButton grades = new JButton("Grades");
         JButton transcript = new JButton("Transcript");
 
-        // Place with setBounds
+        //placing the buttons
         course_catalog.setBounds(10, 10, 150, 30);
         section_catalog.setBounds(160, 10, 140, 30);
         regs.setBounds(170, 10, 150, 30);
@@ -46,10 +46,10 @@ public class StudentDashboard extends BaseDashboard{
         actions.add(transcript);
         add(actions, BorderLayout.NORTH);
 
-        // Default panel
+        //this will be the default panel when you log in to the erp
         setCenter(new StudentCoursePanel());
 
-        // Switchers
+        //switching buttons when you click on them
         course_catalog.addActionListener(e -> setCenter(new StudentCoursePanel()));
         section_catalog.addActionListener(e -> setCenter(new StudentSectionPanel()));
         regs.addActionListener(e -> setCenter(new StudentRegistrationsPanel()));

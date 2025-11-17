@@ -60,7 +60,7 @@ public class SectionDAO {
     //searching a section
     public List<Section> searchSection(String keyword) throws SQLException {
         String sql = """
-        SELECT s.section_id, s.course_code, s.instructor_id, s.day, s.timings, s.classroom,
+        SELECT s.section_id, s.course_code, s.instructor_id, s.instructor_name, s.day, s.timings, s.classroom,
                s.capacity, s.sem_no, s.sem_season, s.year
         FROM sections s
         JOIN instructors i ON s.instructor_id = i.instructor_id
@@ -94,5 +94,35 @@ public class SectionDAO {
             }
         }
         return searched_section;
+    }
+
+    //finding the section id
+    public Section findBySectionId(long section_id) throws SQLException {
+        String sql = """
+        SELECT section_id, course_code, instructor_id, instructor_name, day, timings, classroom,
+               capacity, sem_no, sem_season, year FROM sections WHERE section_id = ? """;
+
+        try (Connection conn = ServerConnector.ERPConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, section_id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Section(
+                            rs.getLong("section_id"),
+                            rs.getString("course_code"),
+                            rs.getLong("instructor_id"),
+                            rs.getString("instructor_name"),
+                            rs.getString("day"),
+                            rs.getString("timings"),
+                            rs.getString("classroom"),
+                            rs.getInt("capacity"),
+                            rs.getInt("sem_no"),
+                            rs.getString("sem_season"),
+                            rs.getInt("year")
+                    );
+                }
+                return null;
+            }
+        }
     }
 }

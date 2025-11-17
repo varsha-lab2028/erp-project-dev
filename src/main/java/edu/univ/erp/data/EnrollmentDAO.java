@@ -2,18 +2,19 @@ package edu.univ.erp.data;
 
 import edu.univ.erp.domain.Enrollment;
 import edu.univ.erp.domain.EnrollmentStatus;
+import edu.univ.erp.domain.Section;
+
 import java.sql.*;
 import java.util.*;
 
-//user_id is the student's id here
-//this DAO has been made to perform student-section registration.
+//this DAO is the backend for performing registrations
 public class EnrollmentDAO {
     //checking if a student has already been enrolled in the section
-    public boolean checkRecordExistence(long user_id, long section_id) throws SQLException{
-        String command = "SELECT 1 FROM enrollments WHERE user_id=? AND section_id=? AND e_status='REGISTERED'";
+    public boolean checkRecordExistence(long student_id, long section_id) throws SQLException{
+        String command = "SELECT 1 FROM enrollments WHERE student_id=? AND section_id=? AND e_status='REGISTERED'";
         try(Connection connection = ServerConnector.ERPConnection();
             PreparedStatement ps = connection.prepareStatement(command)){
-            ps.setLong(1, user_id);
+            ps.setLong(1, student_id);
             ps.setLong(2, section_id);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
@@ -21,7 +22,7 @@ public class EnrollmentDAO {
         }
     }
 
-    //returning the number of students in a course's section
+    //counting the number of students who are currently registered in a section
     public int countEnrolledInSection(long section_id) throws SQLException{
         String command = "SELECT COUNT(*) FROM enrollments WHERE section_id=? AND e_status='REGISTERED'";
         try (Connection connection = ServerConnector.ERPConnection();
@@ -37,30 +38,29 @@ public class EnrollmentDAO {
         }
     }
 
-    //method to insert a student into the enrollment record
-    public void insertStudentEnrollment(long user_id, long section_id) throws SQLException{
+    //inserting a student who has registered for a section
+    public void insertStudentEnrollment(long student_id, long section_id) throws SQLException{
         String command = """
             INSERT INTO enrollments(student_id, section_id, e_status, registered_when)
             VALUES (?, ?, 'REGISTERED', NOW())
         """;
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
-            ps.setLong(1, user_id);
+            ps.setLong(1, student_id);
             ps.setLong(2, section_id);
             ps.executeUpdate();
         }
     }
 
     //removing a student if they have dropped from the course's section
-    public static void removeStudentEnrollment(long user_id, long section_id) throws SQLException{
+    public static void removeStudentEnrollment(long student_id, long section_id) throws SQLException{
         String command = """
-            UPDATE enrollments
-            SET e_status='DROPPED', dropped_when=NOW()
+            UPDATE enrollments SET e_status='DROPPED', dropped_when=NOW()
             WHERE student_id=? AND section_id=? AND e_status='REGISTERED'
         """;
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
-            ps.setLong(1, user_id);
+            ps.setLong(1, student_id);
             ps.setLong(2, section_id);
             ps.executeUpdate();
         }
@@ -68,22 +68,21 @@ public class EnrollmentDAO {
 
     //if a student has completed the course in a section
     //this info will be used by the instructor or admin later
-    public void markCourseComplete(long user_id, long section_id) throws SQLException{
+    public void markCourseComplete(long student_id, long section_id) throws SQLException{
         String command = """
-            UPDATE enrollments
-            SET e_status='COMPLETED', completed_when=NOW()
+            UPDATE enrollments SET e_status='COMPLETED', completed_when=NOW()
             WHERE student_id=? AND section_id=? AND e_status='REGISTERED'
         """;
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
-            ps.setLong(1, user_id);
+            ps.setLong(1, student_id);
             ps.setLong(2, section_id);
             ps.executeUpdate();
         }
     }
 
-    //method to list all the students that have been enrolled in the section so far
-    public List<Enrollment> listByStudent(long user_id) throws SQLException {
+    //listing all the students that have been enrolled in the section so far
+    public List<Enrollment> listEnrolledStudents(long student_id) throws SQLException {
         String command = """
             SELECT enrollment_id, student_id, section_id, e_status,
             registered_when, dropped_when, completed_when
@@ -93,9 +92,9 @@ public class EnrollmentDAO {
         """;
 
         List<Enrollment> enrollments = new ArrayList<>();
-        try (Connection conn = ServerConnector.ERPConnection();
-             PreparedStatement ps = conn.prepareStatement(command)) {
-            ps.setLong(1, user_id);
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(command)) {
+            ps.setLong(1, student_id);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     enrollments.add(new Enrollment(
@@ -111,5 +110,43 @@ public class EnrollmentDAO {
             }
         }
         return enrollments;
+    }
+
+    //listing all actively registered sections of a student
+    public List<Section> listRegisteredSections(long student_id) throws SQLException {
+        String sql = """
+            SELECT s.section_id, s.course_code, s.instructor_id, s.instructor_name,
+                   s.day, s.timings, s.classroom,
+                   s.capacity, s.sem_no, s.sem_season, s.year
+            FROM enrollments e
+            JOIN sections s ON e.section_id = s.section_id
+            WHERE e.student_id = ? AND e.e_status = 'REGISTERED'
+            ORDER BY s.course_code, s.section_id
+        """;
+
+        List<Section> registered_sections = new ArrayList<>();
+
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, student_id);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    registered_sections.add(new Section(
+                            rs.getLong("section_id"),
+                            rs.getString("course_code"),
+                            rs.getLong("instructor_id"),
+                            rs.getString("instructor_name"),
+                            rs.getString("day"),
+                            rs.getString("timings"),
+                            rs.getString("classroom"),
+                            rs.getInt("capacity"),
+                            rs.getInt("sem_no"),
+                            rs.getString("sem_season"),
+                            rs.getInt("year")
+                    ));
+                }
+            }
+        }
+        return registered_sections;
     }
 }

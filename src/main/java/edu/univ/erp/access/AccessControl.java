@@ -10,13 +10,23 @@ public class AccessControl {
     public static boolean isReadOnlyNow(){ return maintenance.isMaintenanceOn(); }
 
     public static boolean canAccess(String action){
-        if (!Session.isLoggedIn()) return false;
-        Role r = Session.user().getRole();
-        return switch (action) {
-            case "ADMIN_MANAGE" -> r == Role.ADMIN && !isReadOnlyNow();
-            case "INSTR_EDIT_GRADES" -> r == Role.INSTRUCTOR && !isReadOnlyNow();
-            case "STU_REGISTER" -> r == Role.STUDENT && !isReadOnlyNow();
-            default -> true; // read-only actions
-        };
+        if (!Session.isLoggedIn()) {
+            return false;
+        }
+        Role role = Session.user().getRole(); //to know the role of the currently logged-in user
+        boolean maintenanceOn = isReadOnlyNow();
+        //admin managing
+        if (action.equals("ADMIN_MANAGE")) {
+            return role == Role.ADMIN;
+        }
+        //instructor editing the grades
+        if (action.equals("INSTR_EDIT_GRADES")) {
+            return role == Role.INSTRUCTOR && !maintenanceOn;
+        }
+        //student who is registering and dropping the courses
+        if (action.equals("STU_REGISTER")) {
+            return role == Role.STUDENT && !maintenanceOn;
+        }
+        return true;
     }
 }

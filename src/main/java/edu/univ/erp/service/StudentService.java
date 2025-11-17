@@ -14,63 +14,59 @@ public class StudentService {
     private final SectionDAO section_dao = new SectionDAO();
     private final EnrollmentDAO enrollment_dao = new EnrollmentDAO();
     private final TimeTableDAO timetable_dao = new TimeTableDAO();
+    private final GradeDAO grade_dao = new GradeDAO();
 
     //course catalog = seeing the available courses during a particular semester
-    public List<Course> browseCourseCatalog(String q) throws SQLException {
-        if (q == null || q.isBlank()) {
+    public List<Course> browseCourseCatalog(String keyword) throws SQLException {
+        if (keyword == null || keyword.isBlank()) {
             //fetches all the available courses
             return course_dao.listCourses();
         }
         else {
-            // If a keyword is entered, search by course code or name
-            return course_dao.searchCourse(q);
+            // If a keyword is entered, course is search either through name or course code
+            return course_dao.searchCourse(keyword);
         }
     }
 
     //section catalog = seeing the professors and other section information
-    public List<Section> browseSectionCatalog(String q) throws SQLException {
-        if (q == null || q.isBlank()) {
+    public List<Section> browseSectionCatalog(String keyword) throws SQLException {
+        if (keyword == null || keyword.isBlank()) {
             //fetches all the course sections
             return section_dao.listAllSections();
         }
         else {
             // if a keyword is entered, search the section
-            return section_dao.searchSection(q);
+            return section_dao.searchSection(keyword);
         }
     }
 
-    //register = registering a student into a section
-    public String registerForSection(long studentId, long sectionId) throws SQLException {
-        if (enrollment_dao.checkRecordExistence(studentId, sectionId)) {
+    //registering a student into a section
+    public String registerForSection(long student_id, long section_id) throws SQLException {
+        if (enrollment_dao.checkRecordExistence(student_id, section_id)) {
             return "You have already registered for this section";
         }
-        int total_capacity = section_dao.capacityOfSection(sectionId);
-        int current_capacity = enrollment_dao.countEnrolledInSection(sectionId);
-        if (total_capacity >= current_capacity) {
+        int total_capacity = section_dao.capacityOfSection(section_id);
+        int current_capacity = enrollment_dao.countEnrolledInSection(section_id);
+        if (current_capacity >= total_capacity) {
             return "Section full";
         }
-        enrollment_dao.insertStudentEnrollment(studentId, sectionId);
-        return "Registered";
+        enrollment_dao.insertStudentEnrollment(student_id, section_id);
+        return "Registered successfully";
     }
 
-    /*drop method = students are provided the option to drop a course they
-    * are not interested in 10 days after the registration of courses window ends.
-    * otherwise it will be frozen*/
-    public String dropSection(long studentId, long sectionId) throws SQLException{
-        if (!enrollment_dao.checkRecordExistence(studentId, sectionId)) {
+    //drop rule = only after registration ends
+    public String dropSection(long student_id, long section_id) throws SQLException{
+        if (!enrollment_dao.checkRecordExistence(student_id, section_id)) {
             return "Not registered in this section";
         }
 
-        /*can be shown in the user interface*/
         //check the final registration date for the current semester
         LocalDateTime final_reg_date = SettingsDAO.getDateTime("registration.finalDate");
         if (final_reg_date == null) {
             return "Drop policy not configured";
         }
 
-        //calculate the drop window
-        //start time = midnight after the final registration date
-        //end = 10 days after the start time at 23:59:59
+        //calculating the drop window
         LocalDateTime start_drop = final_reg_date.toLocalDate().plusDays(1).atStartOfDay();
         LocalDateTime end_drop = start_drop.plusDays(10).minusSeconds(1);
         LocalDateTime current_time = LocalDateTime.now();
@@ -96,23 +92,40 @@ public class StudentService {
             message = days_left + " days left";
         }
 
-        EnrollmentDAO.removeStudentEnrollment(studentId, sectionId);
+        EnrollmentDAO.removeStudentEnrollment(student_id, section_id);
         return "Dropped successfully (" + message + ")";
+    }
+
+    //returning the currently registered sections of a student
+    public List<Section> getRegisteredSectionsList(long student_id) throws SQLException {
+        List<Enrollment> all = enrollment_dao.listEnrolledStudents(student_id);
+
+        //keep only active registrations
+        List<Enrollment> active_registrations = all.stream()
+                .filter(e -> e.getStatus() == EnrollmentStatus.REGISTERED)
+                .toList();
+
+        //converting Enrollment to Section, through enrollments we get section information
+        List<Section> result = new java.util.ArrayList<>();
+        for (Enrollment e : active_registrations) {
+            Section s = section_dao.findBySectionId(e.getSectionId());
+            if (s != null) result.add(s);
+        }
+        return result;
     }
 
     //to display and view the timetable
     public List<TimeTableRow> timetable(long studentId) throws SQLException {
-        return TimeTableDAO.getTimetableForStudent(studentId);
+        return timetable_dao.getTimetableForStudent(studentId);
     }
 
     //to display and view the grades
     public List<GradeComponent> getGrades(long studentId, int semNo, String semSeason, int year) throws SQLException {
-        return GradeDAO.listGradeComponents(studentId, semNo, semSeason, year);
+        return grade_dao.listGradeComponents(studentId, semNo, semSeason, year);
     }
 
     //getting transcript of the completed courses, will be shown in UI
     public List<FinalGrade> getTranscript(long studentId, int semNo, String semSeason, int year) throws SQLException {
-        return GradeDAO.listFinalGrades(studentId, semNo, semSeason, year);
+        return grade_dao.listFinalGrades(studentId, semNo, semSeason, year);
     }
-
 }

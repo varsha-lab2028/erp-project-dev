@@ -4,7 +4,6 @@ import edu.univ.erp.domain.Section;
 import edu.univ.erp.service.StudentService;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
 
@@ -24,15 +23,15 @@ public class StudentSectionPanel extends JPanel{
         //top bar
         JPanel top = new JPanel(null);
         top.setPreferredSize(new Dimension(900, 44));
-
-        JLabel lbl = new JLabel("Search:");
-        lbl.setBounds(10, 10, 60, 24);
+        JLabel search_label = new JLabel("Search:");
+        search_label.setBounds(10, 10, 60, 24);
         search_field.setBounds(70, 10, 260, 24);
         search_button.setBounds(340, 10, 100, 24);
         register_button.setBounds(460, 10, 160, 24);
         register_button.setEnabled(AccessControl.canAccess("STU_REGISTER"));
 
-        top.add(lbl);
+        //adding these to the top bar
+        top.add(search_label);
         top.add(search_field);
         top.add(search_button);
         top.add(register_button);
@@ -45,7 +44,7 @@ public class StudentSectionPanel extends JPanel{
         sp.setBounds(10, 60, 880, 500);
         add(sp, BorderLayout.CENTER);
 
-        // ── Status south ───────────────────────────────────────
+        //status bar placed in the south of the interface
         JPanel south = new JPanel(new BorderLayout());
         south.add(status_label, BorderLayout.WEST);
         add(south, BorderLayout.SOUTH);
@@ -97,7 +96,6 @@ public class StudentSectionPanel extends JPanel{
                 return false;
             }
         });
-
         status_label.setText(sectionTable_list.size() + " sections");
     }
 }

@@ -66,7 +66,7 @@ public class Section{
     }
 
     //getters
-    public long getId(){
+    public long getSectionId(){
         return section_id;
     }
     public String getCourseCode(){

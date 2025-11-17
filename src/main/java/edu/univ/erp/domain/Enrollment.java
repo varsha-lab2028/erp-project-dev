@@ -60,4 +60,10 @@ public class Enrollment {
     public boolean isActive(){
         return e_status == EnrollmentStatus.DROPPED;
     }
+    public EnrollmentStatus getStatus(){
+        return e_status;
+    }
+    public long getSectionId(){
+        return section_id;
+    }
 }
