@@ -1,4 +1,4 @@
-package edu.univ.erp.ui.student;
+package edu.univ.erp.ui.dashboards.student;
 //import com.formdev.flatlaf.ui.FlatListCellBorder;
 import edu.univ.erp.access.AccessControl;
 import edu.univ.erp.domain.Course;

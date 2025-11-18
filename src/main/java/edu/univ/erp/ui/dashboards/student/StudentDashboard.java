@@ -1,4 +1,4 @@
-package edu.univ.erp.ui.student;
+package edu.univ.erp.ui.dashboards.student;
 
 import edu.univ.erp.domain.SemesterSeason;
 import edu.univ.erp.service.StudentService;

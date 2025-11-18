@@ -1,4 +1,4 @@
-package edu.univ.erp.ui.student;
+package edu.univ.erp.ui.dashboards.student;
 
 import edu.univ.erp.util.RoundedButton;
 import edu.univ.erp.auth.session.Session;
