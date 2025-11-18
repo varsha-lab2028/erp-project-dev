@@ -1,4 +1,4 @@
-package edu.univ.erp.ui.student;
+package edu.univ.erp.ui.dashboards.student;
 
 import edu.univ.erp.access.AccessControl;
 import edu.univ.erp.auth.session.Session; //will use it after log in is fully complete

@@ -1,4 +1,4 @@
-package edu.univ.erp.ui.student;
+package edu.univ.erp.ui.dashboards.student;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;

@@ -1,4 +1,4 @@
-package edu.univ.erp.ui.admin;
+package edu.univ.erp.ui.dashboards.admin;
 
 import javax.swing.*;
 

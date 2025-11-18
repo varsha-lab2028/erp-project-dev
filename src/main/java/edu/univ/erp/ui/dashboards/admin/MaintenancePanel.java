@@ -1,4 +1,4 @@
-package edu.univ.erp.ui.admin;
+package edu.univ.erp.ui.dashboards.admin;
 
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
