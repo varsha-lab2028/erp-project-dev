@@ -1,77 +1,59 @@
 package edu.univ.erp.ui.admin;
 
+import edu.univ.erp.ui.common.DashboardComponents;
+import edu.univ.erp.ui.common.DashboardTheme;
+
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-/**
- * Panel for admin to create/edit sections and assign instructors.
- */
 public class SectionManagementPanel extends JPanel {
-
-    private JTable sectionTable;
-    private JScrollPane tableScrollPane;
-    private JPanel formPanel;
-
-    private JComboBox<String> courseComboBox; // TODO: Populate from CourseDAO
-    private JComboBox<String> instructorComboBox; // TODO: Populate from InstructorDAO
-    private JTextField dayTimeField;
-    private JTextField roomField;
-    private JTextField capacityField;
-    private JTextField semesterField;
-    private JButton addSectionButton;
-
     public SectionManagementPanel() {
-        setLayout(new BorderLayout(10, 10));
-        initComponents();
-    }
+        setLayout(new BorderLayout(20, 20));
+        setBackground(DashboardTheme.BG_LIGHT);
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
-    private void initComponents() {
-        // 1. Form for adding sections
-        formPanel = new JPanel(new GridLayout(7, 2, 5, 5));
-        formPanel.setBorder(new TitledBorder("Add New Section"));
-
-        formPanel.add(new JLabel("Course:"));
-        courseComboBox = new JComboBox<>(new String[]{"CS101", "MATH201"}); // Dummy
-        formPanel.add(courseComboBox);
-
-        formPanel.add(new JLabel("Instructor:"));
-        instructorComboBox = new JComboBox<>(new String[]{"Dr. Ada", "Prof. K."}); // Dummy
-        formPanel.add(instructorComboBox);
-
-        formPanel.add(new JLabel("Day/Time:"));
-        dayTimeField = new JTextField("MWF 10:00-10:50");
-        formPanel.add(dayTimeField);
-
-        formPanel.add(new JLabel("Room:"));
-        roomField = new JTextField("A-101");
-        formPanel.add(roomField);
-
-        formPanel.add(new JLabel("Capacity:"));
-        capacityField = new JTextField("50");
-        formPanel.add(capacityField);
-
-        formPanel.add(new JLabel("Semester/Year:"));
-        semesterField = new JTextField("Fall 2025");
-        formPanel.add(semesterField);
+        // 1. Form Card (Top)
+        JPanel formCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        formCard.setLayout(new BorderLayout());
+        formCard.setBorder(new EmptyBorder(20, 20, 20, 20));
         
-        formPanel.add(new JLabel("")); // Spacer
-        addSectionButton = new JButton("Add Section");
-        formPanel.add(addSectionButton);
-        
-        // TODO: Add ActionListener to button
+        JLabel title = new JLabel("Manage Sections");
+        title.setFont(DashboardTheme.FONT_LABEL);
+        formCard.add(title, BorderLayout.NORTH);
 
-        // 2. Table of existing sections
-        String[] columnNames = {"Section ID", "Course", "Instructor", "Day/Time", "Room", "Cap.", "Enrolled"};
+        JPanel fields = new JPanel(new GridLayout(2, 4, 15, 15));
+        fields.setOpaque(false);
+        fields.add(new JLabel("Course Code:"));
+        fields.add(new JTextField());
+        fields.add(new JLabel("Instructor:"));
+        fields.add(new JComboBox<>(new String[]{"Dr. Suresh", "Prof. Gupta"}));
+        fields.add(new JLabel("Room / Time:"));
+        fields.add(new JTextField("e.g. C-01, Mon 10AM"));
+        fields.add(new JLabel("")); // Spacer
+        fields.add(DashboardComponents.createPrimaryButton("Add Section"));
+        
+        formCard.add(fields, BorderLayout.CENTER);
+
+        // 2. Table Card (Center)
+        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        tableCard.setLayout(new BorderLayout());
+        tableCard.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        String[] cols = {"ID", "Course", "Instructor", "Room", "Time", "Enrolled"};
         Object[][] data = {
-                {1, "CS101", "Dr. Ada", "MWF 10:00-10:50", "A-101", 50, 45},
-                {2, "MATH201", "Prof. K.", "TTh 1:00-2:20", "B-205", 40, 30}
+            {"101-A", "CSE101", "Dr. Suresh", "C-01", "Mon 10:00", "45/50"},
+            {"101-B", "CSE101", "Prof. Gupta", "C-02", "Tue 11:30", "30/50"},
+            {"201-A", "MTH201", "Dr. Rao", "S-10", "Wed 09:00", "60/60"}
         };
-        sectionTable = new JTable(data, columnNames);
-        tableScrollPane = new JScrollPane(sectionTable);
+        // Using the shared TablePanel helper would be even cleaner, but raw table works too:
+        JTable table = new JTable(data, cols);
+        table.setRowHeight(30);
+        table.setShowVerticalLines(false);
+        table.setGridColor(DashboardTheme.BG_LIGHT);
+        tableCard.add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // 3. Add components to the main panel
-        add(formPanel, BorderLayout.NORTH);
-        add(tableScrollPane, BorderLayout.CENTER);
+        add(formCard, BorderLayout.NORTH);
+        add(tableCard, BorderLayout.CENTER);
     }
 }

@@ -1,64 +1,57 @@
 package edu.univ.erp.ui.admin;
 
+import edu.univ.erp.ui.common.DashboardComponents;
+import edu.univ.erp.ui.common.DashboardTheme;
+
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-/**
- * Panel for admin to add new users (students, instructors, admins).
- */
 public class UserManagementPanel extends JPanel {
 
-    private JTable userTable;
-    private JScrollPane tableScrollPane;
-    private JPanel formPanel;
-
-    private JTextField usernameField;
-    private JPasswordField passwordField;
-    private JComboBox<String> roleComboBox;
-    private JButton addUserButton;
-
     public UserManagementPanel() {
-        setLayout(new BorderLayout(10, 10));
-        initComponents();
-    }
+        setLayout(new BorderLayout(20, 20));
+        setBackground(DashboardTheme.BG_LIGHT);
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
-    private void initComponents() {
-        // 1. Create the form panel for adding new users
-        formPanel = new JPanel(new GridLayout(4, 2, 5, 5));
-        formPanel.setBorder(new TitledBorder("Add New User"));
-
-        formPanel.add(new JLabel("Username:"));
-        usernameField = new JTextField(20);
-        formPanel.add(usernameField);
-
-        formPanel.add(new JLabel("Password:"));
-        passwordField = new JPasswordField(20);
-        formPanel.add(passwordField);
-
-        formPanel.add(new JLabel("Role:"));
-        roleComboBox = new JComboBox<>(new String[]{"Student", "Instructor", "Admin"}); // [cite: 6, 7, 8]
-        formPanel.add(roleComboBox);
-
-        formPanel.add(new JLabel("")); // Spacer
-        addUserButton = new JButton("Add User");
-        formPanel.add(addUserButton);
+        // 1. Form Card
+        JPanel formCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        formCard.setLayout(new BorderLayout());
+        formCard.setBorder(new EmptyBorder(20, 20, 20, 20));
         
-        // TODO: Add ActionListener to addUserButton to call AdminService
+        JLabel title = new JLabel("Add New User");
+        title.setFont(DashboardTheme.FONT_LABEL);
+        formCard.add(title, BorderLayout.NORTH);
 
-        // 2. Create the table to display existing users
-        // (Dummy data for now, this will come from the database)
-        String[] columnNames = {"User ID", "Username", "Role", "Status"};
+        JPanel fields = new JPanel(new GridLayout(2, 4, 10, 10));
+        fields.setOpaque(false);
+        fields.add(new JLabel("Username:"));
+        fields.add(new JTextField());
+        fields.add(new JLabel("Password:"));
+        fields.add(new JPasswordField());
+        fields.add(new JLabel("Role:"));
+        fields.add(new JComboBox<>(new String[]{"Student", "Instructor", "Admin"}));
+        fields.add(new JLabel("")); 
+        fields.add(DashboardComponents.createPrimaryButton("Create User"));
+        
+        formCard.add(fields, BorderLayout.CENTER);
+
+        // 2. Table Card
+        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        tableCard.setLayout(new BorderLayout());
+        tableCard.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        String[] cols = {"ID", "Username", "Role", "Status"};
         Object[][] data = {
-                {"101", "stu1", "Student", "Active"},
-                {"201", "inst1", "Instructor", "Active"},
-                {"901", "admin1", "Admin", "Active"}
+            {"101", "aman.gupta", "Student", "Active"},
+            {"202", "suresh.kr", "Instructor", "Active"},
+            {"999", "admin", "Admin", "Active"}
         };
-        userTable = new JTable(data, columnNames);
-        tableScrollPane = new JScrollPane(userTable);
-        
-        // 3. Add components to the main panel
-        add(formPanel, BorderLayout.NORTH);
-        add(tableScrollPane, BorderLayout.CENTER);
+        JTable table = new JTable(data, cols);
+        table.setRowHeight(30);
+        tableCard.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        add(formCard, BorderLayout.NORTH);
+        add(tableCard, BorderLayout.CENTER);
     }
 }
