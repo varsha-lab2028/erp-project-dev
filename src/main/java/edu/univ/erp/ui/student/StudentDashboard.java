@@ -1,8 +1,12 @@
 package edu.univ.erp.ui.student;
+
 import edu.univ.erp.domain.SemesterSeason;
-import edu.univ.erp.ui.common.BaseDashboard;
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.auth.session.Session;
+
+import edu.univ.erp.ui.common.BaseDashboard;
+import edu.univ.erp.util.RoundedButton;
+import edu.univ.erp.util.Theme;
 import javax.swing.*;
 import java.awt.*;
 
@@ -20,33 +24,45 @@ public class StudentDashboard extends BaseDashboard{
     //constructor
     public StudentDashboard(){
         super("ERP Student Dashboard");
-        actions.setBackground(new Color(0,0,82));
+        //actions.setBackground(new Color(0,0,82));
+        //actions.setPreferredSize(new Dimension(900, 60));
 
-        actions.setPreferredSize(new Dimension(900, 60));
-        JButton course_catalog = new JButton("Course Catalog");
-        JButton section_catalog = new JButton("Section Catalog");
-        JButton regs = new JButton("My Registrations");
-        JButton timetable = new JButton("Timetable");
-        JButton grades = new JButton("Grades");
-        JButton transcript = new JButton("Transcript");
+        //creating a navigation panel
+        JPanel navigation_panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        navigation_panel.setBackground(Theme.PRIMARY_WHITE);
+        //adding border to separate the navigation from the content
+        navigation_panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.SEA_GREEN));
 
-        //placing the buttons
-        course_catalog.setBounds(10, 10, 150, 30);
-        section_catalog.setBounds(160, 10, 140, 30);
-        regs.setBounds(170, 10, 150, 30);
-        timetable.setBounds(330, 10, 150, 30);
-        grades.setBounds(490, 10, 150, 30);
-        transcript.setBounds(650, 10, 150, 30);
+        //creating buttons
+        RoundedButton course_catalog = new RoundedButton("Course Catalog");
+        RoundedButton section_catalog = new RoundedButton("Section Catalog");
+        RoundedButton regs = new RoundedButton("My Registrations");
+        RoundedButton timetable = new RoundedButton("Timetable");
+        RoundedButton grades = new RoundedButton("Grades");
+        RoundedButton transcript = new RoundedButton("Transcript");
 
-        actions.add(course_catalog);
-        actions.add(section_catalog);
-        actions.add(regs);
-        actions.add(timetable);
-        actions.add(grades);
-        actions.add(transcript);
-        add(actions, BorderLayout.NORTH);
+        //standardizing the button heights
+        Dimension standard_size = new Dimension(140, 35);
+        course_catalog.setPreferredSize(standard_size);
+        section_catalog.setPreferredSize(standard_size);
+        regs.setPreferredSize(standard_size);
+        //making the simple tabs smaller
+        timetable.setPreferredSize(new Dimension(110, 35));
+        grades.setPreferredSize(new Dimension(100, 35));
+        transcript.setPreferredSize(new Dimension(110, 35));
 
-        //this will be the default panel when you log in to the erp
+        //add to the panel
+        navigation_panel.add(course_catalog);
+        navigation_panel.add(section_catalog);
+        navigation_panel.add(regs);
+        navigation_panel.add(timetable);
+        navigation_panel.add(grades);
+        navigation_panel.add(transcript);
+
+        //adding the navigation panel to the header
+        header_stack.add(navigation_panel);
+
+        //this will be default panel when you open the student dashboard
         setCenter(new StudentCoursePanel());
 
         //switching buttons when you click on them

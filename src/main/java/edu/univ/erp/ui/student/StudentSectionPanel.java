@@ -1,8 +1,11 @@
 package edu.univ.erp.ui.student;
+
 import edu.univ.erp.access.AccessControl;
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.service.StudentService;
+import edu.univ.erp.util.RoundedButton;
+import edu.univ.erp.util.Theme;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,46 +18,47 @@ public class StudentSectionPanel extends JPanel {
     private JTable section_table;
     private List<Section> current_sections; //rows currently shown in the table
 
-    private final JTextField search_field = new JTextField();
-    private final JButton search_button = new JButton("Search");
-    private final JButton register_button = new JButton("Register Selected");
+    private final JTextField search_field = new JTextField(20);
+    private final RoundedButton search_button = new RoundedButton("Search");
+    private final RoundedButton register_button = new RoundedButton("Register Selected");
     private final JLabel status_label = new JLabel(" ");
     private final StudentService student_service = new StudentService();
 
     //constructor
     public StudentSectionPanel() {
         setLayout(new BorderLayout());
+        setBackground(Theme.PRIMARY_WHITE);
 
         //top bar
-        JPanel top = new JPanel(null);
-        top.setPreferredSize(new Dimension(900, 44));
-        JLabel search_label = new JLabel("Search:");
-        search_label.setBounds(10, 10, 60, 24);
-        search_field.setBounds(70, 10, 260, 24);
-        search_button.setBounds(340, 10, 100, 24);
+        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
+        top.setBackground(Theme.PRIMARY_WHITE);
+        top.setPreferredSize(new Dimension(900, 60));
 
-        register_button.setBounds(460, 10, 160, 24);
+        JLabel search_label = new JLabel("Search:");
+        search_label.setFont(Theme.FONT_TEXT);
+        search_field.setFont(Theme.FONT_TEXT);
+
         //register_button.setEnabled(AccessControl.canAccess("STU_REGISTER"));
         register_button.setEnabled(true); //right now, it is temporary
-
 
         //adding these to the top bar
         top.add(search_label);
         top.add(search_field);
         top.add(search_button);
+        top.add(Box.createHorizontalStrut(20));
         top.add(register_button);
         add(top, BorderLayout.NORTH);
 
         //loading the sections into the table
         List<Section> sectionTable_list;
-        String[] columns = {"COURSE CODE", "INSTRUCTOR NAME", "DAY", "TIMINGS", "CLASSROOM", "CAPACITY",};
+        String[] columns = {"COURSE CODE", "INSTRUCTOR", "DAY", "TIMINGS", "CLASSROOM", "CAPACITY",};
         try {
             sectionTable_list = student_service.browseSectionCatalog("");
         } catch (SQLException sqlE) {
             sqlE.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Error loading sections: " + sqlE.getMessage(),
+                    "Error loading sections",
                     "Database Error",
                     JOptionPane.ERROR_MESSAGE
             );
@@ -83,14 +87,16 @@ public class StudentSectionPanel extends JPanel {
 
         //table center
         section_table = new JTable(model);
-        section_table.setBackground(new Color(185, 227, 223));
+        StudentCoursePanel.styleTable(section_table);
         JScrollPane sp = new JScrollPane(section_table);
-        //sp.setBounds(10, 60, 880, 500);
+        sp.getViewport().setBackground(Theme.PRIMARY_WHITE);
+        sp.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
         add(sp, BorderLayout.CENTER);
 
         //status bar placed in the south of the interface
         JPanel south = new JPanel(new BorderLayout());
-        south.add(status_label, BorderLayout.WEST);
+        south.setBackground(Theme.PRIMARY_WHITE);
+        status_label.setFont(Theme.FONT_SMALL);
         add(south, BorderLayout.SOUTH);
         status_label.setText(sectionTable_list.size() + " sections");
 

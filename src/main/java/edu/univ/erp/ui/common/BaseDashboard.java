@@ -1,61 +1,76 @@
 package edu.univ.erp.ui.common;
+
 import edu.univ.erp.access.AccessControl;
 import edu.univ.erp.auth.session.Session;
-
+import edu.univ.erp.util.Theme;
 import javax.swing.*;
 import java.awt.*;
 
 public class BaseDashboard extends JFrame{
-    protected final JLabel banner = new JLabel(" ");
+    protected final JLabel banner_label = new JLabel(" ");
     protected final JPanel content = new JPanel();
+    //the container is at the top and stacks the components vertically
+    protected final JPanel header_stack = new JPanel();
 
     public BaseDashboard(String title) {
         super(title);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 600);
+        setSize(900, 650);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
+        header_stack.setLayout(new BoxLayout(header_stack, BoxLayout.Y_AXIS));
+        add(header_stack, BorderLayout.NORTH);
 
-        JPanel north = new JPanel(null); // absolute placement to demo setBounds
-        north.setPreferredSize(new Dimension(900, 40));
-        JLabel left = new JLabel();
-        left.setBounds(12, 10, 600, 20);
-        banner.setBounds(12, 10, 860, 20);
-        north.add(banner);
-        add(north, BorderLayout.NORTH);
+        //welcome banner
+        JPanel banner_panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+        banner_panel.setBackground(Theme.DEEP_SEA);
+        banner_panel.setPreferredSize(new Dimension(900, 40));
+        banner_label.setFont(Theme.FONT_SMALL);
+        banner_label.setForeground(Color.WHITE);
+        banner_panel.add(banner_label);
+        // Add banner as the first item in the stack
+        header_stack.add(banner_panel);
 
-
+        //content area
+        content.setBackground(Theme.PRIMARY_WHITE);
+        content.setLayout(new BorderLayout());
         add(content, BorderLayout.CENTER);
 
-
+        //set text
         if (AccessControl.isReadOnlyNow()) {
-            banner.setText("Maintenance Mode is ON — writes are disabled.");
+            banner_label.setText("MAINTENANCE MODE — Read Only");
+            //making the maintenance label red
+            banner_panel.setBackground(new Color(200, 50, 50));
         } else {
-            banner.setText("Welcome, " + (Session.isLoggedIn()? Session.user().getUsername():""));
+            String user = Session.isLoggedIn() ? Session.user().getUsername() : "Guest";
+            banner_label.setText("Welcome, " + user);
         }
 
-
         setJMenuBar(makeMenuBar());
+        Theme.applyTheme();
     }
-
 
     private JMenuBar makeMenuBar(){
         JMenuBar bar = new JMenuBar();
-        JMenu app = new JMenu("App");
-        JMenuItem who = new JMenuItem("Signed in as: " + (Session.isLoggedIn()? Session.user().getUsername():"-"));
+        JMenu app = new JMenu("Your Account");
+
+        String user = Session.isLoggedIn() ? Session.user().getUsername() : "-";
+        JMenuItem who = new JMenuItem("Signed in as: " + user);
         who.setEnabled(false);
+
         JMenuItem logout = new JMenuItem("Logout");
         logout.addActionListener(e -> doLogout());
-        app.add(who); app.addSeparator(); app.add(logout);
+
+        app.add(who);
+        app.addSeparator();
+        app.add(logout);
         bar.add(app);
         return bar;
     }
 
-
     protected void setCenter(Component c){
         content.removeAll();
-        content.setLayout(new BorderLayout());
         content.add(c, BorderLayout.CENTER);
         content.revalidate();
         content.repaint();
