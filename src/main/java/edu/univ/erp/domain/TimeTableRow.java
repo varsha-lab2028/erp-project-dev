@@ -1,21 +1,19 @@
-/*this class has been created to help in displaying the timetable.
-this class will contain the data of one row which will go into timetable later
-* TimeTableDAO uses this class*/
-
 package edu.univ.erp.domain;
 
 import java.sql.Time;
 
+/*this class has been created to help in displaying the timetable.
+this class will contain the data of one row which will go into timetable later*/
 public class TimeTableRow {
-    private final DayOfTheWeek day; //from enum
+    private final String day;
     private final String timings;    //like "10:00 - 11:00"
     private final String course_code;
     private final String name; //name of the course
-    private final String classroom; //number of the classroom, like LHC C101
+    private final String classroom; //like LHC C101
 
     //constructor
     public TimeTableRow(String day, String timings, String course_code, String name, String classroom) {
-        this.day = DayOfTheWeek.valueOf(day.trim().toUpperCase());
+        this.day = day.trim().toUpperCase();
         this.timings = timings;
         this.course_code = course_code;
         this.name = name;
@@ -23,7 +21,7 @@ public class TimeTableRow {
     }
 
     //getters
-    public DayOfTheWeek getDay() {
+    public String getDay() {
         return day;
     }
     public String getTimings() {

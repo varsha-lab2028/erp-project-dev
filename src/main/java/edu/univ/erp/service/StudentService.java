@@ -130,7 +130,7 @@ public class StudentService {
     }
 
     //to display and view the timetable
-    public List<TimeTableRow> timetable(long studentId) throws SQLException {
+    public List<TimeTableRow> getTimeTable(long studentId) throws SQLException {
         return timetable_dao.getTimetableForStudent(studentId);
     }
 

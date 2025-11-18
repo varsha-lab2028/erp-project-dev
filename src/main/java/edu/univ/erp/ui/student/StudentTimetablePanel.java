@@ -1,19 +1,97 @@
 package edu.univ.erp.ui.student;
 
+import edu.univ.erp.util.RoundedButton;
+import edu.univ.erp.auth.session.Session;
+import edu.univ.erp.domain.TimeTableRow;
+import edu.univ.erp.service.StudentService;
+import edu.univ.erp.util.Theme;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 
 public class StudentTimetablePanel extends JPanel {
-    public StudentTimetablePanel(){
-        setLayout(new BorderLayout());
-        String[] cols = {"Day","Start","End","Course","Section","Room"};
-        DefaultTableModel model = new DefaultTableModel(cols, 0){ @Override public boolean isCellEditable(int r,int c){return false;}};
-        JTable table = new JTable(model); table.setRowHeight(22);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+    private final StudentService student_service = new StudentService();
+    private JTable timetable_table;
+    private final JLabel status_label = new JLabel(" ");
+    private List<TimeTableRow> current_rows = Collections.emptyList();
 
-        // Dummy view (Week-4 DAO: build rows from enrollments/sections)
-        model.addRow(new Object[]{"Mon","10:00","11:00","CS101","S01","C101"});
-        model.addRow(new Object[]{"Thu","14:00","15:00","HS105","S02","B204"});
+    public StudentTimetablePanel() {
+        setLayout(new BorderLayout());
+        setBackground(Theme.PRIMARY_WHITE);
+
+        //top bar
+        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
+        top.setBackground(Theme.PRIMARY_WHITE);
+        top.setPreferredSize(new Dimension(900, 60));
+
+        //showing the label of timetable on top
+        JLabel title = new JLabel("Weekly Class Schedule");
+        title.setFont(Theme.FONT_TITLE);
+        title.setForeground(Theme.DEEP_SEA);
+        top.add(title);
+        add(title, BorderLayout.NORTH);
+
+        //setting up the timetable
+        String[] columns = {"Day", "Time", "Course Code", "Course Name", "Classroom"};
+        //making the cells non-editable
+        DefaultTableModel model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                return false;
+            }
+        };
+
+        timetable_table = new JTable(model);
+        StudentCoursePanel.styleTable(timetable_table);
+
+        JScrollPane scrollPane = new JScrollPane(timetable_table);
+        add(scrollPane, BorderLayout.CENTER);
+        scrollPane.getViewport().setBackground(Theme.PRIMARY_WHITE);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+
+        //status bar
+        JPanel south = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        south.setBackground(Theme.PRIMARY_WHITE);
+        status_label.setFont(Theme.FONT_SMALL);
+        south.add(status_label);
+        add(south, BorderLayout.SOUTH);
+
+        //loading the data
+        loadingTimeTable();
+    }
+
+    private void loadingTimeTable() {
+        long student_id = 3L; //hard-coded
+        try {
+            current_rows = student_service.getTimeTable(student_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to load timetable",
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            current_rows = Collections.emptyList();
+        }
+
+        DefaultTableModel model = (DefaultTableModel) timetable_table.getModel();
+        model.setRowCount(0); //clearing any old rows
+        //add one row per TimeTableRow
+        for (TimeTableRow row : current_rows) {
+            model.addRow(new Object[]{
+                    row.getDay(),
+                    row.getTimings(),
+                    row.getCourseCode(),
+                    row.getName(),
+                    row.getClassroom()
+            });
+        }
+        status_label.setText(current_rows.size() + " classes scheduled");
     }
 }
