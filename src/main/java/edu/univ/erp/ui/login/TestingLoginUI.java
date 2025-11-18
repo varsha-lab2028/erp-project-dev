@@ -1,42 +1,70 @@
 package edu.univ.erp.ui.login;
 
-import edu.univ.erp.auth.LoginManager;
+import edu.univ.erp.auth.AuthenticationService;
 import edu.univ.erp.domain.AuthClass;
+import edu.univ.erp.util.Theme;
 
 import javax.swing.*;
 
 public class TestingLoginUI {
     public static void main(String[] args) {
-        // Dummy LoginManager ONLY for UI testing
-        LoginManager dummyManager = new LoginManager() {
-            @Override
-            public AuthClass login(String username, String password) throws Exception {
+        // 1. Apply System Theme
+        Theme.applyTheme();
 
-                // ---------- OPTION 1: ALWAYS FAIL (to test error message) ----------
-                // uncomment this to always show "Invalid username or password."
-                // throw new Exception("Dummy failure for UI testing");
+        // 2. Create the Dummy Service (ONLY ONCE)
+        AuthenticationService dummyService = (username, password) -> {
+            AuthClass a = new AuthClass();
+            a.username = username;
+            a.auth_status = "ACTIVE"; 
 
-                // ---------- OPTION 2: ALWAYS SUCCEED (to test success path) ----------
-                AuthClass a = new AuthClass();
-                a.user_id = 1;
-                a.username = username;
-                a.role = "STUDENT";
-                a.password_hash = "";
-                a.auth_status = "ACTIVE";
+            // CHECK 1: Admin
+            if ("admin1".equals(username) && "pass123".equals(password)) {
+                a.role = "ADMIN";
+                a.user_id = 100;
                 return a;
+            }
+            // CHECK 2: Student
+            else if ("student1".equals(username) && "pass123".equals(password)) {
+                a.role = "STUDENT";
+                a.user_id = 101;
+                return a;
+            }
+            // CHECK 3: Instructor
+            else if ("prof1".equals(username) && "pass123".equals(password)) {
+                a.role = "INSTRUCTOR";
+                a.user_id = 102;
+                return a;
+            } 
+            // CHECK 4: Fallback (or generic test)
+            else if ("admin".equalsIgnoreCase(username)) { 
+                 a.role = "ADMIN";
+                 return a;
+            }
+            else {
+                throw new Exception("Invalid credentials");
             }
         };
 
-        // Use the dummy manager in the controller
-        LoginController controller = new LoginController(dummyManager);
+        // 3. Pass service to controller
+        LoginController controller = new LoginController(dummyService);
 
+        // 4. Launch UI
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Test Login UI");
+            JFrame frame = new JFrame("University ERP - Login Test");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(400, 300);
-            frame.setLocationRelativeTo(null);
+            
+            LoginPanel panel = new LoginPanel(controller);
+            
+            // Success Listener
+            panel.addPropertyChangeListener("loginSuccess", evt -> {
+                JOptionPane.showMessageDialog(frame, "Login Successful! Role: " + 
+                    ((AuthenticationService)dummyService).getClass().getSimpleName()); 
+                // In a real app, you would close this frame and open Dashboard
+            });
 
-            frame.add(new LoginPanel(controller));
+            frame.add(panel);
+            frame.setSize(900, 600);
+            frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });
     }

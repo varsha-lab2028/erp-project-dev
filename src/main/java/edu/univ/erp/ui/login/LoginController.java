@@ -1,20 +1,21 @@
 package edu.univ.erp.ui.login;
 
-import edu.univ.erp.auth.LoginManager;
+import edu.univ.erp.auth.AuthenticationService;
 
-//this class acts as an API which acts as an interface between the UI and backend logic
 public class LoginController {
-    private final LoginManager loginManager;
+    // Change type from LoginManager to AuthenticationService
+    private final AuthenticationService authService;
 
-    public LoginController(LoginManager loginManager) {
-        this.loginManager = loginManager;
+    public LoginController(AuthenticationService authService) {
+        this.authService = authService;
     }
 
     public boolean authenticate(String username, String password) {
         try {
-            loginManager.login(username, password);
+            authService.login(username, password);
             return true;
         } catch (Exception e) {
+            // e.printStackTrace(); // Uncomment for debugging
             return false;
         }
     }
