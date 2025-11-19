@@ -2,50 +2,49 @@ package edu.univ.erp.ui.login;
 
 import edu.univ.erp.auth.AuthenticationService;
 import edu.univ.erp.domain.AuthClass;
-import edu.univ.erp.util.Theme;
 
 import javax.swing.*;
 
 public class TestingLoginUI {
     public static void main(String[] args) {
         // 1. Apply System Theme
-        Theme.applyTheme();
+        // Note: The aesthetic design is now primarily controlled by LoginPanel's custom colors.
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) {}
 
-        // 2. Create the Dummy Service (ONLY ONCE)
+        // 2. Create the Dummy Service (Mocks successful login for testing UI flow)
         AuthenticationService dummyService = (username, password) -> {
             AuthClass a = new AuthClass();
             a.username = username;
             a.auth_status = "ACTIVE"; 
 
-            // CHECK 1: Admin
+            // Mocked authentication logic:
             if ("admin1".equals(username) && "pass123".equals(password)) {
                 a.role = "ADMIN";
                 a.user_id = 100;
                 return a;
             }
-            // CHECK 2: Student
             else if ("student1".equals(username) && "pass123".equals(password)) {
                 a.role = "STUDENT";
                 a.user_id = 101;
                 return a;
             }
-            // CHECK 3: Instructor
             else if ("prof1".equals(username) && "pass123".equals(password)) {
                 a.role = "INSTRUCTOR";
                 a.user_id = 102;
                 return a;
             } 
-            // CHECK 4: Fallback (or generic test)
             else if ("admin".equalsIgnoreCase(username)) { 
                  a.role = "ADMIN";
                  return a;
             }
             else {
-                throw new Exception("Invalid credentials");
+                throw new Exception("Invalid username or password");
             }
         };
 
-        // 3. Pass service to controller
+        // 3. Pass the mock service to the controller
         LoginController controller = new LoginController(dummyService);
 
         // 4. Launch UI
@@ -55,11 +54,9 @@ public class TestingLoginUI {
             
             LoginPanel panel = new LoginPanel(controller);
             
-            // Success Listener
+            // Success Listener (Shows a dialog instead of switching dashboards)
             panel.addPropertyChangeListener("loginSuccess", evt -> {
-                JOptionPane.showMessageDialog(frame, "Login Successful! Role: " + 
-                    ((AuthenticationService)dummyService).getClass().getSimpleName()); 
-                // In a real app, you would close this frame and open Dashboard
+                JOptionPane.showMessageDialog(frame, "Login Successful!"); 
             });
 
             frame.add(panel);
