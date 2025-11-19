@@ -47,7 +47,7 @@ public class StudentTimetablePanel extends JPanel {
         };
 
         timetable_table = new JTable(model);
-        StudentCoursePanel.styleTable(timetable_table);
+        //StudentCoursePanel.styleTable(timetable_table);
 
         JScrollPane scrollPane = new JScrollPane(timetable_table);
         add(scrollPane, BorderLayout.CENTER);

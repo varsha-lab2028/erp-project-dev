@@ -87,7 +87,7 @@ public class StudentSectionPanel extends JPanel {
 
         //table center
         section_table = new JTable(model);
-        StudentCoursePanel.styleTable(section_table);
+        //StudentCoursePanel.styleTable(section_table);
         JScrollPane sp = new JScrollPane(section_table);
         sp.getViewport().setBackground(Theme.PRIMARY_WHITE);
         sp.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));

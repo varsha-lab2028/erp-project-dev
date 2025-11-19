@@ -1,10 +1,10 @@
 package edu.univ.erp.auth;
 
 import edu.univ.erp.data.ServerConnector;
-import edu.univ.erp.domain.OnlineStatus;
+
 import java.sql.*;
 
-public class SeedingUsers {
+public class SeedingInformation {
     public static void main(String[] args) throws Exception {
         AuthDAO auth_dao = new AuthDAO();
 

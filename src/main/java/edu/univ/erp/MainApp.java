@@ -3,34 +3,39 @@ package edu.univ.erp;
 import javax.swing.*;
 import java.awt.*;
 
+import edu.univ.erp.auth.AuthenticationService;
 import edu.univ.erp.ui.login.LoginPanel;
 import edu.univ.erp.ui.login.LoginController;
-import edu.univ.erp.ui.dashboard.DashboardPanel;
 import edu.univ.erp.auth.LoginManager;
+import edu.univ.erp.ui.dashboards.student.StudentDashboardPanel;
+import edu.univ.erp.ui.dashboards.admin.AdminDashboardPanel;
+import edu.univ.erp.ui.dashboards.instructor.InstructorDashboardPanel;
 import edu.univ.erp.util.Theme;
 
 
 public class MainApp {
-
     private JFrame frame;
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
+    private StudentDashboardPanel studentDashboard;
+    private AdminDashboardPanel adminDashboard;
+    private InstructorDashboardPanel instructorDashboard;
+
     public MainApp() {
-        // Apply theme first
+        //applying the theme first
         Theme.applyTheme();
 
-        // Create the main application window
+        //create the main window
         frame = new JFrame("University ERP System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 600);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
 
-        // Use CardLayout for panel navigation
+        //Use CardLayout for panel navigation
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
-
 
         initPanels();
 
@@ -40,16 +45,23 @@ public class MainApp {
 
     private void initPanels() {
         LoginManager loginManager = new LoginManager();
-        LoginController loginController = new LoginController(loginManager);
+        LoginController loginController = new LoginController((AuthenticationService) loginManager);
         LoginPanel loginPanel = new LoginPanel(loginController);
-        DashboardPanel dashboardPanel = new DashboardPanel();
 
+        //create dashboards
+        studentDashboard = new StudentDashboardPanel();
+        adminDashboard = new AdminDashboardPanel();
+        instructorDashboard = new InstructorDashboardPanel();
+
+        //register all cards with the layout
         mainPanel.add("login", loginPanel);
-        mainPanel.add("dashboard", dashboardPanel);
+        mainPanel.add("studentDashboard", studentDashboard);
+        mainPanel.add("adminDashboard", adminDashboard);
+        mainPanel.add("instructorDashboard", instructorDashboard);
 
-        cardLayout.show(mainPanel, "login"); // Show login first
+        //showing the login window first
+        cardLayout.show(mainPanel, "login");
     }
-
 
     public void showDashboard() {
         cardLayout.show(mainPanel, "dashboard");

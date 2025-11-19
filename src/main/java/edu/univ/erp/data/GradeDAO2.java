@@ -1,4 +1,4 @@
-﻿package edu.univ.erp.data;
+package edu.univ.erp.data;
 
 import edu.univ.erp.domain.GradeComponent;
 import edu.univ.erp.domain.FinalGrade;
@@ -7,9 +7,9 @@ import edu.univ.erp.domain.LetterGrade;
 import java.sql.*;
 import java.util.*;
 
-public class GradeDAO {
+public class GradeDAO2 {
     /*fetches all the grade components of the courses a student has registered
-    *for during a semester*/
+     *for during a semester*/
     public static List<GradeComponent> listGradeComponents(long studentId, int semNo, String semSeason, int year) throws SQLException {
         String sql = """
             SELECT gc.component_name, gc.weight_percent, gc.score,
@@ -80,4 +80,5 @@ public class GradeDAO {
         return final_grades;
     }
 }
+
 

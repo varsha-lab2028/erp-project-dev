@@ -1,4 +1,5 @@
 package edu.univ.erp.service;
+
 import edu.univ.erp.data.*;
 import edu.univ.erp.domain.*;
 import java.sql.SQLException;
@@ -14,7 +15,8 @@ public class StudentService {
     private final SectionDAO section_dao = new SectionDAO();
     private final EnrollmentDAO enrollment_dao = new EnrollmentDAO();
     private final TimeTableDAO timetable_dao = new TimeTableDAO();
-    private final GradeDAO grade_dao = new GradeDAO();
+    private final GradeDAO2 grade_dao = new GradeDAO2();
+    private final TranscriptDAO transcript_dao = new TranscriptDAO();
 
     //course catalog = seeing the available courses during a particular semester
     public List<Course> browseCourseCatalog(String keyword) throws SQLException {
@@ -140,7 +142,11 @@ public class StudentService {
     }
 
     //getting transcript of the completed courses, will be shown in UI
-    public List<FinalGrade> getTranscript(long studentId, int semNo, String semSeason, int year) throws SQLException {
+    /*public List<FinalGrade> getTranscript(long studentId, int semNo, String semSeason, int year) throws SQLException {
         return grade_dao.listFinalGrades(studentId, semNo, semSeason, year);
+    }*/
+
+    public List<Object[]> getRegisteredCourseTranscript(long student_id) throws SQLException {
+        return transcript_dao.listCurrentRegistrations(student_id);
     }
 }
