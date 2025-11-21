@@ -291,4 +291,4 @@ public class LoginPanel extends JPanel {
         statusLabel.setText(message);
         statusLabel.setForeground(isError ? Color.RED : DashboardTheme.TEXT_SECONDARY);
     }
-}
+}//new commit
