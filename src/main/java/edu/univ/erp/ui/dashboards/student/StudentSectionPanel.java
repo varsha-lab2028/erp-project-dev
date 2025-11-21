@@ -2,50 +2,58 @@ package edu.univ.erp.ui.dashboards.student;
 
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.service.StudentService;
+
+import edu.univ.erp.ui.common.DashboardComponents;
+import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.util.RoundedButton;
-import edu.univ.erp.util.LoginTheme;
 
 import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
 
 public class StudentSectionPanel extends JPanel {
     private JTable section_table;
-    private List<Section> current_sections; //rows currently shown in the table
+    private List<Section> current_sections; //sections rows currently shown in the table
 
     private final JTextField search_field = new JTextField(20);
-    private final RoundedButton search_button = new RoundedButton("Search");
-    private final RoundedButton register_button = new RoundedButton("Register Selected");
+    private final RoundedButton search_button;
+    private final RoundedButton register_button;
     private final JLabel status_label = new JLabel(" ");
     private final StudentService student_service = new StudentService();
 
     //constructor
     public StudentSectionPanel() {
-        setLayout(new BorderLayout());
-        setBackground(LoginTheme.PRIMARY_WHITE);
+        setLayout(new BorderLayout(20, 20));
+        setBackground(DashboardTheme.BG_LIGHT);
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
         //top bar
-        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        top.setBackground(LoginTheme.PRIMARY_WHITE);
-        top.setPreferredSize(new Dimension(900, 60));
+        JPanel top_card = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        top_card.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 15));
 
         JLabel search_label = new JLabel("Search:");
-        search_label.setFont(LoginTheme.FONT_TEXT);
-        search_field.setFont(LoginTheme.FONT_TEXT);
+        search_label.setFont(DashboardTheme.FONT_REGULAR);
+        search_field.setFont(DashboardTheme.FONT_REGULAR);
 
+        //search button
+        search_button = new RoundedButton("Search");
+
+        //register button
         //register_button.setEnabled(AccessControl.canAccess("STU_REGISTER"));
+        register_button = new RoundedButton("Register Selected");
         register_button.setEnabled(true); //right now, it is temporary
 
         //adding these to the top bar
-        top.add(search_label);
-        top.add(search_field);
-        top.add(search_button);
-        top.add(Box.createHorizontalStrut(20));
-        top.add(register_button);
-        add(top, BorderLayout.NORTH);
+        top_card.add(search_label);
+        top_card.add(search_field);
+        top_card.add(search_button);
+        top_card.add(Box.createHorizontalStrut(20));
+        top_card.add(register_button);
+        add(top_card, BorderLayout.NORTH);
 
         //loading the sections into the table
         List<Section> sectionTable_list;
@@ -85,17 +93,30 @@ public class StudentSectionPanel extends JPanel {
 
         //table center
         section_table = new JTable(model);
-        //StudentCoursePanel.styleTable(section_table);
+        section_table.setFont(DashboardTheme.FONT_REGULAR);
+        section_table.setRowHeight(35);
+        section_table.setShowGrid(false);
+        section_table.setIntercellSpacing(new Dimension(0, 5));
+        section_table.getTableHeader().setBackground(Color.WHITE);
+        section_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
+        section_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        section_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
+        section_table.setSelectionBackground(new Color(200, 230, 201, 50));
+        section_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
+
         JScrollPane sp = new JScrollPane(section_table);
-        sp.getViewport().setBackground(LoginTheme.PRIMARY_WHITE);
-        sp.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
-        add(sp, BorderLayout.CENTER);
+        sp.getViewport().setBackground(Color.WHITE);
+        sp.setBorder(BorderFactory.createEmptyBorder());
+
+        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        tableCard.setLayout(new BorderLayout());
+        tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+        tableCard.add(sp, BorderLayout.CENTER);
+        add(tableCard, BorderLayout.CENTER);
 
         //status bar placed in the south of the interface
-        JPanel south = new JPanel(new BorderLayout());
-        south.setBackground(LoginTheme.PRIMARY_WHITE);
-        status_label.setFont(LoginTheme.FONT_SMALL);
-        add(south, BorderLayout.SOUTH);
+        status_label.setFont(DashboardTheme.FONT_SMALL);
+        add(status_label, BorderLayout.SOUTH);
         status_label.setText(sectionTable_list.size() + " sections");
 
         //search action listener

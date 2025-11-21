@@ -6,10 +6,10 @@ import edu.univ.erp.service.StudentService;
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.util.RoundedButton;
-import javax.swing.border.EmptyBorder;
 
 import java.util.List;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
@@ -32,7 +32,7 @@ public class StudentCoursePanel extends JPanel{
 
         search_field = new JTextField(20);
         search_field.setFont(DashboardTheme.FONT_REGULAR);
-        JButton search_button = DashboardComponents.createPrimaryButton("Search");
+        RoundedButton search_button = new RoundedButton("Search");
 
         topCard.add(new JLabel("Search Keyword:"));
         topCard.add(search_field);

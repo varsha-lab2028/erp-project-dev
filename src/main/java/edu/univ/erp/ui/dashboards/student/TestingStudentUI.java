@@ -11,14 +11,8 @@ public class TestingStudentUI {
         } catch (Exception ignored) {}
 
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Testing Student Dashboard");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1280, 800);
-            frame.setLocationRelativeTo(null); // Center on screen
-
             StudentDashboardPanel dashboard = new StudentDashboardPanel();
-            frame.add(dashboard);
-            frame.setVisible(true);
+            dashboard.setVisible(true);
         });
     }
 }
