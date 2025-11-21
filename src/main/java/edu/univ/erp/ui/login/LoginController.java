@@ -10,7 +10,7 @@ public class LoginController {
         this.authService = authService;
     }
 
-    public boolean authenticate(String username, String password) {
+    public boolean authenticate(String username, String password, String role) {
         try {
             authService.login(username, password);
             return true;

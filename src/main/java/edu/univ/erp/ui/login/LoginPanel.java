@@ -1,8 +1,12 @@
 package edu.univ.erp.ui.login;
 
+import edu.univ.erp.ui.common.DashboardComponents;
+import edu.univ.erp.ui.common.DashboardTheme;
+
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
@@ -15,229 +19,276 @@ public class LoginPanel extends JPanel {
     private final JTextField usernameField;
     private final JPasswordField passwordField;
     private final JLabel statusLabel;
-
-    // IIITD Specific Colors
-    private static final Color IIITD_TEAL = new Color(0, 128, 128); // The main brand color
-    private static final Color BG_COLOR = new Color(240, 244, 248); // Professional Light Grey-Blue
-    private static final Color TEXT_LABEL = new Color(100, 116, 139); // Muted Blue-Grey for labels
+    
+    private static final Color PAGE_BG = DashboardTheme.PRIMARY_DARK; // #003B36
+    private String selectedRole = "STUDENT";
+    private JPanel[] roleButtons;
 
     public LoginPanel(LoginController controller) {
         this.controller = controller;
 
-        // 1. Main Background Setup
+        // 1. Full Page Background: IIITD Dark Green
         setLayout(new GridBagLayout());
-        setBackground(BG_COLOR);
+        setBackground(PAGE_BG);
 
-        // 2. The "Card" (The floating white box)
-        JPanel card = new JPanel(new GridBagLayout());
-        card.setBackground(Color.WHITE);
-        
-        // create a "Shadow" effect using a double border
-        card.setBorder(new CompoundBorder(
-            BorderFactory.createLineBorder(new Color(220, 220, 230), 1),
-            new EmptyBorder(40, 60, 50, 60) // Generous internal padding
-        ));
+        // 2. Login Card (White, Size Increased)
+        JPanel card = new DashboardComponents.RoundedPanel(14, Color.WHITE, true); 
+        card.setLayout(new GridBagLayout());
+        card.setPreferredSize(new Dimension(500, 650));
+        card.setBorder(new EmptyBorder(32, 32, 20, 32));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0; 
-        gbc.gridy = 0;
+        gbc.gridx = 0; gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
+        gbc.insets = new Insets(8, 0, 8, 0); 
 
         // --- 1. LOGO ---
-        JLabel logoLabel = new JLabel("", SwingConstants.CENTER);
-        try {
-            ImageIcon originalIcon = new ImageIcon("src/main/resources/IIITD LOGO VERTICAL.png");
-            if (originalIcon.getIconWidth() > 0) {
-                Image scaled = originalIcon.getImage().getScaledInstance(90, 90, Image.SCALE_SMOOTH);
-                logoLabel.setIcon(new ImageIcon(scaled));
-            } else {
-                // Fallback Text Logo
-                logoLabel.setText("<html><div style='text-align: center;'>IIITD<br><span style='font-size:10px'>ERP SYSTEM</span></div></html>");
-                logoLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
-                logoLabel.setForeground(IIITD_TEAL);
-            }
-        } catch (Exception e) {
-            logoLabel.setText("IIITD ERP");
-        }
-        gbc.insets = new Insets(0, 0, 20, 0);
-        card.add(logoLabel, gbc);
+        JLabel logo = new JLabel("IIITD ERP", SwingConstants.CENTER); 
+        logo.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        logo.setForeground(DashboardTheme.TEXT_PRIMARY);
+        gbc.insets = new Insets(0, 0, 16, 0);
+        card.add(logo, gbc);
 
-        // --- 2. TITLE ---
-        JLabel titleLabel = new JLabel("Welcome Back", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 26));
-        titleLabel.setForeground(new Color(30, 41, 59)); // Dark Slate
+        // --- 2. WELCOME TEXT ---
+        JLabel title = new JLabel("Welcome Back!", SwingConstants.CENTER);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        title.setForeground(DashboardTheme.TEXT_PRIMARY);
         gbc.gridy++;
-        gbc.insets = new Insets(0, 0, 10, 0);
-        card.add(titleLabel, gbc);
+        gbc.insets = new Insets(0, 0, 4, 0);
+        card.add(title, gbc);
 
-        // --- 3. PROFILE TYPE SELECTOR (Cleaned Up) ---
+        JLabel subtitle = new JLabel("Select Your Profile Type", SwingConstants.CENTER);
+        subtitle.setFont(DashboardTheme.FONT_REGULAR);
+        subtitle.setForeground(DashboardTheme.TEXT_SECONDARY);
+        gbc.gridy++;
+        gbc.insets = new Insets(0, 0, 24, 0);
+        card.add(subtitle, gbc);
+        
+        // --- 3. PROFILE TYPE SELECTION (Fixed Icons) ---
         gbc.gridy++;
         gbc.insets = new Insets(0, 0, 30, 0);
         card.add(createProfileSelector(), gbc);
 
-        // --- 4. INPUTS ---
+        // --- 4. INPUT FIELDS ---
+        gbc.gridy++;
+        card.add(createLabelFieldPair("Username:", usernameField = createStyledInputField(false)), gbc);
+
+        gbc.gridy++;
+        card.add(createLabelFieldPair("Password:", passwordField = createStyledPasswordField()), gbc);
+
+        // --- 5. LOGIN BUTTON & FORGOT LINK ---
+        gbc.gridy++;
+        gbc.insets = new Insets(20, 0, 15, 0);
+        JButton loginBtn = new JButton("LOGIN");
+        styleLoginButton(loginBtn);
+        loginBtn.addActionListener(e -> performLogin());
+        card.add(loginBtn, gbc);
+
+        // Forgot Password Link (Bottom right)
+        gbc.gridy++;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        JPanel bottomRow = new JPanel(new BorderLayout());
+        bottomRow.setOpaque(false);
+
+        statusLabel = new JLabel(" ", SwingConstants.LEFT);
+        statusLabel.setFont(DashboardTheme.FONT_SMALL);
+        statusLabel.setForeground(DashboardTheme.TEXT_SECONDARY);
         
-        // Username
-        gbc.gridy++;
-        gbc.insets = new Insets(0, 0, 8, 0);
-        card.add(createLabel("USERNAME"), gbc);
-
-        gbc.gridy++;
-        gbc.insets = new Insets(0, 0, 20, 0);
-        usernameField = createStyledField(false);
-        card.add(usernameField, gbc);
-
-        // Password
-        gbc.gridy++;
-        gbc.insets = new Insets(0, 0, 8, 0);
-        card.add(createLabel("PASSWORD"), gbc);
-
-        gbc.gridy++;
-        gbc.insets = new Insets(0, 0, 30, 0);
-        passwordField = (JPasswordField) createStyledField(true);
-        card.add(passwordField, gbc);
-
-        // --- 5. LOGIN BUTTON ---
-        gbc.gridy++;
-        gbc.insets = new Insets(0, 0, 15, 0);
-        
-        // Custom Button Styling to match IIITD Teal
-        JButton loginButton = new JButton("Login");
-        loginButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        loginButton.setForeground(Color.WHITE);
-        loginButton.setBackground(IIITD_TEAL);
-        loginButton.setFocusPainted(false);
-        loginButton.setBorderPainted(false);
-        loginButton.setOpaque(true);
-        loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        loginButton.setPreferredSize(new Dimension(100, 45)); // Taller, modern button
-        
-        // Add hover effect
-        loginButton.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent evt) { loginButton.setBackground(IIITD_TEAL.darker()); }
-            public void mouseExited(MouseEvent evt) { loginButton.setBackground(IIITD_TEAL); }
+        JLabel forgotLink = new JLabel("Forgot login details?", SwingConstants.RIGHT);
+        forgotLink.setForeground(DashboardTheme.PRIMARY_DARK);
+        forgotLink.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        forgotLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        forgotLink.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) { JOptionPane.showMessageDialog(card, "Contact the ERP Admin to recover your details."); }
         });
         
-        loginButton.addActionListener(e -> onLogin());
-        card.add(loginButton, gbc);
+        bottomRow.add(statusLabel, BorderLayout.WEST);
+        bottomRow.add(forgotLink, BorderLayout.EAST);
+        card.add(bottomRow, gbc);
 
-        // --- 6. STATUS LABEL ---
-        gbc.gridy++;
-        statusLabel = new JLabel(" ", SwingConstants.CENTER);
-        statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        card.add(statusLabel, gbc);
-
-        add(card);
+        add(card, new GridBagConstraints());
+        
+        // Initial selection
+        SwingUtilities.invokeLater(() -> selectRole("STUDENT")); 
     }
 
-    // --- Helper: The "Profile Type" Dropdown ---
+    // --- UI FACTORIES ---
+    
+    private JPanel createLabelFieldPair(String labelText, JTextField field) {
+        JPanel p = new JPanel(new BorderLayout(0, 5));
+        p.setOpaque(false);
+        JLabel lbl = new JLabel(labelText);
+        lbl.setFont(DashboardTheme.FONT_LABEL);
+        lbl.setForeground(DashboardTheme.TEXT_PRIMARY);
+        p.add(lbl, BorderLayout.NORTH);
+        p.add(field, BorderLayout.CENTER);
+        p.setBorder(new EmptyBorder(10, 0, 10, 0));
+        return p;
+    }
+
+    private JTextField createStyledInputField(boolean isPassword) {
+        JTextField field = isPassword ? new JPasswordField() : new JTextField();
+        field.setFont(DashboardTheme.FONT_REGULAR.deriveFont(Font.BOLD, 15f));
+        field.setForeground(Color.WHITE);
+        field.setBackground(PAGE_BG); // Green Background
+        field.setCaretColor(DashboardTheme.SECONDARY_GREEN);
+        field.setPreferredSize(new Dimension(0, 45));
+        
+        // Black 2px Border
+        field.setBorder(new CompoundBorder(
+            new LineBorder(Color.BLACK, 2, true),
+            new EmptyBorder(10, 10, 10, 10)
+        ));
+        
+        return field;
+    }
+
+    private JPasswordField createStyledPasswordField() {
+        // FIX: Casting is unnecessary and unsafe. The helper already returns the correct JPasswordField object.
+        return (JPasswordField) createStyledInputField(true);
+    }
+    
+    private void styleLoginButton(JButton btn) {
+        btn.setBackground(DashboardTheme.SECONDARY_GREEN);
+        btn.setForeground(Color.WHITE);
+        btn.setPreferredSize(new Dimension(0, 45));
+        btn.setOpaque(true);
+        btn.setBorderPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
     private JPanel createProfileSelector() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
-        panel.setBackground(Color.WHITE);
-
-        JLabel lbl = new JLabel("Profile Type:");
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lbl.setForeground(TEXT_LABEL);
-
-        String[] users = {"Select Profile...", "Student (student1)", "Instructor (prof1)", "Admin (admin1)"};
-        JComboBox<String> combo = new JComboBox<>(users);
-        combo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        combo.setBackground(Color.WHITE);
-        combo.setFocusable(false);
+        JPanel selector = new JPanel(new GridLayout(1, 3, 10, 0));
+        selector.setOpaque(false);
         
-        combo.addActionListener(e -> {
-            String s = (String) combo.getSelectedItem();
-            if (s != null) {
-                if (s.contains("student1")) fillCreds("student1", "pass123");
-                else if (s.contains("prof1")) fillCreds("prof1", "pass123");
-                else if (s.contains("admin1")) fillCreds("admin1", "pass123");
-            }
+        roleButtons = new JPanel[3];
+        
+        roleButtons[0] = createRoleButton("Student", "S", "STUDENT");
+        roleButtons[1] = createRoleButton("Instructor", "I", "INSTRUCTOR");
+        roleButtons[2] = createRoleButton("Admin", "A", "ADMIN");
+        
+        for (JPanel btn : roleButtons) {
+            selector.add(btn);
+        }
+        return selector;
+    }
+
+    private JPanel createRoleButton(String name, String icon, String role) {
+        RoundPanel iconPanel = new RoundPanel();
+        iconPanel.setLayout(new GridBagLayout());
+        
+        JLabel iconLbl = new JLabel(icon, SwingConstants.CENTER);
+        iconLbl.setFont(new Font("Segoe UI", Font.BOLD, 40)); 
+        iconPanel.add(iconLbl);
+
+        JLabel nameLbl = new JLabel(name, SwingConstants.CENTER);
+        nameLbl.setFont(DashboardTheme.FONT_SMALL);
+        nameLbl.setForeground(DashboardTheme.TEXT_PRIMARY);
+        nameLbl.setBorder(new EmptyBorder(5, 0, 0, 0));
+
+        JPanel p = new JPanel(new BorderLayout());
+        p.setOpaque(false);
+        p.add(iconPanel, BorderLayout.NORTH);
+        p.add(nameLbl, BorderLayout.CENTER);
+        
+        // Click Listener
+        p.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) { selectRole(role); }
+            @Override public void mouseEntered(MouseEvent e) { if (!role.equals(selectedRole)) iconPanel.setHover(true); }
+            @Override public void mouseExited(MouseEvent e) { if (!role.equals(selectedRole)) iconPanel.setHover(false); }
         });
+        
+        p.putClientProperty("iconPanel", iconPanel);
+        p.putClientProperty("role", role);
+        p.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        panel.add(lbl);
-        panel.add(combo);
-        return panel;
+        return p;
     }
-
-    private void fillCreds(String u, String p) {
-        usernameField.setText(u);
-        passwordField.setText(p);
-        statusLabel.setText(" ");
+    
+    private void selectRole(String role) {
+        this.selectedRole = role;
+        // Update styling for all buttons
+        for (JPanel btn : roleButtons) {
+            String btnRole = (String) btn.getClientProperty("role");
+            RoundPanel iconPanel = (RoundPanel) btn.getClientProperty("iconPanel");
+            
+            if (iconPanel != null) {
+                 iconPanel.setSelected(btnRole.equals(role));
+            }
+        }
+        usernameField.requestFocusInWindow();
     }
+    
+    // --- FIX 1: Missing Helper class definition added here ---
+    private class RoundPanel extends JPanel {
+        private boolean isSelected = false;
+        private boolean isHover = false;
+        private final int size = 80;
+        private final int borderWidth = 3;
 
-    private void onLogin() {
-        String username = usernameField.getText().trim();
-        String password = new String(passwordField.getPassword());
-
-        if (username.isEmpty() || password.isEmpty()) {
-            statusLabel.setForeground(new Color(220, 38, 38)); // Red
-            statusLabel.setText("Please enter your credentials.");
-            return;
+        public RoundPanel() { 
+            setOpaque(false);
+            setPreferredSize(new Dimension(90, 90));
         }
 
-        statusLabel.setText("Authenticating...");
-        statusLabel.setForeground(Color.GRAY);
+        public void setSelected(boolean selected) { isSelected = selected; repaint(); }
+        public void setHover(boolean hover) { isHover = hover; repaint(); }
 
-        new SwingWorker<Boolean, Void>() {
-            @Override
-            protected Boolean doInBackground() {
-                return controller.authenticate(username, password);
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            Color borderColor = isSelected ? DashboardTheme.SECONDARY_GREEN : DashboardTheme.PRIMARY_DARK;
+            Color fillColor = isSelected ? DashboardTheme.PRIMARY_DARK : (isHover ? new Color(240, 240, 240) : Color.WHITE);
+            
+            int x = (getWidth() - size) / 2;
+            int y = (getHeight() - size) / 2;
+
+            // Border
+            g2.setColor(borderColor);
+            g2.fillOval(x, y, size, size);
+            
+            // Inner Fill
+            g2.setColor(fillColor);
+            g2.fillOval(x + borderWidth, y + borderWidth, size - 2 * borderWidth, size - 2 * borderWidth);
+            
+            // Update icon color based on selection
+            Component[] comps = getComponents();
+            if (comps.length > 0 && comps[0] instanceof JLabel) {
+                ((JLabel)comps[0]).setForeground(isSelected ? Color.WHITE : DashboardTheme.PRIMARY_DARK);
             }
-            @Override
-            protected void done() {
-                try {
-                    if (get()) {
-                        statusLabel.setForeground(IIITD_TEAL);
-                        statusLabel.setText("Login successful!");
-                        firePropertyChange("loginSuccess", false, true);
-                    } else {
-                        statusLabel.setForeground(new Color(220, 38, 38));
-                        statusLabel.setText("Invalid username or password.");
-                    }
-                } catch (Exception e) { e.printStackTrace(); }
-            }
-        }.execute();
+            
+            super.paintComponent(g2);
+            g2.dispose();
+        }
     }
 
-    // --- Helper: Labels ---
-    private JLabel createLabel(String text) {
-        JLabel label = new JLabel(text);
-        label.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        label.setForeground(TEXT_LABEL);
-        label.setBorder(new EmptyBorder(0, 2, 0, 0)); // Tiny left padding
-        return label;
-    }
 
-    // --- Helper: Input Fields (Material Design Style) ---
-    private JTextField createStyledField(boolean isPassword) {
-        JTextField field = isPassword ? new JPasswordField(20) : new JTextField(20);
-        field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        field.setBackground(Color.WHITE);
+    // --- LOGIN LOGIC ---
+    
+    private void performLogin() {
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
         
-        // Default border: Light Grey Bottom Border
-        field.setBorder(BorderFactory.createCompoundBorder(
-            new MatteBorder(0, 0, 2, 0, new Color(226, 232, 240)), 
-            new EmptyBorder(5, 5, 5, 5)
-        ));
-
-        // Focus border: IIITD Teal Bottom Border
-        field.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                field.setBorder(BorderFactory.createCompoundBorder(
-                    new MatteBorder(0, 0, 2, 0, IIITD_TEAL),
-                    new EmptyBorder(5, 5, 5, 5)
-                ));
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                field.setBorder(BorderFactory.createCompoundBorder(
-                    new MatteBorder(0, 0, 2, 0, new Color(226, 232, 240)),
-                    new EmptyBorder(5, 5, 5, 5)
-                ));
-            }
-        });
-        return field;
+        if (username.isEmpty() || password.isEmpty()) {
+            setStatus("Please enter both username and password.", true);
+            return;
+        }
+        
+        setStatus("Authenticating...", false);
+        boolean success = controller.authenticate(username, password, selectedRole);
+        
+        if (success) {
+            setStatus("Login successful! Redirecting...", false);
+        } else {
+            setStatus("Invalid credentials for " + selectedRole + ".", true);
+        }
+    }
+    
+    private void setStatus(String message, boolean isError) {
+        statusLabel.setText(message);
+        statusLabel.setForeground(isError ? Color.RED : DashboardTheme.TEXT_SECONDARY);
     }
 }
