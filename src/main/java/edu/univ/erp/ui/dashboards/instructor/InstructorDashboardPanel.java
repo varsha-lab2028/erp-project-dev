@@ -42,8 +42,9 @@ public class InstructorDashboardPanel extends JPanel {
         add(mainContainer, BorderLayout.CENTER);
     }
 
-    private void onNavigate(String screenName) {
-        if (screenName.equals("Dashboard") || screenName.equals("My Sections") || 
+    private void onNavigate(java.awt.event.ActionEvent e) {
+        String screenName = e.getActionCommand();
+        if (screenName.equals("Dashboard") || screenName.equals("My Sections") ||
             screenName.equals("Gradebook")) {
             cardLayout.show(contentArea, screenName);
         }

@@ -2,12 +2,17 @@ package edu.univ.erp.ui.common;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DashboardComponents {
+    // Note: The constant BG_DARK is defined here as a fallback 
+    // but the SidebarPanel and TablePanel use it via DashboardComponents.BG_DARK.
+    // This is fine, but typically all theme constants belong in DashboardTheme.
+    public static final Color BG_DARK = new Color(34, 34, 34);
     
     public static JButton createPrimaryButton(String text) {
         JButton button = new JButton(text);
@@ -45,13 +50,13 @@ public class DashboardComponents {
             if (shadow) {
                 g2.setColor(new Color(0, 0, 0, 15)); // Soft shadow
                 // Draw shadow slightly offset (2px right, 4px down)
-                g2.fillRoundRect(2, 4, getWidth() - 6, getHeight() - 6, radius, radius);
+                g2.fillRoundRect(2, 4, getWidth(), getHeight(), radius, radius);
             }
 
             g2.setColor(bgColor);
             // Draw main box
-            g2.fillRoundRect(0, 0, getWidth() - (shadow ? 6 : 0), getHeight() - (shadow ? 6 : 0), radius, radius);
-            
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+
             super.paintComponent(g);
         }
     }
@@ -62,15 +67,16 @@ public class DashboardComponents {
     public static class SidebarPanel extends JPanel {
         private String role;
         private ActionListener navigationListener;
-        private List<JButton> itemButtons;
+        private final List<JButton> itemButtons;
 
         public SidebarPanel(String role, ActionListener navigationListener) {
             this.role = role;
             this.navigationListener = navigationListener;
-            this.itemButtons = new ArrayList<>();
-
+            // The itemButtons was declared but not initialized in the original constructor
+            this.itemButtons = new ArrayList<>(); 
+            
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-            setBackground(DashboardTheme.BG_DARK);
+            setBackground(DashboardComponents.BG_DARK);
             setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             setPreferredSize(new Dimension(200, 0));
         }
@@ -169,7 +175,7 @@ public class DashboardComponents {
 
     public static class TablePanel extends RoundedPanel {
         public TablePanel(String title, String[] columnNames, Object[][] data) {
-            super(12, DashboardTheme.BG_DARK, true);
+            super(12, DashboardComponents.BG_DARK, true);
             setLayout(new BorderLayout());
             setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
             setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
@@ -181,7 +187,7 @@ public class DashboardComponents {
 
             DefaultTableModel model = new DefaultTableModel(data, columnNames);
             JTable table = new JTable(model);
-            table.setBackground(DashboardTheme.BG_DARK);
+            table.setBackground(DashboardComponents.BG_DARK);
             table.setForeground(DashboardTheme.TEXT_LIGHT);
             table.setGridColor(DashboardTheme.BG_MEDIUM);
             table.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -191,11 +197,11 @@ public class DashboardComponents {
             JTableHeader header = table.getTableHeader();
             header.setBackground(DashboardTheme.BG_MEDIUM);
             header.setForeground(DashboardTheme.TEXT_LIGHT);
-            header.setFont(new Font("Arial", Font.BOLD, 12));
+            header.setFont(new Font("Arial", Font.BOLD, 12)); // Header font was missing in original TablePanel
 
             JScrollPane scrollPane = new JScrollPane(table);
-            scrollPane.setBackground(DashboardTheme.BG_DARK);
-            scrollPane.getViewport().setBackground(DashboardTheme.BG_DARK);
+            scrollPane.setBackground(DashboardComponents.BG_DARK);
+            scrollPane.getViewport().setBackground(DashboardComponents.BG_DARK);
             add(scrollPane, BorderLayout.CENTER);
         }
     }

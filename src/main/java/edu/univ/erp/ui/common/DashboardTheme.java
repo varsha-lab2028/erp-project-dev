@@ -5,14 +5,18 @@ import java.awt.Font;
 
 public class DashboardTheme {
     // IIITD Color Palette (Dark Green/Teal)
-    public static final Color PRIMARY_DARK = new Color(0, 59, 54);    // #003B36
+    public static final Color PRIMARY_COLOR = new Color(0, 59, 54);  // #003B36
+    public static final Color PRIMARY_DARK = PRIMARY_COLOR;           // Alias for consistency
     public static final Color SECONDARY_GREEN = new Color(0, 165, 110); // #00A56E
     
     // Backgrounds & Neutrals
     public static final Color BG_LIGHT = new Color(247, 248, 250);      // #F7F8FA
+    public static final Color BG_MEDIUM = new Color(64, 64, 64);        // Medium gray for components
     public static final Color BORDER_GRAY = new Color(229, 231, 235);   // #E5E7EB
     public static final Color TEXT_PRIMARY = new Color(26, 26, 26);     // #1A1A1A
     public static final Color TEXT_SECONDARY = new Color(107, 107, 107);// #6B6B6B
+    public static final Color TEXT_LIGHT = Color.WHITE;                  // Light text for dark backgrounds
+    public static final Color TEXT_DARK = new Color(26, 26, 26);        // Dark text for light backgrounds
 
     // Functional Accents
     public static final Color ACCENT_RED = new Color(239, 68, 68);

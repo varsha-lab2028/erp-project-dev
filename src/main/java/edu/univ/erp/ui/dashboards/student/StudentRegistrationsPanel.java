@@ -63,10 +63,9 @@ public class StudentRegistrationsPanel extends JPanel {
         try {
             current_sections = student_service.getRegisteredSectionsList(student_id);
         } catch (SQLException e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Failed to load registrations",
+                    "Failed to load registrations: " + e.getMessage(),
                     "Database Error",
                     JOptionPane.ERROR_MESSAGE
             );

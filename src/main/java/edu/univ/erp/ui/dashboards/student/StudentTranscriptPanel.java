@@ -65,7 +65,6 @@ public class StudentTranscriptPanel extends JPanel{
         try{
             current_rows = student_service.getRegisteredCourseTranscript(student_id);
         } catch (SQLException sqlE){
-            sqlE.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
                     "Failed to load transcript: " + sqlE.getMessage(),
