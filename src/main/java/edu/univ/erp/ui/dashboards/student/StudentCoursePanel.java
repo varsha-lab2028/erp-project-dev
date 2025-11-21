@@ -7,6 +7,7 @@ import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.util.RoundedButton;
 
+import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -52,7 +53,8 @@ public class StudentCoursePanel extends JPanel{
         try {
             courseTable_list = student_service.browseCourseCatalog("");
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to load courses.");
+            JOptionPane.showMessageDialog(this, "Failed to load courses: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            courseTable_list = Collections.emptyList();
         }
         Object[][] data= new Object[courseTable_list.size()][3];
         for (int i=0; i<courseTable_list.size();i++){
@@ -103,9 +105,8 @@ public class StudentCoursePanel extends JPanel{
         try {
             searchedCourse_list = student_service.browseCourseCatalog(keyword);
         } catch (SQLException sqlE){
-            sqlE.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error in loading courses.");
-            return;
+            JOptionPane.showMessageDialog(this, "Error in loading courses: " + sqlE.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            searchedCourse_list = Collections.emptyList();
             }
             //getting the searched up courses
             Object[][] new_data = new Object[searchedCourse_list.size()][3];

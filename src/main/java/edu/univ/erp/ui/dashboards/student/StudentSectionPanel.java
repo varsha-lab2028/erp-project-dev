@@ -61,10 +61,9 @@ public class StudentSectionPanel extends JPanel {
         try {
             sectionTable_list = student_service.browseSectionCatalog("");
         } catch (SQLException sqlE) {
-            sqlE.printStackTrace();
             JOptionPane.showMessageDialog(
                     this,
-                    "Error loading sections",
+                    "Error loading sections: " + sqlE.getMessage(),
                     "Database Error",
                     JOptionPane.ERROR_MESSAGE
             );

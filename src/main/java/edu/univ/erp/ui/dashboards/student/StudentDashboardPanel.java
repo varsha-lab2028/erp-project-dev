@@ -61,7 +61,8 @@ public class StudentDashboardPanel extends BaseDashboard{
         content.add(mainContainer, BorderLayout.CENTER);
     }
 
-    private void onNavigate(String screenName) {
+    private void onNavigate(java.awt.event.ActionEvent e) {
+        String screenName = e.getActionCommand();
         cardLayout.show(contentArea, screenName);
     }
 }

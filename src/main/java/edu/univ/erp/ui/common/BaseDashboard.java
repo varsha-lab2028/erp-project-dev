@@ -38,7 +38,14 @@ public class BaseDashboard extends JFrame{
         add(content, BorderLayout.CENTER);
 
         //set text
-        if (AccessControl.isReadOnlyNow()) {
+        boolean isMaintenance = false;
+        try {
+            isMaintenance = AccessControl.isReadOnlyNow();
+        } catch (Exception e) {
+            // If database not available, assume not maintenance
+            isMaintenance = false;
+        }
+        if (isMaintenance) {
             banner_label.setText("MAINTENANCE MODE — Read Only");
             //making the maintenance label red
             banner_panel.setBackground(new Color(200, 50, 50));
