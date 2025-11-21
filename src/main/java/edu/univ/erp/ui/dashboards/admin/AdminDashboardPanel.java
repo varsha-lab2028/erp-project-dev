@@ -15,7 +15,7 @@ public class AdminDashboardPanel extends JPanel {
         setLayout(new BorderLayout());
         
         // 1. Initialize Sidebar with Navigation Logic
-        DashboardComponents.SidebarPanel sidebar = new DashboardComponents.SidebarPanel("ADMIN", this::onNavigate);
+        DashboardComponents.SidebarPanel sidebar = new DashboardComponents.SidebarPanel("ADMIN", e -> onNavigate(e.getActionCommand()));
         sidebar.addItem("Dashboard", "🏠");
         sidebar.addItem("Students", "👨‍🎓");
         sidebar.addItem("Courses", "📚");

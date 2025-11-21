@@ -16,6 +16,9 @@ public class DashboardTheme {
 
     // Functional Accents
     public static final Color ACCENT_RED = new Color(239, 68, 68);
+    public static final Color ACCENT_YELLOW = new Color(251, 191, 36);
+    public static final Color ACCENT_ORANGE = new Color(249, 115, 22);
+    public static final Color ACCENT_PURPLE = new Color(147, 51, 234);
 
     // Typography
     public static final Font FONT_HEADER = new Font("Segoe UI", Font.BOLD, 22);
