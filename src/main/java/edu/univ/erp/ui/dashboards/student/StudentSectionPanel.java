@@ -160,8 +160,7 @@ public class StudentSectionPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Please select a section first.");
             return;
         }
-
-        /* commenting this out for now cause we dont have login yet
+        /* commenting this out for now because we don't have login yet
         if (!Session.isLoggedIn()) {
             JOptionPane.showMessageDialog(this, "You must be logged in.");
             return;
@@ -171,7 +170,6 @@ public class StudentSectionPanel extends JPanel {
             return;
         }
          */
-
         Section s = current_sections.get(row);
         //long student_id = Session.user().getUserId();
         long student_id = 3L; //just for testing right now

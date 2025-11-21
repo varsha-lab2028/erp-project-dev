@@ -2,8 +2,12 @@ package edu.univ.erp.ui.dashboards.student;
 
 //import com.formdev.flatlaf.ui.FlatListCellBorder;
 import edu.univ.erp.service.StudentService;
+import edu.univ.erp.ui.common.DashboardComponents;
+import edu.univ.erp.ui.common.DashboardTheme;
+import edu.univ.erp.util.RoundedButton;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.File;
@@ -25,33 +29,53 @@ public class StudentTranscriptPanel extends JPanel{
 
     private final JLabel term_label = new JLabel("Current Term: (unknown)");
 
-
     public StudentTranscriptPanel(){
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(20, 20));
+        setBackground(DashboardTheme.BG_LIGHT);
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
         //top bar = shows the term label and export csv button
-        JPanel top = new JPanel(new BorderLayout());
+        JPanel top_card = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        top_card.setLayout(new BorderLayout());
+        top_card.setBorder(new EmptyBorder(10, 15, 10, 15));
 
-        JPanel left = new JPanel (new FlowLayout(FlowLayout.LEFT));
-        JButton csv_button = new JButton("Export CSV");
-        left.add(csv_button);
-        top.add(left, BorderLayout.WEST);
+        RoundedButton csv_button = new RoundedButton("Export CSV");
+        term_label.setFont(DashboardTheme.FONT_REGULAR);
+        top_card.add(csv_button, BorderLayout.WEST);
+        top_card.add(term_label, BorderLayout.EAST);
+        add(top_card, BorderLayout.NORTH);
 
-        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        right.add(term_label);
-        top.add(right, BorderLayout.EAST);
-        add(top, BorderLayout.NORTH);
-
-        //table
+        //transcript table
         String[] columns = {"Course Code", "Course Name", "Course Credits"};
+
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false; // read-only
             }
         };
+        //styling the table
         transcript_table = new JTable(model);
-        add(new JScrollPane(transcript_table), BorderLayout.CENTER);
+        transcript_table.setFont(DashboardTheme.FONT_REGULAR);
+        transcript_table.setRowHeight(35);
+        transcript_table.setShowGrid(false);
+        transcript_table.setIntercellSpacing(new Dimension(0, 5));
+        transcript_table.getTableHeader().setBackground(Color.WHITE);
+        transcript_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
+        transcript_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        transcript_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
+        transcript_table.setSelectionBackground(new Color(200, 230, 201, 50));
+        transcript_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
+
+        JScrollPane sp = new JScrollPane(transcript_table);
+        sp.getViewport().setBackground(Color.WHITE);
+        sp.setBorder(BorderFactory.createEmptyBorder());
+
+        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        tableCard.setLayout(new BorderLayout());
+        tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+        tableCard.add(sp, BorderLayout.CENTER);
+        add(tableCard, BorderLayout.CENTER);
 
         //loading the data into transcript
         loadTranscript();

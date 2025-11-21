@@ -1,9 +1,11 @@
 package edu.univ.erp.ui.dashboards.student;
 
 import edu.univ.erp.service.StudentService;
-import edu.univ.erp.util.LoginTheme;
+import edu.univ.erp.ui.common.DashboardTheme;
+import edu.univ.erp.ui.common.DashboardComponents;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
@@ -17,33 +19,45 @@ public class StudentGradesPanel extends JPanel {
     private final StudentService student_service = new StudentService();
 
     public StudentGradesPanel(){
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(20, 20));
+        setBackground(DashboardTheme.BG_LIGHT);
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        top.setBackground(LoginTheme.PRIMARY_WHITE);
-        top.setPreferredSize(new Dimension(900, 60));
-
-        JLabel title = new JLabel("Course Grade Components");
-        title.setFont(LoginTheme.FONT_TITLE);
-        title.setForeground(LoginTheme.TEXT_DARK);
-        top.add(title);
-
-        add(top, BorderLayout.NORTH);
-
-        // ---------- table center ----------
+        //UI table setup
         grades_table = new JTable();
-        //StudentCoursePanel.styleTable(grades_table);   // reuse same styling
+        //table styling
+        grades_table.setFont(DashboardTheme.FONT_REGULAR);
+        grades_table.setRowHeight(35);
+        grades_table.setShowGrid(false);
+        grades_table.setIntercellSpacing(new Dimension(0, 5));
+        grades_table.getTableHeader().setBackground(Color.WHITE);
+        grades_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
+        grades_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        grades_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
+        grades_table.setSelectionBackground(new Color(200, 230, 201, 50));
+        grades_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
 
         JScrollPane scroll = new JScrollPane(grades_table);
-        scroll.getViewport().setBackground(LoginTheme.PRIMARY_WHITE);
-        add(scroll, BorderLayout.CENTER);
+        scroll.getViewport().setBackground(Color.WHITE);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
 
-        // ---------- status bar ----------
-        JPanel south = new JPanel(new BorderLayout());
-        south.setBackground(LoginTheme.PRIMARY_WHITE);
-        //status_label.setFont(Theme.FONT_STATUS);
-        south.add(status_label, BorderLayout.WEST);
-        add(south, BorderLayout.SOUTH);
+        //Card wrapper
+        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        tableCard.setLayout(new BorderLayout());
+        tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        //title inside the card
+        JLabel title = new JLabel("Course Grade Components");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        title.setForeground(DashboardTheme.TEXT_PRIMARY);
+        title.setBorder(new EmptyBorder(10, 10, 15, 0));
+        tableCard.add(title, BorderLayout.NORTH);
+        tableCard.add(scroll, BorderLayout.CENTER);
+        add(tableCard, BorderLayout.CENTER);
+
+        //status bar
+        status_label.setFont(DashboardTheme.FONT_SMALL);
+        add(status_label, BorderLayout.SOUTH);
 
         // initial load
         reloadGrades();

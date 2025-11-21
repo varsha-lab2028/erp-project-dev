@@ -2,9 +2,11 @@ package edu.univ.erp.ui.dashboards.student;
 
 import edu.univ.erp.domain.TimeTableRow;
 import edu.univ.erp.service.StudentService;
-import edu.univ.erp.util.LoginTheme;
+import edu.univ.erp.ui.common.DashboardComponents;
+import edu.univ.erp.ui.common.DashboardTheme;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
@@ -18,20 +20,14 @@ public class StudentTimetablePanel extends JPanel {
     private List<TimeTableRow> current_rows = Collections.emptyList();
 
     public StudentTimetablePanel() {
-        setLayout(new BorderLayout());
-        setBackground(LoginTheme.PRIMARY_WHITE);
+        setLayout(new BorderLayout(20, 20));
+        setBackground(DashboardTheme.BG_LIGHT);
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
         //top bar
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        top.setBackground(LoginTheme.PRIMARY_WHITE);
+        top.setBackground(DashboardTheme.BG_LIGHT);
         top.setPreferredSize(new Dimension(900, 60));
-
-        //showing the label of timetable on top
-        JLabel title = new JLabel("Weekly Class Schedule");
-        title.setFont(LoginTheme.FONT_TITLE);
-        title.setForeground(LoginTheme.DEEP_SEA);
-        top.add(title);
-        add(title, BorderLayout.NORTH);
 
         //setting up the timetable
         String[] columns = {"Day", "Time", "Course Code", "Course Name", "Classroom"};
@@ -43,20 +39,41 @@ public class StudentTimetablePanel extends JPanel {
             }
         };
 
+        //UI styling
         timetable_table = new JTable(model);
-        //StudentCoursePanel.styleTable(timetable_table);
+        timetable_table.setFont(DashboardTheme.FONT_REGULAR);
+        timetable_table.setRowHeight(35);
+        timetable_table.setShowGrid(false);
+        timetable_table.setIntercellSpacing(new Dimension(0, 5));
+        timetable_table.getTableHeader().setBackground(Color.WHITE);
+        timetable_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
+        timetable_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        timetable_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
+        timetable_table.setSelectionBackground(new Color(200, 230, 201, 50));
+        timetable_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
 
         JScrollPane scrollPane = new JScrollPane(timetable_table);
-        add(scrollPane, BorderLayout.CENTER);
-        scrollPane.getViewport().setBackground(LoginTheme.PRIMARY_WHITE);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        //ui card wrapper
+        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        tableCard.setLayout(new BorderLayout());
+        tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        //title inside the card
+        JLabel title = new JLabel("Weekly Class Schedule");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        title.setForeground(DashboardTheme.TEXT_PRIMARY);
+        title.setBorder(new EmptyBorder(10, 10, 15, 0));
+        tableCard.add(title, BorderLayout.NORTH);
+
+        tableCard.add(scrollPane, BorderLayout.CENTER);
+        add(tableCard, BorderLayout.CENTER);
 
         //status bar
-        JPanel south = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        south.setBackground(LoginTheme.PRIMARY_WHITE);
-        status_label.setFont(LoginTheme.FONT_SMALL);
-        south.add(status_label);
-        add(south, BorderLayout.SOUTH);
+        status_label.setFont(DashboardTheme.FONT_SMALL);
+        add(status_label, BorderLayout.SOUTH);
 
         //loading the data
         loadingTimeTable();

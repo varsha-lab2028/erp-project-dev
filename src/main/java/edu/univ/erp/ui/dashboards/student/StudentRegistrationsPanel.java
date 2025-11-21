@@ -2,10 +2,12 @@ package edu.univ.erp.ui.dashboards.student;
 
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.service.StudentService;
+import edu.univ.erp.ui.common.DashboardTheme;
+import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.util.RoundedButton;
-import edu.univ.erp.util.LoginTheme;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
@@ -16,19 +18,21 @@ import java.util.List;
 public class StudentRegistrationsPanel extends JPanel {
     private JTable reg_table;
     private List<Section> current_sections = Collections.emptyList();
-    private final RoundedButton drop_button = new RoundedButton("Drop Selected");
+    private final RoundedButton drop_button;
     private final JLabel status_label = new JLabel(" ");
     private final StudentService student_service = new StudentService();
 
     public StudentRegistrationsPanel() {
-        setLayout(new BorderLayout());
-        setBackground(LoginTheme.PRIMARY_WHITE);
+        setLayout(new BorderLayout(20, 20));
+        setBackground(DashboardTheme.BG_LIGHT);
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
         //top bar
-        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        top.setBackground(LoginTheme.PRIMARY_WHITE);
-        top.setPreferredSize(new Dimension(900, 60));
+        JPanel top = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        top.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 15));
 
+        //drop button
+        drop_button = new RoundedButton("Drop Selected");
         drop_button.setPreferredSize(new Dimension(160, 35));
         //drop_button.setEnabled(AccessControl.canAccess("STU_REGISTER"));
         top.add(drop_button);
@@ -36,18 +40,30 @@ public class StudentRegistrationsPanel extends JPanel {
 
         //setting up the table
         reg_table = new JTable();
-        styleTable(reg_table); //styling the table
+        reg_table.setFont(DashboardTheme.FONT_REGULAR);
+        reg_table.setRowHeight(35);
+        reg_table.setShowGrid(false);
+        reg_table.setIntercellSpacing(new Dimension(0, 5));
+        reg_table.getTableHeader().setBackground(Color.WHITE);
+        reg_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
+        reg_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        reg_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
+        reg_table.setSelectionBackground(new Color(200, 230, 201, 50));
+        reg_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
+
         JScrollPane sp = new JScrollPane(reg_table);
-        sp.getViewport().setBackground(LoginTheme.PRIMARY_WHITE);
-        sp.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
-        add(sp, BorderLayout.CENTER);
+        sp.getViewport().setBackground(Color.WHITE);
+        sp.setBorder(BorderFactory.createEmptyBorder());
+
+        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        tableCard.setLayout(new BorderLayout());
+        tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+        tableCard.add(sp, BorderLayout.CENTER);
+        add(tableCard, BorderLayout.CENTER);
 
         //adding status label to the bottom of the interface
-        JPanel south = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        south.setBackground(LoginTheme.PRIMARY_WHITE);
-        status_label.setFont(LoginTheme.FONT_SMALL);
-        south.add(status_label);
-        add(south, BorderLayout.SOUTH);
+        status_label.setFont(DashboardTheme.FONT_SMALL);
+        add(status_label, BorderLayout.SOUTH);
 
         //method to load registrations
         reloadRegistrations();
@@ -58,8 +74,8 @@ public class StudentRegistrationsPanel extends JPanel {
 
     // loading currently registered sections into the table
     private void reloadRegistrations() {
-        //long studentId = Session.userId(); can't use it right now because login not there
-        long student_id = 3L;
+        //long studentId = Session.userId(); -> can't use it right now because login not there
+        long student_id = 3L; //hard-coded
         try {
             current_sections = student_service.getRegisteredSectionsList(student_id);
         } catch (SQLException e) {
@@ -137,19 +153,6 @@ public class StudentRegistrationsPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE
             );
         }
-    }
-
-    private void styleTable(JTable table) {
-        table.setFont(LoginTheme.FONT_TEXT);
-        table.setRowHeight(30);
-        table.setSelectionBackground(LoginTheme.SEA_GREEN.darker());
-        table.setSelectionForeground(Color.WHITE);
-        table.setGridColor(new Color(230,230,230));
-
-        JTableHeader header = table.getTableHeader();
-        header.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        header.setBackground(LoginTheme.SEA_GREEN);
-        header.setForeground(LoginTheme.TEXT_DARK);
     }
 }
 

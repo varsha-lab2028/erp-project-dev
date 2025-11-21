@@ -34,7 +34,9 @@ public class StudentCoursePanel extends JPanel{
         search_field.setFont(DashboardTheme.FONT_REGULAR);
         RoundedButton search_button = new RoundedButton("Search");
 
-        topCard.add(new JLabel("Search Keyword:"));
+        JLabel search_label = new JLabel("Search:");
+        search_label.setFont(DashboardTheme.FONT_REGULAR);
+        topCard.add(search_label);
         topCard.add(search_field);
         topCard.add(search_button);
         add(topCard, BorderLayout.NORTH);
