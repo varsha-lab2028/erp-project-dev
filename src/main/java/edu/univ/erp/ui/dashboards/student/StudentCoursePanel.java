@@ -1,20 +1,16 @@
 package edu.univ.erp.ui.dashboards.student;
 
-import edu.univ.erp.access.AccessControl;
 import edu.univ.erp.domain.Course;
 import edu.univ.erp.service.StudentService;
 
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
-import javax.swing.border.EmptyBorder;
-
 import edu.univ.erp.util.RoundedButton;
-import edu.univ.erp.util.Theme;
+import javax.swing.border.EmptyBorder;
 
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.sql.SQLException;
 

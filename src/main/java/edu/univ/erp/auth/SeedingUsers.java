@@ -4,7 +4,7 @@ import edu.univ.erp.data.ServerConnector;
 
 import java.sql.*;
 
-public class SeedingInformation {
+public class SeedingUsers {
     public static void main(String[] args) throws Exception {
         AuthDAO auth_dao = new AuthDAO();
 

@@ -2,7 +2,7 @@ package edu.univ.erp.ui.common;
 
 import edu.univ.erp.access.AccessControl;
 import edu.univ.erp.auth.session.Session;
-import edu.univ.erp.util.Theme;
+import edu.univ.erp.util.LoginTheme;
 import javax.swing.*;
 import java.awt.*;
 
@@ -24,16 +24,16 @@ public class BaseDashboard extends JFrame{
 
         //welcome banner
         JPanel banner_panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
-        banner_panel.setBackground(Theme.DEEP_SEA);
+        banner_panel.setBackground(LoginTheme.DEEP_SEA);
         banner_panel.setPreferredSize(new Dimension(900, 40));
-        banner_label.setFont(Theme.FONT_SMALL);
+        banner_label.setFont(LoginTheme.FONT_SMALL);
         banner_label.setForeground(Color.WHITE);
         banner_panel.add(banner_label);
         // Add banner as the first item in the stack
         header_stack.add(banner_panel);
 
         //content area
-        content.setBackground(Theme.PRIMARY_WHITE);
+        content.setBackground(LoginTheme.PRIMARY_WHITE);
         content.setLayout(new BorderLayout());
         add(content, BorderLayout.CENTER);
 
@@ -48,7 +48,7 @@ public class BaseDashboard extends JFrame{
         }
 
         setJMenuBar(makeMenuBar());
-        Theme.applyTheme();
+        LoginTheme.applyTheme();
     }
 
     private JMenuBar makeMenuBar(){

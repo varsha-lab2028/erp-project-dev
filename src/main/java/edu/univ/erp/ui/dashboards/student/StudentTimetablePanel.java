@@ -1,14 +1,11 @@
 package edu.univ.erp.ui.dashboards.student;
 
-import edu.univ.erp.util.RoundedButton;
-import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.domain.TimeTableRow;
 import edu.univ.erp.service.StudentService;
-import edu.univ.erp.util.Theme;
+import edu.univ.erp.util.LoginTheme;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -22,17 +19,17 @@ public class StudentTimetablePanel extends JPanel {
 
     public StudentTimetablePanel() {
         setLayout(new BorderLayout());
-        setBackground(Theme.PRIMARY_WHITE);
+        setBackground(LoginTheme.PRIMARY_WHITE);
 
         //top bar
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        top.setBackground(Theme.PRIMARY_WHITE);
+        top.setBackground(LoginTheme.PRIMARY_WHITE);
         top.setPreferredSize(new Dimension(900, 60));
 
         //showing the label of timetable on top
         JLabel title = new JLabel("Weekly Class Schedule");
-        title.setFont(Theme.FONT_TITLE);
-        title.setForeground(Theme.DEEP_SEA);
+        title.setFont(LoginTheme.FONT_TITLE);
+        title.setForeground(LoginTheme.DEEP_SEA);
         top.add(title);
         add(title, BorderLayout.NORTH);
 
@@ -51,13 +48,13 @@ public class StudentTimetablePanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(timetable_table);
         add(scrollPane, BorderLayout.CENTER);
-        scrollPane.getViewport().setBackground(Theme.PRIMARY_WHITE);
+        scrollPane.getViewport().setBackground(LoginTheme.PRIMARY_WHITE);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
 
         //status bar
         JPanel south = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        south.setBackground(Theme.PRIMARY_WHITE);
-        status_label.setFont(Theme.FONT_SMALL);
+        south.setBackground(LoginTheme.PRIMARY_WHITE);
+        status_label.setFont(LoginTheme.FONT_SMALL);
         south.add(status_label);
         add(south, BorderLayout.SOUTH);
 

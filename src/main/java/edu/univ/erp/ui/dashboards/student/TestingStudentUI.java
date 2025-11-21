@@ -17,9 +17,7 @@ public class TestingStudentUI {
             frame.setLocationRelativeTo(null); // Center on screen
 
             StudentDashboardPanel dashboard = new StudentDashboardPanel();
-
             frame.add(dashboard);
-
             frame.setVisible(true);
         });
     }

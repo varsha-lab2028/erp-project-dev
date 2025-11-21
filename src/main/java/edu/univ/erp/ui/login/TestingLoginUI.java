@@ -2,14 +2,14 @@ package edu.univ.erp.ui.login;
 
 import edu.univ.erp.auth.AuthenticationService;
 import edu.univ.erp.domain.AuthClass;
-import edu.univ.erp.util.Theme;
+import edu.univ.erp.util.LoginTheme;
 
 import javax.swing.*;
 
 public class TestingLoginUI {
     public static void main(String[] args) {
         // 1. Apply System Theme
-        Theme.applyTheme();
+        LoginTheme.applyTheme();
 
         // 2. Create the Dummy Service (ONLY ONCE)
         AuthenticationService dummyService = (username, password) -> {

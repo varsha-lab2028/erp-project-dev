@@ -10,7 +10,7 @@ import edu.univ.erp.auth.LoginManager;
 import edu.univ.erp.ui.dashboards.student.StudentDashboardPanel;
 import edu.univ.erp.ui.dashboards.admin.AdminDashboardPanel;
 import edu.univ.erp.ui.dashboards.instructor.InstructorDashboardPanel;
-import edu.univ.erp.util.Theme;
+import edu.univ.erp.util.LoginTheme;
 
 
 public class MainApp {
@@ -24,7 +24,7 @@ public class MainApp {
 
     public MainApp() {
         //applying the theme first
-        Theme.applyTheme();
+        LoginTheme.applyTheme();
 
         //create the main window
         frame = new JFrame("University ERP System");

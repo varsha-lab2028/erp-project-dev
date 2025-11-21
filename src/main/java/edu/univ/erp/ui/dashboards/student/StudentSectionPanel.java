@@ -1,11 +1,9 @@
 package edu.univ.erp.ui.dashboards.student;
 
-import edu.univ.erp.access.AccessControl;
 import edu.univ.erp.domain.Section;
-import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.util.RoundedButton;
-import edu.univ.erp.util.Theme;
+import edu.univ.erp.util.LoginTheme;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,16 +25,16 @@ public class StudentSectionPanel extends JPanel {
     //constructor
     public StudentSectionPanel() {
         setLayout(new BorderLayout());
-        setBackground(Theme.PRIMARY_WHITE);
+        setBackground(LoginTheme.PRIMARY_WHITE);
 
         //top bar
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        top.setBackground(Theme.PRIMARY_WHITE);
+        top.setBackground(LoginTheme.PRIMARY_WHITE);
         top.setPreferredSize(new Dimension(900, 60));
 
         JLabel search_label = new JLabel("Search:");
-        search_label.setFont(Theme.FONT_TEXT);
-        search_field.setFont(Theme.FONT_TEXT);
+        search_label.setFont(LoginTheme.FONT_TEXT);
+        search_field.setFont(LoginTheme.FONT_TEXT);
 
         //register_button.setEnabled(AccessControl.canAccess("STU_REGISTER"));
         register_button.setEnabled(true); //right now, it is temporary
@@ -89,14 +87,14 @@ public class StudentSectionPanel extends JPanel {
         section_table = new JTable(model);
         //StudentCoursePanel.styleTable(section_table);
         JScrollPane sp = new JScrollPane(section_table);
-        sp.getViewport().setBackground(Theme.PRIMARY_WHITE);
+        sp.getViewport().setBackground(LoginTheme.PRIMARY_WHITE);
         sp.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
         add(sp, BorderLayout.CENTER);
 
         //status bar placed in the south of the interface
         JPanel south = new JPanel(new BorderLayout());
-        south.setBackground(Theme.PRIMARY_WHITE);
-        status_label.setFont(Theme.FONT_SMALL);
+        south.setBackground(LoginTheme.PRIMARY_WHITE);
+        status_label.setFont(LoginTheme.FONT_SMALL);
         add(south, BorderLayout.SOUTH);
         status_label.setText(sectionTable_list.size() + " sections");
 

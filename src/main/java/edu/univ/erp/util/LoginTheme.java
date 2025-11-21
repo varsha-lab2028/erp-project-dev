@@ -3,8 +3,8 @@ package edu.univ.erp.util;
 import java.awt.*;
 import javax.swing.*;
 
-public final class Theme {
-    private Theme() {}
+public final class LoginTheme {
+    private LoginTheme() {}
 
     public static final Color PRIMARY_WHITE = Color.WHITE;
     public static final Color SEA_GREEN = new Color(178, 255, 228); // light sea green

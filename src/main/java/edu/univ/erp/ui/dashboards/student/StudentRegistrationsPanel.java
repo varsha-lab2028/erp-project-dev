@@ -1,11 +1,9 @@
 package edu.univ.erp.ui.dashboards.student;
 
-import edu.univ.erp.access.AccessControl;
-import edu.univ.erp.auth.session.Session; //will use it after log in is fully complete
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.util.RoundedButton;
-import edu.univ.erp.util.Theme;
+import edu.univ.erp.util.LoginTheme;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -24,11 +22,11 @@ public class StudentRegistrationsPanel extends JPanel {
 
     public StudentRegistrationsPanel() {
         setLayout(new BorderLayout());
-        setBackground(Theme.PRIMARY_WHITE);
+        setBackground(LoginTheme.PRIMARY_WHITE);
 
         //top bar
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        top.setBackground(Theme.PRIMARY_WHITE);
+        top.setBackground(LoginTheme.PRIMARY_WHITE);
         top.setPreferredSize(new Dimension(900, 60));
 
         drop_button.setPreferredSize(new Dimension(160, 35));
@@ -40,14 +38,14 @@ public class StudentRegistrationsPanel extends JPanel {
         reg_table = new JTable();
         styleTable(reg_table); //styling the table
         JScrollPane sp = new JScrollPane(reg_table);
-        sp.getViewport().setBackground(Theme.PRIMARY_WHITE);
+        sp.getViewport().setBackground(LoginTheme.PRIMARY_WHITE);
         sp.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
         add(sp, BorderLayout.CENTER);
 
         //adding status label to the bottom of the interface
         JPanel south = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        south.setBackground(Theme.PRIMARY_WHITE);
-        status_label.setFont(Theme.FONT_SMALL);
+        south.setBackground(LoginTheme.PRIMARY_WHITE);
+        status_label.setFont(LoginTheme.FONT_SMALL);
         south.add(status_label);
         add(south, BorderLayout.SOUTH);
 
@@ -142,16 +140,16 @@ public class StudentRegistrationsPanel extends JPanel {
     }
 
     private void styleTable(JTable table) {
-        table.setFont(Theme.FONT_TEXT);
+        table.setFont(LoginTheme.FONT_TEXT);
         table.setRowHeight(30);
-        table.setSelectionBackground(Theme.SEA_GREEN.darker());
+        table.setSelectionBackground(LoginTheme.SEA_GREEN.darker());
         table.setSelectionForeground(Color.WHITE);
         table.setGridColor(new Color(230,230,230));
 
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        header.setBackground(Theme.SEA_GREEN);
-        header.setForeground(Theme.TEXT_DARK);
+        header.setBackground(LoginTheme.SEA_GREEN);
+        header.setForeground(LoginTheme.TEXT_DARK);
     }
 }
 
