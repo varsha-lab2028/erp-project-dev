@@ -1,7 +1,7 @@
 package edu.univ.erp.auth;
 
 import edu.univ.erp.data.ServerConnector;
-import edu.univ.erp.domain.OnlineStatus;
+
 import java.sql.*;
 
 public class SeedingUsers {

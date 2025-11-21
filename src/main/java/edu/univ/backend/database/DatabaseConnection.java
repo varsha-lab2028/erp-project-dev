@@ -1,9 +1,10 @@
-package edu.univ.backend.databse;
+package edu.univ.backend.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/*
 public class DatabaseConnection {
     private static final String URL = "jdbc:mysql://localhost:3306/university_erp";
     private static final String USERNAME = "root";
@@ -18,9 +19,9 @@ public class DatabaseConnection {
         if (connection == null) {
             try {
                 connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-                System.out.println("✅ Database connected successfully!");
+                System.out.println("Database connected successfully!");
             } catch (SQLException e) {
-                System.err.println("❌ Failed to connect to the database!");
+                System.err.println("Failed to connect to the database!");
                 e.printStackTrace();
             }
         }
@@ -32,11 +33,12 @@ public class DatabaseConnection {
             try {
                 connection.close();
                 connection = null;
-                System.out.println("🔌 Database connection closed.");
+                System.out.println("Database connection closed.");
             } catch (SQLException e) {
-                System.err.println("❌ Error closing connection!");
+                System.err.println("Error closing connection!");
                 e.printStackTrace();
             }
         }
     }
 }
+ */

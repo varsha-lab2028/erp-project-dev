@@ -1,9 +1,11 @@
 package edu.univ.erp.service;
+
 import edu.univ.erp.data.*;
 import edu.univ.erp.domain.*;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /*Student service acts like an API to connect between the students table in Mysql
@@ -14,7 +16,8 @@ public class StudentService {
     private final SectionDAO section_dao = new SectionDAO();
     private final EnrollmentDAO enrollment_dao = new EnrollmentDAO();
     private final TimeTableDAO timetable_dao = new TimeTableDAO();
-    private final GradeDAO grade_dao = new GradeDAO();
+    private final GradeDAO2 grade_dao = new GradeDAO2();
+    private final TranscriptDAO transcript_dao = new TranscriptDAO();
 
     //course catalog = seeing the available courses during a particular semester
     public List<Course> browseCourseCatalog(String keyword) throws SQLException {
@@ -94,7 +97,6 @@ public class StudentService {
         else {
             message = days_left + " days left";
         }
-
         EnrollmentDAO.removeStudentEnrollment(student_id, section_id);
         return "Dropped successfully (" + message + ")";
     }
@@ -117,10 +119,6 @@ public class StudentService {
         return result;
     }
 
-    public List<Section> listRegisteredSections(long student_id) throws SQLException {
-        return getRegisteredSectionsList(student_id);
-    }
-
     public void dropRegisteredSection(long studentId, long sectionId) throws SQLException {
         String message = dropSection(studentId, sectionId);
         if (!message.startsWith("Dropped successfully")) {
@@ -130,17 +128,16 @@ public class StudentService {
     }
 
     //to display and view the timetable
-    public List<TimeTableRow> timetable(long studentId) throws SQLException {
+    public List<TimeTableRow> getTimeTable(long studentId) throws SQLException {
         return timetable_dao.getTimetableForStudent(studentId);
     }
 
     //to display and view the grades
-    public List<GradeComponent> getGrades(long studentId, int semNo, String semSeason, int year) throws SQLException {
-        return grade_dao.listGradeComponents(studentId, semNo, semSeason, year);
+    public List<Object[]> getGradeComponentTable(long student_id, int sem_no, String sem_season, int year) throws SQLException {
+        return grade_dao.listGradeComponents(student_id, sem_no, sem_season, year);
     }
 
-    //getting transcript of the completed courses, will be shown in UI
-    public List<FinalGrade> getTranscript(long studentId, int semNo, String semSeason, int year) throws SQLException {
-        return grade_dao.listFinalGrades(studentId, semNo, semSeason, year);
+    public List<Object[]> getRegisteredCourseTranscript(long student_id) throws SQLException {
+        return transcript_dao.listCurrentRegistrations(student_id);
     }
 }

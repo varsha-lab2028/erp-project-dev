@@ -1,53 +1,50 @@
 package edu.univ.erp.ui.dashboards.student;
-//import com.formdev.flatlaf.ui.FlatListCellBorder;
-import edu.univ.erp.access.AccessControl;
+
 import edu.univ.erp.domain.Course;
 import edu.univ.erp.service.StudentService;
+
+import edu.univ.erp.ui.common.DashboardComponents;
+import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.util.RoundedButton;
-import edu.univ.erp.util.Theme;
 
 import java.util.List;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.sql.SQLException;
 
 public class StudentCoursePanel extends JPanel{
     private final JTable course_table;
-    private final JTextField search_field = new JTextField(20); //set columns for width
-    private final RoundedButton search_button = new RoundedButton("Search");
-    private final RoundedButton register_button = new RoundedButton("Register Selected");
-    private final JLabel status_label = new JLabel(" ");
     private final StudentService student_service = new StudentService();
+    private final JTextField search_field;
+    private final JLabel status_label;
 
     //constructor
     public StudentCoursePanel(){
-        setLayout(new BorderLayout());
-        setBackground(Theme.PRIMARY_WHITE);
+        setLayout(new BorderLayout(20, 20)); //gaps for better spacing
+        setBackground(DashboardTheme.BG_LIGHT);
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        //top bar
-        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        top.setBackground(Theme.PRIMARY_WHITE);
-        top.setPreferredSize(new Dimension(900, 60));
+        //UI for the top search bar
+        JPanel topCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        topCard.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 15));
 
-        JLabel search_label = new JLabel("Search:");
-        search_label.setFont(Theme.FONT_TEXT);
-        search_field.setFont(Theme.FONT_TEXT);
+        search_field = new JTextField(20);
+        search_field.setFont(DashboardTheme.FONT_REGULAR);
+        RoundedButton search_button = new RoundedButton("Search");
 
-        //register buttons
-        register_button.setEnabled(false);
-        register_button.setToolTipText("Register for your courses from the Section Catalog Tab");
+        topCard.add(new JLabel("Search Keyword:"));
+        topCard.add(search_field);
+        topCard.add(search_button);
+        add(topCard, BorderLayout.NORTH);
 
-        //adding to the top bar
-        top.add(search_label);
-        top.add(search_field);
-        top.add(search_button);
-        top.add(Box.createHorizontalStrut(20));
-        top.add(register_button);
-        add(top, BorderLayout.NORTH);
+        //UI for the status label which will be placed at the south part of interface
+        status_label = new JLabel(" ");
+        status_label.setFont(DashboardTheme.FONT_SMALL);
+        add(status_label, BorderLayout.SOUTH);
 
-        //Course Catalog table
+        //loading data into the course catalog table
         List<Course> courseTable_list;
         String[] columns = {"COURSE CODE","COURSE NAME","COURSE CREDITS"};
         try {
@@ -69,20 +66,32 @@ public class StudentCoursePanel extends JPanel{
                 return false;
             }
         };
-        course_table = new JTable (model);
-        styleTable(course_table);
+
+        course_table = new JTable(model);
+        //styling the table according to the theme
+        course_table.setFont(DashboardTheme.FONT_REGULAR);
+        course_table.setRowHeight(35);
+        course_table.setShowGrid(false);
+        course_table.setIntercellSpacing(new Dimension(0, 5));
+        course_table.getTableHeader().setBackground(Color.WHITE);
+        course_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
+        course_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        course_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
+        course_table.setSelectionBackground(new Color(200, 230, 201, 50));
+        course_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
+
         JScrollPane sp = new JScrollPane(course_table);
-        sp.getViewport().setBackground(Theme.PRIMARY_WHITE);
-        sp.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
-        add(sp, BorderLayout.CENTER);
+        sp.getViewport().setBackground(Color.WHITE);
+        sp.setBorder(BorderFactory.createEmptyBorder());
 
-        //status bar placed in the south of the interface
-        JPanel south = new JPanel(new BorderLayout());
-        south.setBackground(Theme.PRIMARY_WHITE);
-        status_label.setFont(Theme.FONT_SMALL);
-        south.add(status_label, BorderLayout.WEST);
-        add(south, BorderLayout.SOUTH);
+        //to give the card type look to it
+        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        tableCard.setLayout(new BorderLayout());
+        tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+        tableCard.add(sp, BorderLayout.CENTER);
+        add(tableCard, BorderLayout.CENTER);
 
+        //information which will show up in the status label
         status_label.setText(courseTable_list.size() + " courses");
 
         //Action listeners
@@ -96,7 +105,7 @@ public class StudentCoursePanel extends JPanel{
             JOptionPane.showMessageDialog(this, "Error in loading courses.");
             return;
             }
-        //getting the searched up courses
+            //getting the searched up courses
             Object[][] new_data = new Object[searchedCourse_list.size()][3];
             for (int i = 0; i < searchedCourse_list.size(); i++) {
                 Course c = searchedCourse_list.get(i);
@@ -118,20 +127,6 @@ public class StudentCoursePanel extends JPanel{
             //updating the status label
             status_label.setText(searchedCourse_list.size() + " courses");
         });
-    }
-
-    public static void styleTable(JTable table) {
-        table.setFont(Theme.FONT_TEXT);
-        table.setRowHeight(30); // Taller rows for better readability
-        table.setGridColor(new Color(230, 230, 230));
-        table.setSelectionBackground(Theme.SEA_GREEN.darker());
-        table.setSelectionForeground(Color.WHITE);
-
-        JTableHeader header = table.getTableHeader();
-        header.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        header.setBackground(Theme.SEA_GREEN);
-        header.setForeground(Theme.TEXT_DARK);
-        header.setPreferredSize(new Dimension(0, 35)); // Taller header
     }
 
 }
