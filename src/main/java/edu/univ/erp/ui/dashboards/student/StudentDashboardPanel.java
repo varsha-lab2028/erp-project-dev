@@ -26,7 +26,11 @@ public class StudentDashboardPanel extends BaseDashboard{
 
     JPanel actions = new JPanel(null);
 
-    //constructor
+    //constructors
+    public StudentDashboardPanel() {
+        this(new StudentService());
+    }
+
     public StudentDashboardPanel(StudentService studentService){
         super("Student Dashboard");
         this.student_service = studentService;

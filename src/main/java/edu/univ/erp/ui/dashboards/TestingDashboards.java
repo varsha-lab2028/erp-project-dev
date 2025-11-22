@@ -23,10 +23,16 @@ public class TestingDashboards {
             JTabbedPane tabbedPane = new JTabbedPane();
             
             // Tab 1: Admin
-            tabbedPane.addTab("Admin View", new AdminDashboardPanel());
+            // AdminDashboardPanel() constructor not available in this build; use a placeholder panel
+            JPanel adminPlaceholder = new JPanel(new BorderLayout());
+            adminPlaceholder.add(new JLabel("Admin dashboard is not available in this build", SwingConstants.CENTER), BorderLayout.CENTER);
+            tabbedPane.addTab("Admin View", adminPlaceholder);
             
             // Tab 2: Instructor
-            tabbedPane.addTab("Instructor View", new InstructorDashboardPanel());
+            // InstructorDashboardPanel currently requires constructor parameters; use a placeholder panel until it's updated
+            JPanel instructorPlaceholder = new JPanel(new BorderLayout());
+            instructorPlaceholder.add(new JLabel("Instructor dashboard is not available in this build", SwingConstants.CENTER), BorderLayout.CENTER);
+            tabbedPane.addTab("Instructor View", instructorPlaceholder);
 
             // Style the tabs slightly
             tabbedPane.setFont(new Font("Segoe UI", Font.PLAIN, 14));

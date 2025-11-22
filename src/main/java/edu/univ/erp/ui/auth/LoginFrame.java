@@ -5,6 +5,7 @@ import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.domain.AuthClass;
 import edu.univ.erp.domain.User;
 import edu.univ.erp.ui.dashboards.student.StudentDashboardPanel;
+import edu.univ.erp.service.StudentService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -71,7 +72,7 @@ public class LoginFrame extends JFrame{
 
     private void routeToDashboard(){
         switch (Session.user().getRole()){
-            case STUDENT: new StudentDashboardPanel().setVisible(true); break;
+            case STUDENT: new StudentDashboardPanel(new StudentService()).setVisible(true); break;
             //case INSTRUCTOR: new InstructorDashboard().setVisible(true); break;
             //case ADMIN: new AdminDashboard().setVisible(true); break;
         }
