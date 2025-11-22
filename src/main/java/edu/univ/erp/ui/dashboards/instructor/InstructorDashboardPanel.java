@@ -6,12 +6,19 @@ import edu.univ.erp.ui.common.DashboardTheme;
 import javax.swing.*;
 import java.awt.*;
 
+import edu.univ.erp.service.StudentService;
+import edu.univ.erp.service.MaintenanceService;
+
 public class InstructorDashboardPanel extends JPanel {
     
     private JPanel contentArea;
     private CardLayout cardLayout;
+    private final StudentService studentService;
+    private final MaintenanceService maintenanceService;
 
-    public InstructorDashboardPanel() {
+    public InstructorDashboardPanel(StudentService studentService, MaintenanceService maintenanceService) {
+        this.studentService = studentService;
+        this.maintenanceService = maintenanceService;
         setLayout(new BorderLayout());
         
         // 1. Sidebar (Instructor Mode)

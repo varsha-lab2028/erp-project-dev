@@ -11,10 +11,12 @@ import edu.univ.erp.ui.common.DashboardTheme;
 import javax.swing.*;
 import java.awt.*;
 
+import edu.univ.erp.service.StudentService;
+
 public class StudentDashboardPanel extends BaseDashboard{
     private final JPanel contentArea;
     private final CardLayout cardLayout;
-    private final StudentService student_service = new StudentService();
+    private final StudentService student_service;
 
     //these methods will fetch data about the currently logged in student
     private long loggedStudentId() { return Session.userId(); }
@@ -25,8 +27,9 @@ public class StudentDashboardPanel extends BaseDashboard{
     JPanel actions = new JPanel(null);
 
     //constructor
-    public StudentDashboardPanel(){
+    public StudentDashboardPanel(StudentService studentService){
         super("Student Dashboard");
+        this.student_service = studentService;
         //using the content panel from BaseDashboard
         content.setLayout(new BorderLayout());
 

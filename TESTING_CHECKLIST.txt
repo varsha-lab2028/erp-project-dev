@@ -1,0 +1,10 @@
+Manual comprehensive testing checklist:
+- Login as student, admin, instructor roles
+- Verify UI dashboards load and data fetch from DB correctly
+- Test all UI flows, buttons, and inputs thoroughly
+- Validate role-based access control restrictions
+- Trigger maintenance mode and verify UI restrictions
+- Test backend error handling and session state behavior
+- Use curl or Postman to test all API endpoints, happy and edge cases
+- Verify DB transactions and data integrity on actions like course registration
+

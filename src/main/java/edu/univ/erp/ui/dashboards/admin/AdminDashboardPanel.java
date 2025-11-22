@@ -6,12 +6,18 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+import edu.univ.erp.service.MaintenanceService;
+
 public class AdminDashboardPanel extends JPanel {
     
     private JPanel contentArea;
     private CardLayout cardLayout;
 
-    public AdminDashboardPanel() {
+    private final MaintenanceService maintenanceService;
+
+    public AdminDashboardPanel(MaintenanceService maintenanceService) {
+        this.maintenanceService = maintenanceService;
+
         setLayout(new BorderLayout());
         
         // 1. Initialize Sidebar with Navigation Logic
