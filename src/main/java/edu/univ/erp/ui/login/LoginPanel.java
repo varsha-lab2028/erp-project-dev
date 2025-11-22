@@ -282,6 +282,18 @@ public class LoginPanel extends JPanel {
         
         if (success) {
             setStatus("Login successful! Redirecting...", false);
+            // Call to MainApp to show corresponding dashboard
+            SwingUtilities.invokeLater(() -> {
+                java.awt.Window topWindow = javax.swing.SwingUtilities.getWindowAncestor(this);
+                if (topWindow != null && topWindow.getClass().getName().equals("edu.univ.erp.MainApp")) {
+                    try {
+                        java.lang.reflect.Method showDashboardMethod = topWindow.getClass().getMethod("showDashboard", String.class);
+                        showDashboardMethod.invoke(topWindow, selectedRole);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         } else {
             setStatus("Invalid credentials for " + selectedRole + ".", true);
         }

@@ -87,8 +87,21 @@ public class MainApp {
         cardLayout.show(mainPanel, "login");
     }
 
-    public void showDashboard() {
-        cardLayout.show(mainPanel, "dashboard");
+    public void showDashboard(String role) {
+        switch(role.toLowerCase()) {
+            case "student":
+                cardLayout.show(mainPanel, "studentDashboard");
+                break;
+            case "instructor":
+                cardLayout.show(mainPanel, "instructorDashboard");
+                break;
+            case "admin":
+                cardLayout.show(mainPanel, "adminDashboard");
+                break;
+            default:
+                cardLayout.show(mainPanel, "login"); // fallback to login
+                break;
+        }
     }
 
     public void showLogin() {
