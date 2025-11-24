@@ -2,6 +2,7 @@ package edu.univ.erp.ui.dashboards.admin;
 
 import javax.swing.*;
 import edu.univ.erp.service.MaintenanceService;
+import edu.univ.erp.service.AdminService;
 
 public class TestingAdminUI {
     public static void main(String[] args) {
@@ -14,7 +15,8 @@ public class TestingAdminUI {
             frame.setLocationRelativeTo(null);
             
             MaintenanceService maintenanceService = new MaintenanceService();
-            frame.add(new AdminDashboardPanel(maintenanceService));
+            AdminService adminService = new AdminService();
+            frame.add(new AdminDashboardPanel(maintenanceService, adminService));
             
             frame.setVisible(true);
         });
