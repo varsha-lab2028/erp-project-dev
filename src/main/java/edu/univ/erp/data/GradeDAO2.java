@@ -89,6 +89,36 @@ public class GradeDAO2 {
         }
         return final_grades;
     }
+
+    public List<Object[]> listGradesBySection(long section_id) throws SQLException {
+        String command = """
+                SELECT e.student_id, st.first_name, st.last_name, fg.final_score, fg.letter_grade
+                FROM enrollments e
+                JOIN students st ON e.student_id = st.student_id
+                JOIN sections s ON e.section_id = s.section_id
+                LEFT JOIN final_grades fg ON fg.enrollment_id = e.enrollment_id
+                WHERE e.section_id = ? AND e.e_status = 'REGISTERED'
+                ORDER BY st.first_name, st.last_name
+                """;
+
+        List<Object[]> grades = new ArrayList<>();
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(command)) {
+            ps.setLong(1, section_id);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    grades.add(new Object[]{
+                            rs.getLong("student_id"),
+                            rs.getString("first_name"),
+                            rs.getString("last_name"),
+                            rs.getDouble("final_score"),
+                            rs.getString("letter_grade")
+                    });
+                }
+            }
+        }
+        return grades;
+    }
 }
 
 
