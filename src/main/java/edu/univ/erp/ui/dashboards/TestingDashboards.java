@@ -22,17 +22,15 @@ public class TestingDashboards {
             // 2. Create Tabs to switch between roles
             JTabbedPane tabbedPane = new JTabbedPane();
             
-            // Tab 1: Admin
-            // AdminDashboardPanel() constructor not available in this build; use a placeholder panel
-            JPanel adminPlaceholder = new JPanel(new BorderLayout());
-            adminPlaceholder.add(new JLabel("Admin dashboard is not available in this build", SwingConstants.CENTER), BorderLayout.CENTER);
-            tabbedPane.addTab("Admin View", adminPlaceholder);
-            
-            // Tab 2: Instructor
-            // InstructorDashboardPanel currently requires constructor parameters; use a placeholder panel until it's updated
-            JPanel instructorPlaceholder = new JPanel(new BorderLayout());
-            instructorPlaceholder.add(new JLabel("Instructor dashboard is not available in this build", SwingConstants.CENTER), BorderLayout.CENTER);
-            tabbedPane.addTab("Instructor View", instructorPlaceholder);
+        // Tab 1: Admin
+        JPanel adminInfoPanel = new JPanel(new BorderLayout());
+        adminInfoPanel.add(new JLabel("<html>Admin dashboard UI moved.<br/>Please run <b>TestingAdminUI</b> for testing.</html>", SwingConstants.CENTER), BorderLayout.CENTER);
+        tabbedPane.addTab("Admin View", adminInfoPanel);
+
+        // Tab 2: Instructor
+        JPanel instructorInfoPanel = new JPanel(new BorderLayout());
+        instructorInfoPanel.add(new JLabel("<html>Instructor dashboard UI moved.<br/>Please run <b>TestingInstructorUI</b> for testing.</html>", SwingConstants.CENTER), BorderLayout.CENTER);
+        tabbedPane.addTab("Instructor View", instructorInfoPanel);
 
             // Style the tabs slightly
             tabbedPane.setFont(new Font("Segoe UI", Font.PLAIN, 14));

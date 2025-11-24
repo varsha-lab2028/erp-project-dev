@@ -5,9 +5,7 @@ import edu.univ.erp.domain.*;
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * InstructorService acts as a bridge between instructor-related DB operations and the UI.
- */
+//InstructorService acts as a bridge between instructor-related DB operations and the UI.
 public class InstructorService {
     private final SectionDAO sectionDAO = new SectionDAO();
     private final EnrollmentDAO enrollmentDAO = new EnrollmentDAO();
