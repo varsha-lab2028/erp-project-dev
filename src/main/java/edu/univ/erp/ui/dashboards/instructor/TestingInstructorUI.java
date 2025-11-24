@@ -24,8 +24,7 @@ public class TestingInstructorUI {
             MaintenanceService maintenanceService = new MaintenanceService();
             InstructorService instructorService = new InstructorService();
 
-            // use the no-arg constructor if the three-arg constructor is not defined
-            frame.add(new InstructorDashboardPanel());
+            frame.add(new InstructorDashboardPanel(instructorService));
             frame.setVisible(true);
         });
     }

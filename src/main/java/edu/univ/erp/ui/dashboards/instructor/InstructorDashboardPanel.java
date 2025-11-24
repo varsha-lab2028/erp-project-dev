@@ -2,6 +2,7 @@ package edu.univ.erp.ui.dashboards.instructor;
 
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
+import edu.univ.erp.service.InstructorService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +11,7 @@ public class InstructorDashboardPanel extends JPanel {
     private JPanel contentArea;
     private CardLayout cardLayout;
 
-    public InstructorDashboardPanel() {
+    public InstructorDashboardPanel(InstructorService instructorService) {
         setLayout(new BorderLayout());
         
         //side panel for the instructor
@@ -29,8 +30,8 @@ public class InstructorDashboardPanel extends JPanel {
 
         // 3. Add Views
         contentArea.add(new InstructorHomePanel(), "Dashboard");
-        contentArea.add(new MySectionsPanel(), "My Sections");
-        contentArea.add(new GradebookPanel(), "Gradebook");
+        contentArea.add(new MySectionsPanel(instructorService), "My Sections");
+        contentArea.add(new GradebookPanel(instructorService), "Gradebook");
         // contentArea.add(new SettingsPanel(), "Settings"); // Placeholder
 
         // 4. Top Bar
