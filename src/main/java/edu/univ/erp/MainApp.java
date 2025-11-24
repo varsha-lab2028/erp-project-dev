@@ -74,7 +74,7 @@ public class MainApp {
 
         //create dashboards with service injection
         studentDashboard = new StudentDashboardPanel(services.studentService);
-        //adminDashboard = new AdminDashboardPanel(services.maintenanceService);
+        adminDashboard = new AdminDashboardPanel(services.maintenanceService);
         //instructorDashboard = new InstructorDashboardPanel(services.studentService, services.maintenanceService);
 
         //register all cards with the layout
