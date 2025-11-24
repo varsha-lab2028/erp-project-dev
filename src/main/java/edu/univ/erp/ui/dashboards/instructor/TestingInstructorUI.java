@@ -1,3 +1,5 @@
+
+
 package edu.univ.erp.ui.dashboards.instructor;
 
 import javax.swing.*;
@@ -22,7 +24,8 @@ public class TestingInstructorUI {
             MaintenanceService maintenanceService = new MaintenanceService();
             InstructorService instructorService = new InstructorService();
 
-            frame.add(new InstructorDashboardPanel(studentService, maintenanceService, instructorService));
+            // use the no-arg constructor if the three-arg constructor is not defined
+            frame.add(new InstructorDashboardPanel());
             frame.setVisible(true);
         });
     }

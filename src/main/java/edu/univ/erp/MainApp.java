@@ -72,16 +72,10 @@ public class MainApp {
         LoginController loginController = new LoginController(services.authService);
         LoginPanel loginPanel = new LoginPanel(loginController);
 
-        // Add property change listener for login success
-        loginPanel.addPropertyChangeListener("loginSuccess", evt -> {
-            String role = (String) evt.getNewValue();
-            showDashboard(role);
-        });
-
         //create dashboards with service injection
         studentDashboard = new StudentDashboardPanel(services.studentService);
-        adminDashboard = new AdminDashboardPanel(services.maintenanceService, new edu.univ.erp.service.AdminService());
-        instructorDashboard = new InstructorDashboardPanel(services.studentService, services.maintenanceService, new edu.univ.erp.service.InstructorService());
+        //adminDashboard = new AdminDashboardPanel(services.maintenanceService);
+        //instructorDashboard = new InstructorDashboardPanel(services.studentService, services.maintenanceService);
 
         //register all cards with the layout
         mainPanel.add("login", loginPanel);

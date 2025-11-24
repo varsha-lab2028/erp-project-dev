@@ -2,13 +2,13 @@ package edu.univ.erp.ui.login;
 
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
-import edu.univ.erp.domain.AuthClass;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
+
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -28,7 +28,7 @@ public class LoginPanel extends JPanel {
     public LoginPanel(LoginController controller) {
         this.controller = controller;
 
-        // 1. Full Page Background: IIITD Dark Green
+        //full page background
         setLayout(new GridBagLayout());
         setBackground(PAGE_BG);
 
@@ -279,13 +279,33 @@ public class LoginPanel extends JPanel {
         }
 
         setStatus("Authenticating...", false);
-        // Changed from boolean to AuthClass response
-        AuthClass authUser = controller.authenticate(username, password, selectedRole);
+        // authenticate returns AuthClass object or null
+        edu.univ.erp.domain.AuthClass authResult = controller.authenticate(username, password, selectedRole);
 
-        if (authUser != null) {
-            setStatus("Login successful! Redirecting...", false);
-            // Notify login success with role
-            firePropertyChange("loginSuccess", null, authUser.role);
+        if (authResult != null) {
+            try {
+                // Convert AuthClass to User and set session
+                edu.univ.erp.auth.AuthDAO authDAO = new edu.univ.erp.auth.AuthDAO();
+                edu.univ.erp.domain.User user = authDAO.toUser(authResult);
+                edu.univ.erp.auth.session.Session.login(user);
+
+                setStatus("Login successful! Redirecting...", false);
+
+                SwingUtilities.invokeLater(() -> {
+                    java.awt.Window topWindow = javax.swing.SwingUtilities.getWindowAncestor(this);
+                    if (topWindow != null && topWindow.getClass().getName().equals("edu.univ.erp.MainApp")) {
+                        try {
+                            java.lang.reflect.Method showDashboardMethod = topWindow.getClass().getMethod("showDashboard", String.class);
+                            showDashboardMethod.invoke(topWindow, selectedRole);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                setStatus("Login failed due to internal error.", true);
+            }
         } else {
             setStatus("Invalid credentials for " + selectedRole + ".", true);
         }

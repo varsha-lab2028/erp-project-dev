@@ -90,7 +90,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <mainClass>edu.univ.erp.ui.common.MainERPFrame</mainClass>
+                    <mainClass>edu.univ.erp.MainApp</mainClass>
                 </configuration>
             </plugin>
 

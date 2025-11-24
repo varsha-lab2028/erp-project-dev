@@ -11,11 +11,9 @@ import edu.univ.erp.ui.common.DashboardTheme;
 import javax.swing.*;
 import java.awt.*;
 
-import edu.univ.erp.service.StudentService;
-
 public class StudentDashboardPanel extends BaseDashboard{
-    private final JPanel contentArea;
-    private final CardLayout cardLayout;
+    private final JPanel content_area;
+    private final CardLayout card_layout;
     private final StudentService student_service;
 
     //these methods will fetch data about the currently logged in student
@@ -49,27 +47,27 @@ public class StudentDashboardPanel extends BaseDashboard{
         content.add(sidebar, BorderLayout.WEST);
 
         //content area
-        cardLayout = new CardLayout();
-        contentArea = new JPanel(cardLayout);
-        contentArea.setBackground(DashboardTheme.BG_LIGHT);
+        card_layout = new CardLayout();
+        content_area = new JPanel(card_layout);
+        content_area.setBackground(DashboardTheme.BG_LIGHT);
 
         //buttons
-        contentArea.add(new StudentCoursePanel(), "Course Catalog");
-        contentArea.add(new StudentSectionPanel(), "Section Catalog");
-        contentArea.add(new StudentRegistrationsPanel(), "My Registrations");
-        contentArea.add(new StudentTimetablePanel(), "Timetable");
-        contentArea.add(new StudentGradesPanel(), "Grades");
-        contentArea.add(new StudentTranscriptPanel(), "Transcript");
+        content_area.add(new StudentCoursePanel(), "Course Catalog");
+        content_area.add(new StudentSectionPanel(), "Section Catalog");
+        content_area.add(new StudentRegistrationsPanel(), "My Registrations");
+        content_area.add(new StudentTimetablePanel(), "Timetable");
+        content_area.add(new StudentGradesPanel(), "Grades");
+        content_area.add(new StudentTranscriptPanel(), "Transcript");
 
         //top bar + content area
-        JPanel mainContainer = new JPanel(new BorderLayout());
-        mainContainer.add(new DashboardComponents.TopBarPanel("Student Portal", "ST"), BorderLayout.NORTH);
-        mainContainer.add(contentArea, BorderLayout.CENTER);
-        content.add(mainContainer, BorderLayout.CENTER);
+        JPanel main_container = new JPanel(new BorderLayout());
+        main_container.add(new DashboardComponents.TopBarPanel("Student Portal", "ST"), BorderLayout.NORTH);
+        main_container.add(content_area, BorderLayout.CENTER);
+        content.add(main_container, BorderLayout.CENTER);
     }
 
     private void onNavigate(java.awt.event.ActionEvent e) {
-        String screenName = e.getActionCommand();
-        cardLayout.show(contentArea, screenName);
+        String screen_name = e.getActionCommand();
+        card_layout.show(content_area, screen_name);
     }
 }

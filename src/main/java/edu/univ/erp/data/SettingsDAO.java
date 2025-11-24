@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class SettingsDAO {
     //return raw value for key or null if not there
     public static String get(String key) throws SQLException {
-        String command = "SELECT value FROM settings WHERE k = ?";
+        String command = "SELECT v FROM settings WHERE k = ?";
 
         //connect to the ERP Database
         try (Connection connection = ServerConnector.ERPConnection();
@@ -20,7 +20,7 @@ public class SettingsDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 //if matching key found, then it will return
                 if (rs.next()) {
-                    return rs.getString("value");
+                    return rs.getString("v");
                 }
                 else {
                     return null;
@@ -44,15 +44,11 @@ public class SettingsDAO {
 
     //parsing the date time, this is static
     public static LocalDateTime getDateTime(String key) throws SQLException {
-        String v = get(key);
-        if (v == null || v.isBlank()) {
+        String raw = get(key);
+        if(raw == null){
             return null;
         }
-        try {
-            return LocalDateTime.parse(v.trim());
-        } catch (Exception e) {
-            return null;
-        }
+        return LocalDateTime.parse(raw);
     }
 
     //upsert setting, if value doesn't exist insertion will occur
