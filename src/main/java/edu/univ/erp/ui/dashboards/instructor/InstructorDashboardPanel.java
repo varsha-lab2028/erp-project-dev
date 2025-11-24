@@ -6,14 +6,25 @@ import edu.univ.erp.ui.common.DashboardTheme;
 import javax.swing.*;
 import java.awt.*;
 
+import edu.univ.erp.service.StudentService;
+import edu.univ.erp.service.MaintenanceService;
+import edu.univ.erp.service.InstructorService;
+
 public class InstructorDashboardPanel extends JPanel {
+    
     private JPanel contentArea;
     private CardLayout cardLayout;
+    private final StudentService studentService;
+    private final MaintenanceService maintenanceService;
+    private final InstructorService instructorService;
 
-    public InstructorDashboardPanel() {
+    public InstructorDashboardPanel(StudentService studentService, MaintenanceService maintenanceService, InstructorService instructorService) {
+        this.studentService = studentService;
+        this.maintenanceService = maintenanceService;
+        this.instructorService = instructorService;
         setLayout(new BorderLayout());
         
-        //side panel for the instructor
+        // 1. Sidebar (Instructor Mode)
         DashboardComponents.SidebarPanel sidebar = new DashboardComponents.SidebarPanel("INSTRUCTOR", this::onNavigate);
         sidebar.addItem("Dashboard", "🏠");
         sidebar.addItem("My Sections", "📅");
@@ -29,8 +40,8 @@ public class InstructorDashboardPanel extends JPanel {
 
         // 3. Add Views
         contentArea.add(new InstructorHomePanel(), "Dashboard");
-        contentArea.add(new MySectionsPanel(), "My Sections");
-        contentArea.add(new GradebookPanel(), "Gradebook");
+        contentArea.add(new MySectionsPanel(instructorService), "My Sections");
+        contentArea.add(new GradebookPanel(instructorService), "Gradebook");
         // contentArea.add(new SettingsPanel(), "Settings"); // Placeholder
 
         // 4. Top Bar

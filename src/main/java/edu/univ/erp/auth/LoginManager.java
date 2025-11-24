@@ -1,7 +1,9 @@
 package edu.univ.erp.auth;
 import edu.univ.erp.domain.AuthClass;
 
-/*this class contains the logic on how the authentication process is going to be*/
+/*this class contains the logic on how the authentication/logging in process
+is going to be*/
+
 public class LoginManager {
     private final AuthDAO auth_dao = new AuthDAO();
 
@@ -14,7 +16,7 @@ public class LoginManager {
             throw new IllegalStateException("account is likely disabled");
         }
         if (!PasswordHasher.verifyHash(raw_password, u.password_hash)) {
-            throw new IllegalArgumentException("Incorrect username or password");
+            throw new IllegalArgumentException("incorrect username or password");
         }
         auth_dao.updateLastLogin(u.user_id);
         return u; // contains the user_id + role, will be used later to load ERP profile

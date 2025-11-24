@@ -86,7 +86,7 @@ public class DashboardComponents {
             JButton button = new JButton(emoji + " " + name);
             button.setAlignmentX(Component.LEFT_ALIGNMENT);
             button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-            button.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+            button.setFont(new Font("Arial", Font.PLAIN, 14));
             button.setBackground(DashboardTheme.BG_MEDIUM);
             button.setForeground(DashboardTheme.TEXT_LIGHT);
             button.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
