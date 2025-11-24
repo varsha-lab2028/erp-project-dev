@@ -8,6 +8,7 @@ import java.awt.*;
 
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.service.MaintenanceService;
+import edu.univ.erp.service.InstructorService;
 
 public class InstructorDashboardPanel extends JPanel {
     
@@ -15,10 +16,12 @@ public class InstructorDashboardPanel extends JPanel {
     private CardLayout cardLayout;
     private final StudentService studentService;
     private final MaintenanceService maintenanceService;
+    private final InstructorService instructorService;
 
-    public InstructorDashboardPanel(StudentService studentService, MaintenanceService maintenanceService) {
+    public InstructorDashboardPanel(StudentService studentService, MaintenanceService maintenanceService, InstructorService instructorService) {
         this.studentService = studentService;
         this.maintenanceService = maintenanceService;
+        this.instructorService = instructorService;
         setLayout(new BorderLayout());
         
         // 1. Sidebar (Instructor Mode)
@@ -37,8 +40,8 @@ public class InstructorDashboardPanel extends JPanel {
 
         // 3. Add Views
         contentArea.add(new InstructorHomePanel(), "Dashboard");
-        contentArea.add(new MySectionsPanel(), "My Sections");
-        contentArea.add(new GradebookPanel(), "Gradebook");
+        contentArea.add(new MySectionsPanel(instructorService), "My Sections");
+        contentArea.add(new GradebookPanel(instructorService), "Gradebook");
         // contentArea.add(new SettingsPanel(), "Settings"); // Placeholder
 
         // 4. Top Bar

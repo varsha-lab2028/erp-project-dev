@@ -20,25 +20,24 @@ public class LoginController {
      * @param username
      * @param password
      * @param role - selected role from login UI
-     * @return true if authentication successful and role matches, false otherwise
+     * @return AuthClass object on successful authentication and role matches, null otherwise
      */
-    public boolean authenticate(String username, String password, String role) {
+    public AuthClass authenticate(String username, String password, String role) {
         try {
             AuthClass authUser = loginManager.login(username, password);
             if (authUser == null) {
-                return false;
+                return null;
             }
             String userRole = authUser.role;
             // Basic role match check
             if (userRole == null || !userRole.equalsIgnoreCase(role)) {
-                return false;
+                return null;
             }
-            // TODO: Save authenticated user/session info if needed
             // Authentication successful and role matches
-            return true;
+            return authUser;
         } catch (Exception e) {
             // Log or handle specific auth exceptions if needed
-            return false;
+            return null;
         }
     }
 }

@@ -149,4 +149,35 @@ public class EnrollmentDAO {
         }
         return registered_sections;
     }
+
+    // lists all students enrolled in a specific section
+    public List<Enrollment> listEnrolledStudentsBySection(long sectionId) throws SQLException {
+        String command = """
+            SELECT enrollment_id, student_id, section_id, e_status,
+                   registered_when, dropped_when, completed_when
+            FROM enrollments
+            WHERE section_id = ? AND e_status = 'REGISTERED'
+            ORDER BY registered_when DESC
+        """;
+
+        List<Enrollment> enrollments = new ArrayList<>();
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(command)) {
+            ps.setLong(1, sectionId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    enrollments.add(new Enrollment(
+                            rs.getLong("enrollment_id"),
+                            rs.getLong("student_id"),
+                            rs.getLong("section_id"),
+                            EnrollmentStatus.valueOf(rs.getString("e_status")),
+                            rs.getTimestamp("registered_when") != null ? rs.getTimestamp("registered_when").toLocalDateTime() : null,
+                            rs.getTimestamp("dropped_when") != null ? rs.getTimestamp("dropped_when").toLocalDateTime() : null,
+                            rs.getTimestamp("completed_when") != null ? rs.getTimestamp("completed_when").toLocalDateTime() : null
+                    ));
+                }
+            }
+        }
+        return enrollments;
+    }
 }

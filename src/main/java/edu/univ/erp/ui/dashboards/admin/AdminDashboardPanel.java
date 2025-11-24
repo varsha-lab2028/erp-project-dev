@@ -7,6 +7,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 import edu.univ.erp.service.MaintenanceService;
+import edu.univ.erp.service.AdminService;
 
 public class AdminDashboardPanel extends JPanel {
     
@@ -14,9 +15,11 @@ public class AdminDashboardPanel extends JPanel {
     private CardLayout cardLayout;
 
     private final MaintenanceService maintenanceService;
+    private final AdminService adminService;
 
-    public AdminDashboardPanel(MaintenanceService maintenanceService) {
+    public AdminDashboardPanel(MaintenanceService maintenanceService, AdminService adminService) {
         this.maintenanceService = maintenanceService;
+        this.adminService = adminService;
 
         setLayout(new BorderLayout());
         

@@ -2,6 +2,7 @@ package edu.univ.erp.ui.login;
 
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
+import edu.univ.erp.domain.AuthClass;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -271,29 +272,20 @@ public class LoginPanel extends JPanel {
     private void performLogin() {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword()).trim();
-        
+
         if (username.isEmpty() || password.isEmpty()) {
             setStatus("Please enter both username and password.", true);
             return;
         }
-        
+
         setStatus("Authenticating...", false);
-        boolean success = controller.authenticate(username, password, selectedRole);
-        
-        if (success) {
+        // Changed from boolean to AuthClass response
+        AuthClass authUser = controller.authenticate(username, password, selectedRole);
+
+        if (authUser != null) {
             setStatus("Login successful! Redirecting...", false);
-            // Call to MainApp to show corresponding dashboard
-            SwingUtilities.invokeLater(() -> {
-                java.awt.Window topWindow = javax.swing.SwingUtilities.getWindowAncestor(this);
-                if (topWindow != null && topWindow.getClass().getName().equals("edu.univ.erp.MainApp")) {
-                    try {
-                        java.lang.reflect.Method showDashboardMethod = topWindow.getClass().getMethod("showDashboard", String.class);
-                        showDashboardMethod.invoke(topWindow, selectedRole);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            // Notify login success with role
+            firePropertyChange("loginSuccess", null, authUser.role);
         } else {
             setStatus("Invalid credentials for " + selectedRole + ".", true);
         }

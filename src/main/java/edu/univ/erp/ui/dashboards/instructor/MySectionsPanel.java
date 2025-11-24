@@ -8,11 +8,16 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class MySectionsPanel extends JPanel {
-    public MySectionsPanel() {
+    private final edu.univ.erp.service.InstructorService instructorService;
+
+    public MySectionsPanel(edu.univ.erp.service.InstructorService instructorService) {
+        this.instructorService = instructorService;
         setLayout(new BorderLayout(20, 20));
         setBackground(DashboardTheme.BG_LIGHT);
         setBorder(new EmptyBorder(20, 20, 20, 20));
         
+        // TODO: Replace static data with instructorService data fetch
+
         // Reuse the TablePanel for a clean look
         String[] cols = {"Course Code", "Title", "Section", "Room", "Schedule", "Capacity", "Enrolled"};
         Object[][] data = {

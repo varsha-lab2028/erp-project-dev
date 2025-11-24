@@ -8,10 +8,15 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class GradebookPanel extends JPanel {
-    public GradebookPanel() {
+    private final edu.univ.erp.service.InstructorService instructorService;
+
+    public GradebookPanel(edu.univ.erp.service.InstructorService instructorService) {
+        this.instructorService = instructorService;
         setLayout(new BorderLayout(20, 20));
         setBackground(DashboardTheme.BG_LIGHT);
         setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        // TODO: Replace static sections and grades with data from instructorService
 
         // 1. Top Controls (Select Section)
         JPanel controls = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
