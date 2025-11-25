@@ -10,28 +10,28 @@ import java.awt.*;
 public class InstructorHomePanel extends JPanel {
     public InstructorHomePanel() {
         setLayout(new BorderLayout());
-        setBackground(DashboardTheme.BG_LIGHT);
-        setBorder(new EmptyBorder(24, 24, 24, 24));
+        setBackground(DashboardTheme.BG_MAIN);
+        setBorder(new EmptyBorder(30, 30, 30, 30));
 
         JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        body.setBackground(DashboardTheme.BG_LIGHT);
+        body.setBackground(DashboardTheme.BG_MAIN);
 
         // --- 1. Stats Cards ---
         JPanel grid = new JPanel(new GridLayout(1, 3, 20, 0));
-        grid.setBackground(DashboardTheme.BG_LIGHT);
-        grid.setMaximumSize(new Dimension(2000, 140));
+        grid.setBackground(DashboardTheme.BG_MAIN);
+        grid.setMaximumSize(new Dimension(2000, 110));
         
-        grid.add(new DashboardComponents.StatsCard("My Sections", "4", "📅", DashboardTheme.SECONDARY_GREEN));
-        grid.add(new DashboardComponents.StatsCard("Total Students", "185", "👥", DashboardTheme.ACCENT_YELLOW));
-        grid.add(new DashboardComponents.StatsCard("Pending Grades", "2", "📝", DashboardTheme.ACCENT_ORANGE));
+        grid.add(new DashboardComponents.StatsCard("My Sections", "4", DashboardTheme.PRIMARY)); // Blue
+        grid.add(new DashboardComponents.StatsCard("Total Students", "185", DashboardTheme.SUCCESS)); // Green
+        grid.add(new DashboardComponents.StatsCard("Pending Grades", "2", DashboardTheme.WARNING)); // Orange
         body.add(grid);
         
         body.add(Box.createVerticalStrut(30));
 
         // --- 2. Split View (Table + Chart) ---
-        JPanel split = new JPanel(new GridLayout(1, 2, 20, 0));
-        split.setBackground(DashboardTheme.BG_LIGHT);
+        JPanel split = new JPanel(new GridLayout(1, 2, 25, 0));
+        split.setBackground(DashboardTheme.BG_MAIN);
 
         // Left: Active Sections Table
         String[] cols = {"Course", "Section", "Room", "Time"};
@@ -43,16 +43,17 @@ public class InstructorHomePanel extends JPanel {
         };
         split.add(new DashboardComponents.TablePanel("My Active Sections", cols, data));
 
-        // Right: Grade Analytics Chart
-        JPanel chartCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        // Right: Grade Analytics Chart (Using CardPanel for rounded floating look)
+        DashboardComponents.CardPanel chartCard = new DashboardComponents.CardPanel();
         chartCard.setLayout(new BorderLayout());
-        chartCard.setBorder(new EmptyBorder(20, 20, 20, 20));
         
-        JLabel chartTitle = new JLabel("Grade Distribution (Recent)");
-        chartTitle.setFont(DashboardTheme.FONT_LABEL);
+        JLabel chartTitle = new JLabel("Grade Distribution");
+        chartTitle.setFont(DashboardTheme.FONT_SUBTITLE);
+        chartTitle.setForeground(DashboardTheme.TEXT_PRIMARY); // Dynamic Text
+        chartTitle.setBorder(new EmptyBorder(15, 20, 10, 0));
         chartCard.add(chartTitle, BorderLayout.NORTH);
         
-        // Custom Paint Bar Chart
+        // Custom Graph
         JPanel graph = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -64,21 +65,35 @@ public class InstructorHomePanel extends JPanel {
                 int h = getHeight();
                 int[] values = {10, 25, 45, 20, 15}; // F, D, C, B, A
                 String[] labels = {"F", "D", "C", "B", "A"};
-                int barWidth = (w / 5) - 15;
+                
+                int padding = 20;
+                int barWidth = (w - (padding * 2)) / 5 - 20;
+                int maxVal = 50;
+
+                // Draw Base Line (Dynamic Color)
+                g2.setColor(DashboardTheme.BORDER_COLOR);
+                g2.setStroke(new BasicStroke(2));
+                g2.drawLine(padding, h - 30, w - padding, h - 30);
                 
                 // Draw Bars
                 for(int i=0; i<5; i++) {
-                    int barHeight = (int)((values[i]/50.0) * (h-40));
-                    int x = i * (barWidth + 15);
+                    int barHeight = (int)((values[i] / (double)maxVal) * (h - 60));
+                    int x = padding + i * (barWidth + 20) + 10;
                     int y = h - 30 - barHeight;
                     
-                    g2.setColor(i == 2 ? DashboardTheme.SECONDARY_GREEN : DashboardTheme.PRIMARY_DARK); // Highlight 'C' or average
+                    // Gradient Fill
+                    GradientPaint gp = new GradientPaint(x, y, DashboardTheme.PRIMARY, x, y + barHeight, DashboardTheme.PRIMARY_DARK);
+                    if(i==2) gp = new GradientPaint(x, y, DashboardTheme.SUCCESS, x, y + barHeight, DashboardTheme.SUCCESS.darker()); 
+                    
+                    g2.setPaint(gp);
                     g2.fillRoundRect(x, y, barWidth, barHeight, 8, 8);
                     
-                    // Draw Label
+                    // Draw Label (Dynamic Color)
                     g2.setColor(DashboardTheme.TEXT_SECONDARY);
-                    g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
-                    g2.drawString(labels[i], x + barWidth/2 - 5, h - 10);
+                    g2.setFont(DashboardTheme.FONT_BOLD);
+                    FontMetrics fm = g2.getFontMetrics();
+                    int labelWidth = fm.stringWidth(labels[i]);
+                    g2.drawString(labels[i], x + (barWidth - labelWidth)/2, h - 10);
                 }
             }
         };
@@ -88,6 +103,8 @@ public class InstructorHomePanel extends JPanel {
         split.add(chartCard);
         body.add(split);
 
-        add(new JScrollPane(body), BorderLayout.CENTER);
+        add(new JScrollPane(body) {
+             { setBorder(null); getViewport().setBackground(DashboardTheme.BG_MAIN); }
+        }, BorderLayout.CENTER);
     }
 }

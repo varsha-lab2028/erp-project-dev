@@ -1,209 +1,284 @@
 package edu.univ.erp.ui.common;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-import edu.univ.erp.ui.common.DashboardTheme;
 
 public class DashboardComponents {
-    // Note: The constant BG_DARK is defined here as a fallback 
-    // but the SidebarPanel and TablePanel use it via DashboardComponents.BG_DARK.
-    // This is fine, but typically all theme constants belong in DashboardTheme.
-    public static final Color BG_DARK = new Color(34, 34, 34);
-    
-    public static JButton createPrimaryButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(DashboardTheme.FONT_REGULAR);
-        button.setBackground(DashboardTheme.PRIMARY_DARK);
-        button.setForeground(Color.WHITE);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
-        button.setFocusPainted(false);
-        button.setOpaque(true);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return button;
+
+    // --- 1. Top Bar with Theme Toggle ---
+    public static class TopBarPanel extends JPanel {
+        public TopBarPanel(String title, String userInitials, ActionListener onToggleSidebar, ActionListener onProfileClick, ActionListener onThemeSwitch) {
+            setLayout(new BorderLayout());
+            setBackground(DashboardTheme.SURFACE); // Dynamic Background
+            setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_COLOR),
+                new EmptyBorder(10, 20, 10, 20)
+            ));
+
+            // LEFT
+            JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+            left.setOpaque(false);
+            
+            JButton toggleBtn = new JButton("☰");
+            toggleBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
+            toggleBtn.setBorderPainted(false);
+            toggleBtn.setContentAreaFilled(false);
+            toggleBtn.setFocusPainted(false);
+            toggleBtn.setForeground(DashboardTheme.TEXT_PRIMARY);
+            toggleBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            toggleBtn.addActionListener(onToggleSidebar);
+            
+            JLabel lblTitle = new JLabel(title);
+            lblTitle.setFont(DashboardTheme.FONT_TITLE);
+            lblTitle.setForeground(DashboardTheme.TEXT_PRIMARY);
+
+            left.add(toggleBtn);
+            left.add(lblTitle);
+
+            // RIGHT: Theme Toggle + Profile
+            JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+            right.setOpaque(false);
+            
+            // Theme Button
+            JButton themeBtn = new JButton(DashboardTheme.isDark ? "☀️" : "🌙");
+            themeBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+            themeBtn.setBorderPainted(false);
+            themeBtn.setContentAreaFilled(false);
+            themeBtn.setFocusPainted(false);
+            themeBtn.setToolTipText("Toggle Dark/Light Mode");
+            themeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            themeBtn.addActionListener(e -> {
+                onThemeSwitch.actionPerformed(e);
+                themeBtn.setText(DashboardTheme.isDark ? "☀️" : "🌙");
+            });
+            
+            right.add(themeBtn);
+
+            // Profile Avatar
+            JPanel profileBadge = new CircleAvatar(userInitials, 40);
+            profileBadge.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            profileBadge.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    onProfileClick.actionPerformed(null);
+                }
+            });
+            
+            right.add(profileBadge);
+
+            add(left, BorderLayout.WEST);
+            add(right, BorderLayout.EAST);
+        }
+    }
+
+    // --- 2. Sidebar Button ---
+    public static class SidebarButton extends JButton {
+        private String text;
+        private String icon;
+        private boolean collapsed = false;
+
+        public SidebarButton(String text, String iconSymbol) {
+            this.text = text;
+            this.icon = iconSymbol;
+            updateText();
+            setFont(new Font("Segoe UI", Font.BOLD, 16)); 
+            setForeground(new Color(176, 190, 197));
+            setBackground(DashboardTheme.BG_SIDEBAR); // Keep Sidebar dark usually, or use BG_SIDEBAR
+            setBorder(new EmptyBorder(15, 20, 15, 20));
+            setFocusPainted(false);
+            setHorizontalAlignment(SwingConstants.LEFT);
+            setContentAreaFilled(false);
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            addMouseListener(new MouseAdapter() {
+                public void mouseEntered(MouseEvent e) {
+                    setForeground(Color.WHITE);
+                    setBackground(DashboardTheme.PRIMARY.darker());
+                    setOpaque(true);
+                    repaint();
+                }
+                public void mouseExited(MouseEvent e) {
+                    setForeground(new Color(176, 190, 197));
+                    setBackground(DashboardTheme.BG_SIDEBAR);
+                    setOpaque(false);
+                    repaint();
+                }
+            });
+        }
+        
+        public void setCollapsed(boolean collapsed) {
+            this.collapsed = collapsed;
+            updateText();
+            setHorizontalAlignment(collapsed ? SwingConstants.CENTER : SwingConstants.LEFT);
+        }
+        
+        private void updateText() {
+            setText(collapsed ? icon : icon + "   " + text);
+        }
+    }
+
+    // --- 3. Card Panel (Updated to use SURFACE color) ---
+    public static class CardPanel extends JPanel {
+        private int cornerRadius = 15;
+        public CardPanel() {
+            super(); setOpaque(false); setBorder(new EmptyBorder(10, 10, 15, 10)); setLayout(new BorderLayout());
+        }
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            int width = getWidth() - 10; int height = getHeight() - 10;
+            
+            // Shadow (Darker in Dark Mode)
+            g2.setColor(DashboardTheme.isDark ? new Color(0,0,0, 100) : new Color(200, 200, 200, 80));
+            g2.fillRoundRect(8, 5, width, height, cornerRadius, cornerRadius);
+            
+            // Background
+            g2.setColor(DashboardTheme.SURFACE);
+            g2.fillRoundRect(5, 2, width, height, cornerRadius, cornerRadius);
+            g2.dispose();
+            super.paintComponent(g);
+        }
     }
     
-    /**
-     * Helper panel that draws a rounded background and a soft shadow.
-     * Used for the floating cards and the Login box.
-     */
-    public static class RoundedPanel extends JPanel {
-        private final int radius;
-        private Color bgColor;
-        private boolean shadow;
+    // --- 4. Primary Button ---
+    public static JButton createPrimaryButton(String text) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                super.paintComponent(g2);
+                g2.dispose();
+            }
+        };
+        btn.setFont(DashboardTheme.FONT_BOLD);
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(DashboardTheme.PRIMARY);
+        btn.setBorder(new EmptyBorder(12, 15, 12, 15));
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) { btn.setBackground(DashboardTheme.PRIMARY_DARK); }
+            public void mouseExited(MouseEvent e) { btn.setBackground(DashboardTheme.PRIMARY); }
+        });
+        return btn;
+    }
 
-        public RoundedPanel(int radius, Color bgColor, boolean shadow) {
-            this.radius = radius;
-            this.bgColor = bgColor;
-            this.shadow = shadow;
-            setOpaque(false); // Important for custom painting
+    // --- 5. Circle Avatar ---
+    public static class CircleAvatar extends JPanel {
+        private String initials;
+        public CircleAvatar(String initials, int size) {
+            this.initials = initials; setOpaque(false); setPreferredSize(new Dimension(size, size));
         }
-
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            if (shadow) {
-                g2.setColor(new Color(0, 0, 0, 15)); // Soft shadow
-                // Draw shadow slightly offset (2px right, 4px down)
-                g2.fillRoundRect(2, 4, getWidth(), getHeight(), radius, radius);
-            }
-
-            g2.setColor(bgColor);
-            // Draw main box
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
-
-            super.paintComponent(g);
+            g2.setColor(DashboardTheme.PRIMARY);
+            g2.fillOval(0, 0, getWidth(), getHeight());
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Segoe UI", Font.BOLD, getWidth() / 2));
+            FontMetrics fm = g2.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth(initials)) / 2;
+            int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+            g2.drawString(initials, x, y);
         }
     }
-
-    /**
-     * Sidebar panel with navigation items.
-     */
-    public static class SidebarPanel extends JPanel {
-        private String role;
-        private ActionListener navigationListener;
-        private final List<JButton> itemButtons;
-
-        public SidebarPanel(String role, ActionListener navigationListener) {
-            this.role = role;
-            this.navigationListener = navigationListener;
-            // The itemButtons was declared but not initialized in the original constructor
-            this.itemButtons = new ArrayList<>(); 
+    
+    // --- 6. Table Panel (Updated Colors) ---
+    public static class TablePanel extends CardPanel {
+        public TablePanel(String title, String[] columns, Object[][] data) {
+            super();
+            JLabel titleLbl = new JLabel(title);
+            titleLbl.setFont(DashboardTheme.FONT_SUBTITLE);
+            titleLbl.setForeground(DashboardTheme.TEXT_PRIMARY); // Use Theme Color
+            titleLbl.setBorder(new EmptyBorder(15, 20, 15, 20));
+            add(titleLbl, BorderLayout.NORTH);
             
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-            setBackground(DashboardComponents.BG_DARK);
-            setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-            setPreferredSize(new Dimension(200, 0));
-        }
-
-        public void addItem(String name, String emoji) {
-            JButton button = new JButton(emoji + " " + name);
-            button.setAlignmentX(Component.LEFT_ALIGNMENT);
-            button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-            button.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
-            button.setBackground(DashboardTheme.BG_MEDIUM);
-            button.setForeground(DashboardTheme.TEXT_LIGHT);
-            button.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
-            button.setFocusPainted(false);
-            button.setOpaque(true);
-
-            button.addActionListener(e -> {
-                if (navigationListener != null) {
-                    navigationListener.actionPerformed(new java.awt.event.ActionEvent(this, 0, name));
-                }
-            });
-
-            itemButtons.add(button);
-            add(button);
-            add(Box.createVerticalStrut(5));
-        }
-    }
-
-    /**
-     * Top bar panel with title and user info.
-     */
-    public static class TopBarPanel extends JPanel {
-        private String title;
-        private String userInitials;
-
-        public TopBarPanel(String title, String userInitials) {
-            this.title = title;
-            this.userInitials = userInitials;
-
-            setLayout(new BorderLayout());
-            setBackground(DashboardTheme.PRIMARY_COLOR);
-            setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
-            setPreferredSize(new Dimension(0, 60));
-
-            JLabel titleLabel = new JLabel(title);
-            titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-            titleLabel.setForeground(DashboardTheme.TEXT_LIGHT);
-            add(titleLabel, BorderLayout.WEST);
-
-            JPanel userPanel = new JPanel();
-            userPanel.setBackground(DashboardTheme.PRIMARY_COLOR);
-            JLabel userLabel = new JLabel(userInitials);
-            userLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            userLabel.setForeground(DashboardTheme.TEXT_LIGHT);
-            userLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-            userPanel.add(userLabel);
-            add(userPanel, BorderLayout.EAST);
-        }
-    }
-
-    public static class StatsCard extends RoundedPanel {
-        public StatsCard(String label, String value, String emoji, Color bgColor) {
-            super(12, bgColor, true);
-            setLayout(new BorderLayout());
-            setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
-            setPreferredSize(new Dimension(200, 120));
-
-            JPanel content = new JPanel();
-            content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-            content.setBackground(bgColor);
-            content.setOpaque(false);
-
-            JLabel emojiLabel = new JLabel(emoji);
-            emojiLabel.setFont(new Font("Arial", Font.PLAIN, 32));
-            emojiLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            content.add(emojiLabel);
-
-            content.add(Box.createVerticalStrut(8));
-
-            JLabel labelText = new JLabel(label);
-            labelText.setFont(new Font("Arial", Font.PLAIN, 12));
-            labelText.setForeground(DashboardTheme.TEXT_DARK);
-            labelText.setAlignmentX(Component.LEFT_ALIGNMENT);
-            content.add(labelText);
-
-            content.add(Box.createVerticalStrut(4));
-
-            JLabel valueText = new JLabel(value);
-            valueText.setFont(new Font("Arial", Font.BOLD, 24));
-            valueText.setForeground(DashboardTheme.TEXT_DARK);
-            valueText.setAlignmentX(Component.LEFT_ALIGNMENT);
-            content.add(valueText);
-
-            add(content, BorderLayout.CENTER);
-        }
-    }
-
-    public static class TablePanel extends RoundedPanel {
-        public TablePanel(String title, String[] columnNames, Object[][] data) {
-            super(12, DashboardComponents.BG_DARK, true);
-            setLayout(new BorderLayout());
-            setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
-            setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
-
-            JLabel titleLabel = new JLabel(title);
-            titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            titleLabel.setForeground(DashboardTheme.TEXT_LIGHT);
-            add(titleLabel, BorderLayout.NORTH);
-
-            DefaultTableModel model = new DefaultTableModel(data, columnNames);
+            DefaultTableModel model = new DefaultTableModel(data, columns) {
+                public boolean isCellEditable(int row, int column) { return false; }
+            };
             JTable table = new JTable(model);
-            table.setBackground(DashboardComponents.BG_DARK);
-            table.setForeground(DashboardTheme.TEXT_LIGHT);
-            table.setGridColor(DashboardTheme.BG_MEDIUM);
-            table.setFont(new Font("Arial", Font.PLAIN, 12));
-            table.setRowHeight(25);
-            table.setEnabled(false);
+            table.setRowHeight(35);
+            table.setShowVerticalLines(false);
+            table.setGridColor(DashboardTheme.BORDER_COLOR);
+            table.setFont(DashboardTheme.FONT_REGULAR);
+            
+            // Dynamic Table Colors
+            table.setBackground(DashboardTheme.SURFACE);
+            table.setForeground(DashboardTheme.TEXT_PRIMARY);
+            table.setSelectionBackground(DashboardTheme.PRIMARY.brighter());
+            table.setSelectionForeground(Color.WHITE);
 
             JTableHeader header = table.getTableHeader();
-            header.setBackground(DashboardTheme.BG_MEDIUM);
-            header.setForeground(DashboardTheme.TEXT_LIGHT);
-            header.setFont(new Font("Arial", Font.BOLD, 12)); // Header font was missing in original TablePanel
+            header.setBackground(DashboardTheme.SURFACE); // Or slightly offset color
+            header.setForeground(DashboardTheme.TEXT_PRIMARY);
+            header.setFont(DashboardTheme.FONT_BOLD);
+            header.setPreferredSize(new Dimension(0, 40));
+            
+            JScrollPane sp = new JScrollPane(table);
+            sp.setBorder(BorderFactory.createEmptyBorder());
+            sp.getViewport().setBackground(DashboardTheme.SURFACE);
+            add(sp, BorderLayout.CENTER);
+        }
+    }
+    // ... existing imports
+// ADD THIS METHOD TO DashboardComponents class
 
-            JScrollPane scrollPane = new JScrollPane(table);
-            scrollPane.setBackground(DashboardComponents.BG_DARK);
-            scrollPane.getViewport().setBackground(DashboardComponents.BG_DARK);
-            add(scrollPane, BorderLayout.CENTER);
+    // --- 8. Input Styling Helper ---
+    public static void styleControl(JComponent component) {
+        component.setFont(DashboardTheme.FONT_REGULAR);
+        component.setForeground(DashboardTheme.TEXT_PRIMARY);
+        
+        // Input Background (slightly different from Surface for contrast)
+        if (DashboardTheme.isDark) {
+            component.setBackground(new Color(60, 60, 60)); 
+            component.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
+        } else {
+            component.setBackground(Color.WHITE);
+            component.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        }
+        
+        // Fix for JComboBox in Dark Mode
+        if (component instanceof JComboBox) {
+            ((JComboBox<?>) component).getEditor().getEditorComponent().setBackground(
+                DashboardTheme.isDark ? new Color(60, 60, 60) : Color.WHITE
+            );
+            ((JComboBox<?>) component).getEditor().getEditorComponent().setForeground(DashboardTheme.TEXT_PRIMARY);
+        }
+    }
+
+    // --- 7. Stats Card ---
+    public static class StatsCard extends CardPanel {
+        public StatsCard(String title, String value, Color accent) {
+            super(); setLayout(new BorderLayout());
+            JPanel content = new JPanel(new GridLayout(2, 1)); content.setOpaque(false);
+            content.setBorder(new EmptyBorder(15, 20, 15, 20));
+            
+            JLabel lblTitle = new JLabel(title.toUpperCase()); 
+            lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 12)); 
+            lblTitle.setForeground(DashboardTheme.TEXT_SECONDARY);
+            
+            JLabel lblValue = new JLabel(value); 
+            lblValue.setFont(new Font("Segoe UI", Font.BOLD, 28)); 
+            lblValue.setForeground(DashboardTheme.TEXT_PRIMARY);
+            
+            content.add(lblTitle); content.add(lblValue);
+            
+            JPanel accentBar = new JPanel(); 
+            accentBar.setPreferredSize(new Dimension(5, 0)); 
+            accentBar.setBackground(accent);
+            add(accentBar, BorderLayout.WEST); add(content, BorderLayout.CENTER);
         }
     }
 }
