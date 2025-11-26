@@ -8,8 +8,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 
 /*this class is for talking to the database (MYSQL) and allows changes*/
-/*for handling authentication*/
-/*for handling user_auth table (user_id, username, role, password_hash, status, last_login)*/
+/*for handling authentication and the user_auth table in MySQL*/
 
 public class AuthDAO {
     private final DataSource data_source = ServerConnector.auth();
@@ -65,6 +64,17 @@ public class AuthDAO {
             ps.setLong(2, user_id);
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
+        }
+    }
+
+    public void updateStatus(long user_id, String new_status) throws SQLException{
+        //like switching account from "ACTIVE" to "INACTIVE" if a student drops out or instructor leaves
+        String command = "UPDATE user_auth SET status = ? WHERE user_id = ?";
+        try (java.sql.Connection connection = data_source.getConnection();
+             java.sql.PreparedStatement ps = connection.prepareStatement(command)) {
+            ps.setString(1, new_status);
+            ps.setLong(2, user_id);
+            ps.executeUpdate();
         }
     }
 
