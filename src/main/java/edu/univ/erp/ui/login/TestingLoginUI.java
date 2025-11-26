@@ -27,7 +27,7 @@ public class TestingLoginUI {
             }
             else if ("student1".equals(username) && "pass123".equals(password)) {
                 a.role = "STUDENT";
-                a.user_id = 101;
+                a.user_id = 3;
                 return a;
             }
             else if ("prof1".equals(username) && "pass123".equals(password)) {

@@ -54,23 +54,118 @@ public class GradeDAO2 {
         return components;
     }
 
-    //fetches the final grades of the student
+    //computing the final grades of the student, method is used by the Instructor
+    public void calculateFinalGrades(long section_id) throws SQLException{
+        //for a section, finding the numerical final score per enrollment
+        String aggregate_command = """
+        SELECT
+            a.course_id,
+            a.section_id,
+            a.enrollment_id,
+            SUM(a.ass_score * gc.weightage / 100.0) AS final_score
+        FROM assessment_scores a
+        JOIN grade_components gc
+          ON gc.section_id = a.section_id
+         AND gc.course_id  = a.course_id
+         AND gc.assessment_name = a.assessment_name
+        WHERE a.section_id = ?
+        GROUP BY a.course_id, a.section_id, a.enrollment_id
+    """;
+
+        //inserting into the final_grades table
+        String upsert_command = """
+        INSERT INTO final_grades
+            (course_id, section_id, enrollment_id, grade_letter, course_cg)
+        VALUES (?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            grade_letter = VALUES(grade_letter),
+            course_cg    = VALUES(course_cg)
+    """;
+
+        try (Connection conn = ServerConnector.ERPConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement selectPs = conn.prepareStatement(aggregate_command);
+                 PreparedStatement upsertPs = conn.prepareStatement(upsert_command)) {
+
+                //computing the final score per enrollment
+                selectPs.setLong(1, section_id);
+
+                try (ResultSet rs = selectPs.executeQuery()) {
+                    while (rs.next()) {
+                        long courseId     = rs.getLong("course_id");
+                        long secId        = rs.getLong("section_id");
+                        long enrollmentId = rs.getLong("enrollment_id");
+                        double finalScore = rs.getDouble("final_score");
+
+                        //mapping score to letter grade
+                        String letter   = mapToLetterGrade(finalScore);
+                        double courseCg = finalScore / 10.0;
+
+                        //upserting into final_grades table
+                        upsertPs.setLong(1, courseId);
+                        upsertPs.setLong(2, secId);
+                        upsertPs.setLong(3, enrollmentId);
+                        upsertPs.setString(4, letter);
+                        upsertPs.setDouble(5, courseCg);
+                        upsertPs.addBatch();
+                    }
+                }
+
+                // ----- STEP 4: execute batch + commit -----
+                upsertPs.executeBatch();
+                conn.commit();
+
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
+
+    //mapping the final score to a letter grade
+    private String mapToLetterGrade(double score) {
+        if (score >= 90) return "A+";
+        if (score >= 80) return "A";
+        if (score >= 75) return "A-";
+        if (score >= 70) return "B+";
+        if (score >= 65) return "B";
+        if (score >= 60) return "B-";
+        if (score >= 55) return "C";
+        if (score >= 50) return "C-";
+        if (score >= 45) return "D";
+        if (score >= 40) return "D-";
+        return "F";
+    }
+
+    //fetches the final grades of the student, used in Student UI
     public static List<FinalGrade> listFinalGrades(long student_id, int sem_no, String sem_season, int year) throws SQLException {
-        String sql = """
-            SELECT fg.final_score, fg.letter_grade,
-                   c.course_code, c.name AS course_name, c.credits
-            FROM enrollments e
-            JOIN sections s ON e.section_id = s.section_id
-            JOIN courses  c ON s.course_code = c.course_code
-            JOIN final_grades fg ON fg.enrollment_id = e.enrollment_id
-            WHERE e.student_id = ? AND e.e_status='COMPLETED'
-              AND s.sem_no = ? AND s.sem_season = ? AND s.year = ?
-            ORDER BY c.course_code
+        String command = """
+            SELECT
+                                fg.course_id,
+                                fg.section_id,
+                                fg.enrollment_id,
+                                fg.grade_letter,
+                                fg.course_cg,
+                                c.course_code,
+                                c.name AS course_name,
+                                c.credits
+                            FROM enrollments e
+                            JOIN sections s ON e.section_id = s.section_id
+                            JOIN courses  c ON s.course_code = c.course_code
+                            JOIN final_grades fg ON fg.enrollment_id = e.enrollment_id
+                            WHERE e.student_id = ?
+                              AND e.e_status='COMPLETED'
+                              AND s.sem_no = ?
+                              AND s.sem_season = ?
+                              AND s.year = ?
+                            ORDER BY c.course_code
         """;
 
         List<FinalGrade> final_grades = new ArrayList<>();
-        try (Connection conn = ServerConnector.ERPConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(command)) {
             ps.setLong(1, student_id);
             ps.setInt(2, sem_no);
             ps.setString(3, sem_season);

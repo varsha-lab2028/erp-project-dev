@@ -198,7 +198,9 @@ public class DashboardComponents {
     // --- 6. Table Panel (Updated Colors) ---
     public static class TablePanel extends CardPanel {
         public TablePanel(String title, String[] columns, Object[][] data) {
-            super();
+            setLayout(new BorderLayout());
+
+            //header title
             JLabel titleLbl = new JLabel(title);
             titleLbl.setFont(DashboardTheme.FONT_SUBTITLE);
             titleLbl.setForeground(DashboardTheme.TEXT_PRIMARY); // Use Theme Color
@@ -208,11 +210,14 @@ public class DashboardComponents {
             DefaultTableModel model = new DefaultTableModel(data, columns) {
                 public boolean isCellEditable(int row, int column) { return false; }
             };
+
             JTable table = new JTable(model);
             table.setRowHeight(35);
             table.setShowVerticalLines(false);
             table.setGridColor(DashboardTheme.BORDER_COLOR);
             table.setFont(DashboardTheme.FONT_REGULAR);
+            //to add a horizontal scrolling to the table
+            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
             
             // Dynamic Table Colors
             table.setBackground(DashboardTheme.SURFACE);

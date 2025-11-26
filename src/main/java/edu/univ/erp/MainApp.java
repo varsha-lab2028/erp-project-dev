@@ -40,7 +40,7 @@ public class MainApp {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 600);
         frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
+        frame.setResizable(true);
 
         //Use CardLayout for panel navigation
         cardLayout = new CardLayout();

@@ -33,7 +33,8 @@ public class LoginPanel extends JPanel {
         setBackground(PAGE_BG);
 
         // 2. Login Card (White, Size Increased)
-        JPanel card = new DashboardComponents.RoundedPanel(14, Color.WHITE, true); 
+        //JPanel card = new DashboardComponents.RoundedPanel(14, Color.WHITE, true);
+        JPanel card = new DashboardComponents.CardPanel();
         card.setLayout(new GridBagLayout());
         card.setPreferredSize(new Dimension(500, 650));
         card.setBorder(new EmptyBorder(32, 32, 20, 32));
@@ -120,7 +121,7 @@ public class LoginPanel extends JPanel {
         JPanel p = new JPanel(new BorderLayout(0, 5));
         p.setOpaque(false);
         JLabel lbl = new JLabel(labelText);
-        lbl.setFont(DashboardTheme.FONT_LABEL);
+        lbl.setFont(DashboardTheme.FONT_REGULAR);
         lbl.setForeground(DashboardTheme.TEXT_PRIMARY);
         p.add(lbl, BorderLayout.NORTH);
         p.add(field, BorderLayout.CENTER);
@@ -130,10 +131,16 @@ public class LoginPanel extends JPanel {
 
     private JTextField createStyledInputField(boolean isPassword) {
         JTextField field = isPassword ? new JPasswordField() : new JTextField();
+
+        // Make absolutely sure it can receive input
+        field.setEditable(true);
+        field.setEnabled(true);
+        field.setFocusable(true);
+
         field.setFont(DashboardTheme.FONT_REGULAR.deriveFont(Font.BOLD, 15f));
         field.setForeground(Color.WHITE);
         field.setBackground(PAGE_BG); // Green Background
-        field.setCaretColor(DashboardTheme.SECONDARY_GREEN);
+        field.setCaretColor(DashboardTheme.TEXT_PRIMARY); //MAKING THE CURSOR WHITE
         field.setPreferredSize(new Dimension(0, 45));
         
         // Black 2px Border
@@ -151,7 +158,7 @@ public class LoginPanel extends JPanel {
     }
     
     private void styleLoginButton(JButton btn) {
-        btn.setBackground(DashboardTheme.SECONDARY_GREEN);
+        btn.setBackground(DashboardTheme.PRIMARY); //CHANGED THIS COLOUR
         btn.setForeground(Color.WHITE);
         btn.setPreferredSize(new Dimension(0, 45));
         btn.setOpaque(true);
@@ -241,7 +248,7 @@ public class LoginPanel extends JPanel {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             
-            Color borderColor = isSelected ? DashboardTheme.SECONDARY_GREEN : DashboardTheme.PRIMARY_DARK;
+            Color borderColor = isSelected ? DashboardTheme.BORDER_COLOR : DashboardTheme.PRIMARY_DARK; //ADDED THE BORDER COLOUR FROM DASHBOARD THEME
             Color fillColor = isSelected ? DashboardTheme.PRIMARY_DARK : (isHover ? new Color(240, 240, 240) : Color.WHITE);
             
             int x = (getWidth() - size) / 2;

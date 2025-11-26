@@ -73,32 +73,18 @@ public class CourseDAO {
         }
     }
 
-    /* //returns possibly many matches by name fragment
-    public Course findByCourseName(String keyword) throws SQLException {
-        String like = "%" + keyword + "%";
-        String sql = """
-        SELECT course_id, course_code, name, credits
-        FROM courses
-        WHERE name LIKE ?
-        ORDER BY course_code
-        """;
-
-        List<Course> courses = new ArrayList<>();
-        try (Connection connection = ServerConnector.ERPConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, like);
+    //specifically made for instructor panel
+    public String findNameByCourseCode(String courseCode) throws SQLException {
+        String sql = "SELECT name FROM courses WHERE course_code = ?";
+        try (Connection conn = ServerConnector.ERPConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, courseCode);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    courses.add(new Course(
-                            rs.getLong("course_id"),
-                            rs.getString("course_code"),
-                            rs.getString("name"),
-                            rs.getInt("credits")
-                    ));
+                if (rs.next()) {
+                    return rs.getString("name");
                 }
             }
         }
-        return courses;
+        return courseCode;
     }
-     */
 }

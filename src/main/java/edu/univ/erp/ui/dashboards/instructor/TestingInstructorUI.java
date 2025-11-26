@@ -2,6 +2,7 @@ package edu.univ.erp.ui.dashboards.instructor;
 
 import javax.swing.*;
 import edu.univ.erp.service.InstructorService;
+import edu.univ.erp.service.MaintenanceService;
 
 public class TestingInstructorUI {
     public static void main(String[] args) {
@@ -30,9 +31,10 @@ public class TestingInstructorUI {
 
             // Initialize required services
             InstructorService instructorService = new InstructorService();
+            MaintenanceService maintenanceService = new MaintenanceService();
 
             // Load the updated Instructor Dashboard
-            frame.add(new InstructorDashboardPanel(instructorService));
+            frame.add(new InstructorDashboardPanel(instructorService, maintenanceService));
 
             frame.setVisible(true);
         });

@@ -1,12 +1,12 @@
 package edu.univ.erp.ui.dashboards.instructor;
 
+import edu.univ.erp.service.MaintenanceService;
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.service.InstructorService;
-import edu.univ.erp.data.EnrollmentDAO;
-// --- KEY IMPORTS from Admin Package ---
+
 import edu.univ.erp.ui.dashboards.admin.AdminProfilePanel;
-import edu.univ.erp.ui.dashboards.admin.MaintenancePanel; // <--- Correct Class Name
+import edu.univ.erp.ui.dashboards.admin.MaintenancePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,13 +15,16 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class InstructorDashboardPanel extends JPanel {
-    
     private InstructorService instructorService;
+    private MaintenanceService maintenanceService;
+    //private final long instructorUserId;
+
     private boolean isSidebarCollapsed = false;
     private String currentScreen = "Dashboard";
 
-    public InstructorDashboardPanel(InstructorService instructorService) {
+    public InstructorDashboardPanel(InstructorService instructorService, MaintenanceService maintenanceService) {
         this.instructorService = instructorService;
+        this.maintenanceService = maintenanceService;
         setLayout(new BorderLayout());
         initUI();
     }
@@ -52,7 +55,7 @@ public class InstructorDashboardPanel extends JPanel {
         contentArea.setBackground(DashboardTheme.BG_MAIN);
 
         contentArea.add(new InstructorHomePanel(), "Dashboard");
-        contentArea.add(new MySectionsPanel(instructorService), "My Sections");
+        contentArea.add(new InstructorSectionsPanel(instructorService), "My Sections");
         contentArea.add(new GradebookPanel(instructorService), "Gradebook");
         contentArea.add(new AdminProfilePanel(), "Profile");
         
