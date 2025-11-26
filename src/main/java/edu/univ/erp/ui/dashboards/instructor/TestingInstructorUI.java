@@ -1,30 +1,39 @@
-
-
 package edu.univ.erp.ui.dashboards.instructor;
 
 import javax.swing.*;
-
-import edu.univ.erp.service.StudentService;
-import edu.univ.erp.service.MaintenanceService;
 import edu.univ.erp.service.InstructorService;
 
 public class TestingInstructorUI {
     public static void main(String[] args) {
         try {
+            // 1. macOS Specific Integration (Top Menu Bar & App Name)
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("apple.awt.application.name", "IIITD ERP");
+            
+            // 2. Text Rendering: Enables smoother font antialiasing
+            System.setProperty("awt.useSystemAAFontSettings", "on");
+            System.setProperty("swing.aatext", "true");
+
+            // 3. Set Native System Look and Feel
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // Fallback to default if system L&F fails
+        }
 
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("University ERP - Instructor");
+            JFrame frame = new JFrame("IIITD University ERP - Instructor Portal");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1200, 800);
-            frame.setLocationRelativeTo(null);
+            
+            // Increased resolution to accommodate the sidebar and "floating" UI comfortably
+            frame.setSize(1280, 850); 
+            frame.setLocationRelativeTo(null); // Center on screen
 
-            StudentService studentService = new StudentService();
-            MaintenanceService maintenanceService = new MaintenanceService();
+            // Initialize required services
             InstructorService instructorService = new InstructorService();
 
-            //frame.add(new InstructorDashboardPanel(instructor_service));
+            // Load the updated Instructor Dashboard
+            frame.add(new InstructorDashboardPanel(instructorService));
+
             frame.setVisible(true);
         });
     }

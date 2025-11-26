@@ -13,11 +13,9 @@ public class MySectionsPanel extends JPanel {
     public MySectionsPanel(edu.univ.erp.service.InstructorService instructorService) {
         this.instructorService = instructorService;
         setLayout(new BorderLayout(20, 20));
-        setBackground(DashboardTheme.BG_LIGHT);
-        setBorder(new EmptyBorder(20, 20, 20, 20));
+        setBackground(DashboardTheme.BG_MAIN); // Dynamic Background
+        setBorder(new EmptyBorder(30, 30, 30, 30));
         
-        // TODO: Replace static data with instructorService data fetch
-
         // Reuse the TablePanel for a clean look
         String[] cols = {"Course Code", "Title", "Section", "Room", "Schedule", "Capacity", "Enrolled"};
         Object[][] data = {
