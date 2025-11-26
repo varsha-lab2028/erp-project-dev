@@ -2,79 +2,75 @@ package edu.univ.erp.ui.dashboards.student;
 
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.service.StudentService;
-
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
-import edu.univ.erp.util.RoundedButton;
 
-import java.util.Collections;
-import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.Collections;
+import java.util.List;
 import java.sql.SQLException;
 
 public class StudentSectionPanel extends JPanel {
-    private JTable section_table;
-    private List<Section> current_sections; //sections rows currently shown in the table
+    private StudentService student_service = new StudentService();
+    private JPanel contentPanel;
+    private List<Section> current_sections;
+    
+    // We need to keep track of the table to get selected rows
+    // Since TablePanel encapsulates JTable, for this specific panel where we need interaction,
+    // we might need to modify TablePanel or just use a custom implementation using style helpers.
+    // For simplicity, I will use a custom implementation of the table here to support selection.
+    private JTable sectionTable;
 
-    private final JTextField search_field = new JTextField(20);
-    private final RoundedButton search_button;
-    private final RoundedButton register_button;
-    private final JLabel status_label = new JLabel(" ");
-    private final StudentService student_service = new StudentService();
-
-    //constructor
     public StudentSectionPanel() {
         setLayout(new BorderLayout(20, 20));
-        setBackground(DashboardTheme.BG_LIGHT);
-        setBorder(new EmptyBorder(20, 20, 20, 20));
+        setBackground(DashboardTheme.BG_MAIN);
+        setBorder(new EmptyBorder(30, 30, 30, 30));
 
-        //top bar
-        JPanel top_card = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
-        top_card.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 15));
+        // 1. Top Bar
+        DashboardComponents.CardPanel topCard = new DashboardComponents.CardPanel();
+        topCard.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 10));
 
-        JLabel search_label = new JLabel("Search:");
-        search_label.setFont(DashboardTheme.FONT_REGULAR);
-        search_field.setFont(DashboardTheme.FONT_REGULAR);
+        JTextField searchField = new JTextField(20);
+        DashboardComponents.styleControl(searchField);
 
-        //search button
-        search_button = new RoundedButton("Search");
+        JButton searchBtn = DashboardComponents.createPrimaryButton("Search");
+        JButton registerBtn = DashboardComponents.createPrimaryButton("Register Selected");
 
-        //register button
-        //register_button.setEnabled(AccessControl.canAccess("STU_REGISTER"));
-        register_button = new RoundedButton("Register Selected");
-        register_button.setEnabled(true); //right now, it is temporary
+        topCard.add(new JLabel("Search: "));
+        topCard.add(searchField);
+        topCard.add(searchBtn);
+        topCard.add(Box.createHorizontalStrut(20));
+        topCard.add(registerBtn);
+        
+        add(topCard, BorderLayout.NORTH);
 
-        //adding these to the top bar
-        top_card.add(search_label);
-        top_card.add(search_field);
-        top_card.add(search_button);
-        top_card.add(Box.createHorizontalStrut(20));
-        top_card.add(register_button);
-        add(top_card, BorderLayout.NORTH);
+        // 2. Table Area
+        contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setOpaque(false);
+        add(contentPanel, BorderLayout.CENTER);
 
-        //loading the sections into the table
-        List<Section> sectionTable_list;
-        String[] columns = {"COURSE CODE", "INSTRUCTOR", "DAY", "TIMINGS", "CLASSROOM", "CAPACITY",};
+        // Load Data
+        reloadSections("");
+
+        // Listeners
+        searchBtn.addActionListener(e -> reloadSections(searchField.getText().trim()));
+        registerBtn.addActionListener(e -> registerSelected());
+    }
+
+    private void reloadSections(String keyword) {
         try {
-            sectionTable_list = student_service.browseSectionCatalog("");
-        } catch (SQLException sqlE) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Error loading sections: " + sqlE.getMessage(),
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            sectionTable_list = Collections.emptyList();
+            current_sections = student_service.browseSectionCatalog(keyword);
+        } catch (SQLException e) {
+            current_sections = Collections.emptyList();
         }
 
-        current_sections = sectionTable_list;
+        String[] cols = {"Code", "Instructor", "Day", "Timings", "Room", "Cap"};
+        Object[][] data = new Object[current_sections.size()][cols.length];
 
-        Object[][] data = new Object[sectionTable_list.size()][columns.length];
-        for (int i = 0; i < sectionTable_list.size(); i++) {
-            Section s = sectionTable_list.get(i);
+        for (int i = 0; i < current_sections.size(); i++) {
+            Section s = current_sections.get(i);
             data[i][0] = s.getCourseCode();
             data[i][1] = s.getInstructorName();
             data[i][2] = s.getDay();
@@ -83,113 +79,52 @@ public class StudentSectionPanel extends JPanel {
             data[i][5] = s.getCapacity();
         }
 
-        DefaultTableModel model = new DefaultTableModel(data, columns) {
-            @Override
-            public boolean isCellEditable(int r, int c) {
-                return false;
-            }
-        };
-
-        //table center
-        section_table = new JTable(model);
-        section_table.setFont(DashboardTheme.FONT_REGULAR);
-        section_table.setRowHeight(35);
-        section_table.setShowGrid(false);
-        section_table.setIntercellSpacing(new Dimension(0, 5));
-        section_table.getTableHeader().setBackground(Color.WHITE);
-        section_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
-        section_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        section_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
-        section_table.setSelectionBackground(new Color(200, 230, 201, 50));
-        section_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
-
-        JScrollPane sp = new JScrollPane(section_table);
-        sp.getViewport().setBackground(Color.WHITE);
-        sp.setBorder(BorderFactory.createEmptyBorder());
-
-        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        // Custom Table Creation using Dashboard Styles
+        DashboardComponents.CardPanel tableCard = new DashboardComponents.CardPanel();
         tableCard.setLayout(new BorderLayout());
-        tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        JLabel title = new JLabel("Available Sections");
+        title.setFont(DashboardTheme.FONT_SUBTITLE);
+        title.setForeground(DashboardTheme.TEXT_PRIMARY);
+        title.setBorder(new EmptyBorder(15, 20, 15, 20));
+        tableCard.add(title, BorderLayout.NORTH);
+
+        sectionTable = new JTable(data, cols);
+        sectionTable.setRowHeight(35);
+        sectionTable.setFont(DashboardTheme.FONT_REGULAR);
+        sectionTable.getTableHeader().setFont(DashboardTheme.FONT_BOLD);
+        
+        // Colors
+        sectionTable.setBackground(DashboardTheme.SURFACE);
+        sectionTable.setForeground(DashboardTheme.TEXT_PRIMARY);
+        sectionTable.setGridColor(DashboardTheme.BORDER_COLOR);
+        
+        JScrollPane sp = new JScrollPane(sectionTable);
+        sp.getViewport().setBackground(DashboardTheme.SURFACE);
+        sp.setBorder(null);
+        
         tableCard.add(sp, BorderLayout.CENTER);
-        add(tableCard, BorderLayout.CENTER);
-
-        //status bar placed in the south of the interface
-        status_label.setFont(DashboardTheme.FONT_SMALL);
-        add(status_label, BorderLayout.SOUTH);
-        status_label.setText(sectionTable_list.size() + " sections");
-
-        //search action listener
-        search_button.addActionListener(e -> {
-            String keyword = search_field.getText().trim();
-            List<Section> search_list;
-            try {
-                search_list = student_service.browseSectionCatalog(keyword);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error loading sections.");
-                return;
-            }
-
-            current_sections = search_list;
-
-            Object[][] newData = new Object[search_list.size()][columns.length];
-            for (int i = 0; i < search_list.size(); i++) {
-                Section s = search_list.get(i);
-                newData[i][0] = s.getCourseCode();
-                newData[i][1] = s.getInstructorName();
-                newData[i][2] = s.getDay();
-                newData[i][3] = s.getTimings();
-                newData[i][4] = s.getClassroom();
-                newData[i][5] = s.getCapacity();
-            }
-
-            DefaultTableModel new_model = new DefaultTableModel(newData, columns) {
-                @Override public boolean isCellEditable(int row, int col) { return false; }
-            };
-            section_table.setModel(new_model);
-            status_label.setText(search_list.size() + " sections");
-        });
-
-        //register action listener
-        register_button.addActionListener(e -> registerSelectedSection());
+        
+        contentPanel.removeAll();
+        contentPanel.add(tableCard, BorderLayout.CENTER);
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
-    private void registerSelectedSection(){
-        int row = section_table.getSelectedRow();
-        if(row < 0){
-            JOptionPane.showMessageDialog(this, "Please select a section first.");
+
+    private void registerSelected() {
+        int row = sectionTable.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a section.");
             return;
         }
-        /* commenting this out for now because we don't have login yet
-        if (!Session.isLoggedIn()) {
-            JOptionPane.showMessageDialog(this, "You must be logged in.");
-            return;
-        }
-        if (!AccessControl.canAccess("STU_REGISTER")) {
-            JOptionPane.showMessageDialog(this, "Registration disabled. ERP currently under maintenance");
-            return;
-        }
-         */
         Section s = current_sections.get(row);
-        //long student_id = Session.user().getUserId();
-        long student_id = 3L; //just for testing right now
+        long student_id = 3L; 
 
         try {
             student_service.registerForSection(student_id, s.getSectionId());
-            JOptionPane.showMessageDialog(this,
-                    "Successfully registered for " + s.getCourseCode());
-
-        } catch (IllegalStateException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Failed", JOptionPane.WARNING_MESSAGE);
-
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Database error: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Registered for " + s.getCourseCode());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
-
-
-
-

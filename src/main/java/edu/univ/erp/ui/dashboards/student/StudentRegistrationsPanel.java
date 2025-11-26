@@ -24,11 +24,13 @@ public class StudentRegistrationsPanel extends JPanel {
 
     public StudentRegistrationsPanel() {
         setLayout(new BorderLayout(20, 20));
-        setBackground(DashboardTheme.BG_LIGHT);
+        setBackground(new Color(245, 245, 245));
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
         //top bar
-        JPanel top = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        JPanel top = new JPanel();
+        top.setBackground(Color.WHITE);
+        top.setOpaque(true);
         top.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 15));
 
         //drop button
@@ -47,17 +49,19 @@ public class StudentRegistrationsPanel extends JPanel {
         reg_table.getTableHeader().setBackground(Color.WHITE);
         reg_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
         reg_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        reg_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
+        reg_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(225, 225, 225)));
         reg_table.setSelectionBackground(new Color(200, 230, 201, 50));
-        reg_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
-
         JScrollPane sp = new JScrollPane(reg_table);
         sp.getViewport().setBackground(Color.WHITE);
         sp.setBorder(BorderFactory.createEmptyBorder());
 
-        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        JPanel tableCard = new JPanel();
+        tableCard.setBackground(Color.WHITE);
+        tableCard.setOpaque(true);
         tableCard.setLayout(new BorderLayout());
         tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+        tableCard.add(sp, BorderLayout.CENTER);
+        add(tableCard, BorderLayout.CENTER);
         tableCard.add(sp, BorderLayout.CENTER);
         add(tableCard, BorderLayout.CENTER);
 

@@ -31,11 +31,12 @@ public class StudentTranscriptPanel extends JPanel{
 
     public StudentTranscriptPanel(){
         setLayout(new BorderLayout(20, 20));
-        setBackground(DashboardTheme.BG_LIGHT);
+        setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
         //top bar = shows the term label and export csv button
-        JPanel top_card = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        JPanel top_card = new JPanel();
+        top_card.setBackground(Color.WHITE);
         top_card.setLayout(new BorderLayout());
         top_card.setBorder(new EmptyBorder(10, 15, 10, 15));
 
@@ -63,18 +64,19 @@ public class StudentTranscriptPanel extends JPanel{
         transcript_table.getTableHeader().setBackground(Color.WHITE);
         transcript_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
         transcript_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        transcript_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
+        transcript_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         transcript_table.setSelectionBackground(new Color(200, 230, 201, 50));
         transcript_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
 
         JScrollPane sp = new JScrollPane(transcript_table);
         sp.getViewport().setBackground(Color.WHITE);
         sp.setBorder(BorderFactory.createEmptyBorder());
-
-        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        JPanel tableCard = new JPanel();
+        tableCard.setBackground(Color.WHITE);
         tableCard.setLayout(new BorderLayout());
         tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
         tableCard.add(sp, BorderLayout.CENTER);
+        add(tableCard, BorderLayout.CENTER);
         add(tableCard, BorderLayout.CENTER);
 
         //loading the data into transcript

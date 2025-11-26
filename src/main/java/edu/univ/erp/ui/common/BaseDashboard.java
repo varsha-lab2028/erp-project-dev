@@ -6,60 +6,75 @@ import edu.univ.erp.util.LoginTheme;
 import javax.swing.*;
 import java.awt.*;
 
-public class BaseDashboard extends JPanel{
+public class BaseDashboard extends JPanel { // Correctly extends JPanel
     protected final JLabel banner_label = new JLabel(" ");
     protected final JPanel content = new JPanel();
-    //the container is at the top and stacks the components vertically
     protected final JPanel header_stack = new JPanel();
 
     public BaseDashboard(String title) {
-        super(title);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 650);
-        setLocationRelativeTo(null);
+        // Removed super(title) as JPanel doesn't take a title
+        // Removed window-specific setup like setDefaultCloseOperation and setLocationRelativeTo
+
+        // Use setPreferredSize for Panels, not setSize
+        setPreferredSize(new Dimension(900, 650));
         setLayout(new BorderLayout());
 
+        // Header Stack (Contains Menu + Banner)
         header_stack.setLayout(new BoxLayout(header_stack, BoxLayout.Y_AXIS));
+        
+        // Fix: Add MenuBar directly to the layout since Panels don't have setJMenuBar
+        JMenuBar menuBar = makeMenuBar();
+        // Ensure menu bar stretches full width
+        menuBar.setMaximumSize(new Dimension(Short.MAX_VALUE, 30)); 
+        header_stack.add(menuBar);
+        
         add(header_stack, BorderLayout.NORTH);
 
-        //welcome banner
+        // Welcome Banner
         JPanel banner_panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
         banner_panel.setBackground(LoginTheme.DEEP_SEA);
+        
+        // Ensure banner stretches full width in BoxLayout
         banner_panel.setPreferredSize(new Dimension(900, 40));
+        banner_panel.setMaximumSize(new Dimension(Short.MAX_VALUE, 40));
+        
         banner_label.setFont(LoginTheme.FONT_SMALL);
         banner_label.setForeground(Color.WHITE);
         banner_panel.add(banner_label);
-        // Add banner as the first item in the stack
+        
         header_stack.add(banner_panel);
 
-        //content area
+        // Content Area
         content.setBackground(LoginTheme.PRIMARY_WHITE);
         content.setLayout(new BorderLayout());
         add(content, BorderLayout.CENTER);
 
-        //set text
+        // Set Text / Maintenance Logic
         boolean isMaintenance = false;
         try {
             isMaintenance = AccessControl.isReadOnlyNow();
         } catch (Exception e) {
-            // If database not available, assume not maintenance
             isMaintenance = false;
         }
+        
         if (isMaintenance) {
             banner_label.setText("MAINTENANCE MODE — Read Only");
-            //making the maintenance label red
             banner_panel.setBackground(new Color(200, 50, 50));
         } else {
             String user = Session.isLoggedIn() ? Session.user().getUsername() : "Guest";
             banner_label.setText("Welcome, " + user);
         }
 
-        setJMenuBar(makeMenuBar());
         LoginTheme.applyTheme();
     }
 
     private JMenuBar makeMenuBar(){
         JMenuBar bar = new JMenuBar();
+        
+        // Optional: Style the menu bar to look integrated
+        bar.setBackground(Color.WHITE);
+        bar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+
         JMenu app = new JMenu("Your Account");
 
         String user = Session.isLoggedIn() ? Session.user().getUsername() : "-";
@@ -84,7 +99,11 @@ public class BaseDashboard extends JPanel{
     }
 
     private void doLogout(){
-        dispose();
+        // Fix: Use getWindowAncestor to close the parent frame
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        if (parentWindow != null) {
+            parentWindow.dispose();
+        }
         new edu.univ.erp.ui.ui_auth.LoginFrame().setVisible(true);
     }
 }

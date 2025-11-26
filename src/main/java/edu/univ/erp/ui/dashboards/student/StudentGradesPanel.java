@@ -20,7 +20,7 @@ public class StudentGradesPanel extends JPanel {
 
     public StudentGradesPanel(){
         setLayout(new BorderLayout(20, 20));
-        setBackground(DashboardTheme.BG_LIGHT);
+        setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
         //UI table setup
@@ -33,7 +33,8 @@ public class StudentGradesPanel extends JPanel {
         grades_table.getTableHeader().setBackground(Color.WHITE);
         grades_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
         grades_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        grades_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
+        // replace undefined DashboardTheme.BORDER_GRAY with a concrete Color
+        grades_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(224, 224, 224)));
         grades_table.setSelectionBackground(new Color(200, 230, 201, 50));
         grades_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
 
@@ -42,10 +43,42 @@ public class StudentGradesPanel extends JPanel {
         scroll.setBorder(BorderFactory.createEmptyBorder());
 
         //Card wrapper
-        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        JPanel tableCard = new JPanel();
+        tableCard.setBackground(Color.WHITE);
+        tableCard.setOpaque(true);
         tableCard.setLayout(new BorderLayout());
         tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+        // replace default panel with a rounded-corner panel (no external DashboardComponents type needed)
+        tableCard = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+            int arc = 16;
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+            // subtle shadow
+            g2.setColor(new Color(0, 0, 0, 12));
+            g2.fillRoundRect(4, 4, getWidth() - 8, getHeight() - 8, arc, arc);
+
+            // panel background
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth() - 8, getHeight() - 8, arc, arc);
+
+            g2.dispose();
+
+            // don't call super.paintComponent before custom painting to avoid overpainting rounded corners
+            super.paintComponent(g);
+            }
+
+            @Override
+            public boolean isOpaque() {
+            // keep opaque false so rounded corners show properly
+            return false;
+            }
+        };
+        tableCard.setBackground(Color.WHITE);
+        tableCard.setLayout(new BorderLayout());
+        tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
         //title inside the card
         JLabel title = new JLabel("Course Grade Components");
         title.setFont(new Font("Segoe UI", Font.BOLD, 16));

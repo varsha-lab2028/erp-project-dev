@@ -21,12 +21,12 @@ public class StudentTimetablePanel extends JPanel {
 
     public StudentTimetablePanel() {
         setLayout(new BorderLayout(20, 20));
-        setBackground(DashboardTheme.BG_LIGHT);
+        setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
         //top bar
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        top.setBackground(DashboardTheme.BG_LIGHT);
+        top.setBackground(DashboardTheme.BG_MAIN);
         top.setPreferredSize(new Dimension(900, 60));
 
         //setting up the timetable
@@ -48,7 +48,7 @@ public class StudentTimetablePanel extends JPanel {
         timetable_table.getTableHeader().setBackground(Color.WHITE);
         timetable_table.getTableHeader().setForeground(DashboardTheme.TEXT_SECONDARY);
         timetable_table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        timetable_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_GRAY));
+        timetable_table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         timetable_table.setSelectionBackground(new Color(200, 230, 201, 50));
         timetable_table.setSelectionForeground(DashboardTheme.TEXT_PRIMARY);
 
@@ -57,7 +57,9 @@ public class StudentTimetablePanel extends JPanel {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         //ui card wrapper
-        JPanel tableCard = new DashboardComponents.RoundedPanel(15, Color.WHITE, true);
+        JPanel tableCard = new JPanel();
+        tableCard.setBackground(Color.WHITE);
+        tableCard.setOpaque(true);
         tableCard.setLayout(new BorderLayout());
         tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
 
