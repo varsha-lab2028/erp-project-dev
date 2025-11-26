@@ -6,7 +6,7 @@ import edu.univ.erp.util.LoginTheme;
 import javax.swing.*;
 import java.awt.*;
 
-public class BaseDashboard extends JFrame{
+public class BaseDashboard extends JPanel{
     protected final JLabel banner_label = new JLabel(" ");
     protected final JPanel content = new JPanel();
     //the container is at the top and stacks the components vertically
@@ -85,6 +85,6 @@ public class BaseDashboard extends JFrame{
 
     private void doLogout(){
         dispose();
-        new edu.univ.erp.ui.auth.LoginFrame().setVisible(true);
+        new edu.univ.erp.ui.ui_auth.LoginFrame().setVisible(true);
     }
 }

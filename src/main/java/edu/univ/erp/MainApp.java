@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 
 import edu.univ.erp.auth.AuthenticationService;
+import edu.univ.erp.domain.AuthClass;
+import edu.univ.erp.service.InstructorService;
 import edu.univ.erp.ui.login.LoginPanel;
 import edu.univ.erp.ui.login.LoginController;
 import edu.univ.erp.auth.LoginManager;
@@ -12,25 +14,8 @@ import edu.univ.erp.ui.dashboards.admin.AdminDashboardPanel;
 import edu.univ.erp.ui.dashboards.instructor.InstructorDashboardPanel;
 import edu.univ.erp.util.LoginTheme;
 
-
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.service.MaintenanceService;
-
-import edu.univ.erp.auth.AuthenticationService;
-import edu.univ.erp.auth.LoginManager;
-
-// New Service Registry to hold backend services centrally
-class ServiceRegistry {
-    public final StudentService studentService;
-    public final MaintenanceService maintenanceService;
-    public final AuthenticationService authService;
-
-    public ServiceRegistry() {
-        this.studentService = new StudentService();
-        this.maintenanceService = new MaintenanceService();
-        this.authService = (AuthenticationService) new LoginManager(); // casting explicitly
-    }
-}
 
 public class MainApp {
     private JFrame frame;
@@ -69,7 +54,7 @@ public class MainApp {
 
     private void initPanels() {
         // Provide centralized AuthenticationService to LoginController
-        LoginController loginController = new LoginController(services.authService);
+        LoginController loginController = new LoginController(services.auth_service);
         LoginPanel loginPanel = new LoginPanel(loginController);
 
         // Add property change listener for login success
@@ -79,9 +64,9 @@ public class MainApp {
         });
 
         //create dashboards with service injection
-        studentDashboard = new StudentDashboardPanel(services.studentService);
-        adminDashboard = new AdminDashboardPanel(services.maintenanceService, new edu.univ.erp.service.AdminService());
-        instructorDashboard = new InstructorDashboardPanel(services.studentService, services.maintenanceService, new edu.univ.erp.service.InstructorService());
+        studentDashboard = new StudentDashboardPanel(services.student_service);
+        adminDashboard = new AdminDashboardPanel(services.maintenance_service, new edu.univ.erp.service.AdminService());
+        instructorDashboard = new InstructorDashboardPanel(services.instructor_service, services.maintenance_service);
 
         //register all cards with the layout
         mainPanel.add("login", loginPanel);

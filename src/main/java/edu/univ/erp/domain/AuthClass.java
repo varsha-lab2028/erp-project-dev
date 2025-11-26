@@ -1,5 +1,3 @@
-//authentication class
-
 package edu.univ.erp.domain;
 import java.time.LocalDateTime;
 

@@ -1,4 +1,4 @@
-package edu.univ.erp.ui.auth;
+package edu.univ.erp.ui.ui_auth;
 
 import edu.univ.erp.auth.AuthDAO;
 import edu.univ.erp.auth.PasswordHasher;

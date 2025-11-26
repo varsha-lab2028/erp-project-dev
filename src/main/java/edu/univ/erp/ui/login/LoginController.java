@@ -1,22 +1,32 @@
 package edu.univ.erp.ui.login;
 
 import edu.univ.erp.auth.AuthenticationService;
+import edu.univ.erp.domain.AuthClass;
 
+//acts as a middle bridge between login UI and AuthenticationService
 public class LoginController {
     // Change type from LoginManager to AuthenticationService
-    private final AuthenticationService authService;
+    private final AuthenticationService auth_service;
 
-    public LoginController(AuthenticationService authService) {
-        this.authService = authService;
+    public LoginController(AuthenticationService auth_service) {
+        this.auth_service = auth_service;
     }
 
-    public boolean authenticate(String username, String password, String role) {
+    //returns the authenticated user if login is successful
+    public AuthClass authenticate(String username, String password, String selected_role) {
         try {
-            authService.login(username, password);
-            return true;
+            //verifying the user + password
+            AuthClass user = auth_service.login(username, password);
+            if (user == null) {
+                return null; //login failed
+            }
+            //check whether selected_role matches the user.role from DB
+            if (user.role == null || !user.role.equalsIgnoreCase(selected_role)) {
+                return null; // role mismatch
+            }
+            return user; //will return if everything is correct
         } catch (Exception e) {
-            // e.printStackTrace(); // Uncomment for debugging
-            return false;
+            return null;
         }
     }
-}//new commit
+}

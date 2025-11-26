@@ -24,7 +24,7 @@ public class TestingInstructorUI {
             MaintenanceService maintenanceService = new MaintenanceService();
             InstructorService instructorService = new InstructorService();
 
-            frame.add(new InstructorDashboardPanel(instructorService));
+            //frame.add(new InstructorDashboardPanel(instructor_service));
             frame.setVisible(true);
         });
     }

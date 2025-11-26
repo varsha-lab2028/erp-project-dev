@@ -1,8 +1,12 @@
 package edu.univ.erp.ui.dashboards.instructor;
 
+import com.sun.tools.javac.Main;
+import edu.univ.erp.domain.Instructor;
+import edu.univ.erp.service.MaintenanceService;
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.service.InstructorService;
+import edu.univ.erp.ui.dashboards.admin.MaintenancePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,8 +14,12 @@ import java.awt.*;
 public class InstructorDashboardPanel extends JPanel {
     private JPanel contentArea;
     private CardLayout cardLayout;
+    private final InstructorService instructor_service;
+    private final MaintenanceService maintenance_service;
 
-    public InstructorDashboardPanel(InstructorService instructorService) {
+    public InstructorDashboardPanel(InstructorService instructor_service, MaintenanceService maintenance_service) {
+        this.instructor_service = instructor_service;
+        this.maintenance_service = maintenance_service;
         setLayout(new BorderLayout());
         
         //side panel for the instructor
@@ -30,15 +38,14 @@ public class InstructorDashboardPanel extends JPanel {
 
         // 3. Add Views
         contentArea.add(new InstructorHomePanel(), "Dashboard");
-        contentArea.add(new MySectionsPanel(instructorService), "My Sections");
-        contentArea.add(new GradebookPanel(instructorService), "Gradebook");
-        // contentArea.add(new SettingsPanel(), "Settings"); // Placeholder
+        contentArea.add(new MySectionsPanel(instructor_service), "My Sections");
+        contentArea.add(new GradebookPanel(instructor_service), "Gradebook");
+        contentArea.add(new MaintenancePanel(), "Settings");
 
         // 4. Top Bar
         JPanel mainContainer = new JPanel(new BorderLayout());
         mainContainer.add(new DashboardComponents.TopBarPanel("Instructor Portal", "DR"), BorderLayout.NORTH);
         mainContainer.add(contentArea, BorderLayout.CENTER);
-        
         add(mainContainer, BorderLayout.CENTER);
     }
 
