@@ -3,6 +3,7 @@ package edu.univ.erp.ui.dashboards.instructor;
 import javax.swing.*;
 import edu.univ.erp.service.InstructorService;
 import edu.univ.erp.service.MaintenanceService;
+import edu.univ.erp.ui.common.DashboardTheme;
 
 public class TestingInstructorUI {
     public static void main(String[] args) {
@@ -25,16 +26,20 @@ public class TestingInstructorUI {
             JFrame frame = new JFrame("IIITD University ERP - Instructor Portal");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             
-            // Increased resolution to accommodate the sidebar and "floating" UI comfortably
+            // Resolution set to accommodate sidebar and content comfortably
             frame.setSize(1280, 850); 
             frame.setLocationRelativeTo(null); // Center on screen
 
             // Initialize required services
+            // Ensure your database connection is valid inside these services/DAOs
             InstructorService instructorService = new InstructorService();
             MaintenanceService maintenanceService = new MaintenanceService();
 
             // Load the updated Instructor Dashboard
-            frame.add(new InstructorDashboardPanel(instructorService, maintenanceService));
+            // This panel will now automatically instantiate the InstructorController internally
+            InstructorDashboardPanel dashboardPanel = new InstructorDashboardPanel(instructorService, maintenanceService);
+            
+            frame.add(dashboardPanel);
 
             frame.setVisible(true);
         });
