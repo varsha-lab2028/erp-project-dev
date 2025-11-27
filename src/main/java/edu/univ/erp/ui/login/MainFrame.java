@@ -1,12 +1,12 @@
 package edu.univ.erp.ui.login;
 
 import edu.univ.erp.service.*;
+import edu.univ.erp.domain.AuthClass;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.ui.login.LoginPanel;
 import edu.univ.erp.ui.dashboards.admin.AdminDashboardPanel;
 import edu.univ.erp.ui.dashboards.instructor.InstructorDashboardPanel;
 import edu.univ.erp.ui.dashboards.student.StudentDashboardPanel;
-import edu.univ.erp.ui.dashboards.instructor.InstructorDashboardPanel;
 import javax.swing.*;
 import java.awt.*;
 
@@ -21,6 +21,7 @@ public class MainFrame extends JFrame implements LoginPanel.MainFrameController 
     private final MaintenanceService maintenanceService = new MaintenanceService();
     private final AdminService adminService = new AdminService();
     private final InstructorService instructorService = new InstructorService();
+    private final LoginController loginController = new LoginController(new edu.univ.erp.auth.AuthenticationService());
 
     public MainFrame() {
         setTitle("IIITD ERP System");
@@ -56,7 +57,7 @@ public class MainFrame extends JFrame implements LoginPanel.MainFrameController 
         // FIX 4: Removed 'constraints:' hint from all lines below
         mainPanel.add(new LoginPanel(this), "LOGIN");
         mainPanel.add(new AdminDashboardPanel(maintenanceService, adminService), "ADMIN");
-        mainPanel.add(new InstructorDashboardPanel(instructorService), "INSTRUCTOR");
+        mainPanel.add(new InstructorDashboardPanel(instructorService, maintenanceService), "INSTRUCTOR");
         mainPanel.add(new StudentDashboardPanel(studentService), "STUDENT");
 
         add(mainPanel, BorderLayout.CENTER);
@@ -79,10 +80,15 @@ public class MainFrame extends JFrame implements LoginPanel.MainFrameController 
         checkMaintenance();
     }
     
+    @Override
+    public AuthClass authenticate(String username, String password, String selectedRole) {
+        return loginController.authenticate(username, password, selectedRole);
+    }
+
     public void checkMaintenance() {
         // Logic to toggle banner based on service
-        // boolean isMaintenance = maintenanceService.isMaintenanceMode();
-        // maintenanceBanner.setVisible(isMaintenance);
+        boolean isMaintenance = maintenanceService.isMaintenanceMode();
+        maintenanceBanner.setVisible(isMaintenance);
     }
 
     public static void main(String[] args) {

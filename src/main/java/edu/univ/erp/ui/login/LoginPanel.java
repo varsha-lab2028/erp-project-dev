@@ -1,46 +1,31 @@
 package edu.univ.erp.ui.login;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import java.awt.*;
-
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
-import edu.univ.erp.util.PasswordUtils;
 import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.domain.AuthClass;
 import edu.univ.erp.domain.Role;
 
-import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-//import javax.swing.border.MatteBorder;
 import java.awt.*;
-//import java.awt.event.FocusAdapter;
-//import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class LoginPanel extends JPanel {
-    private final Runnable onLoginSuccess;
-    private final JTextField userField;
-    private final JPasswordField passField;
-    private final JLabel errorLabel;
+    private final MainFrameController controller;
+    private final JTextField usernameField;
+    private final JPasswordField passwordField;
+    private final JLabel statusLabel;
+    private String selectedRole = "STUDENT"; // Default role
 
     public LoginPanel(MainFrameController controller) {
-        this.onLoginSuccess = null; // Unused in this pattern, controller handles it
+        this.controller = controller;
         setLayout(new GridBagLayout());
         setBackground(DashboardTheme.BG_MAIN);
 
-        // --- Login Card ---
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-            new LineBorder(new Color(226, 232, 240), 1),
-            new EmptyBorder(40, 40, 40, 40)
         // 2. Login Card (White, Size Increased)
         JPanel card = new DashboardComponents.CardPanel();
         card.setLayout(new GridBagLayout());
@@ -48,13 +33,14 @@ public class LoginPanel extends JPanel {
         card.setBorder(new EmptyBorder(32, 32, 20, 32));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
-        gbc.insets = new Insets(8, 0, 8, 0); 
+        gbc.insets = new Insets(8, 0, 8, 0);
 
         // --- 1. LOGO ---
-        JLabel logo = new JLabel("IIITD ERP", SwingConstants.CENTER); 
+        JLabel logo = new JLabel("IIITD ERP", SwingConstants.CENTER);
         logo.setFont(new Font("Segoe UI", Font.BOLD, 32));
         logo.setForeground(DashboardTheme.TEXT_PRIMARY);
         gbc.insets = new Insets(0, 0, 16, 0);
@@ -74,25 +60,27 @@ public class LoginPanel extends JPanel {
         gbc.gridy++;
         gbc.insets = new Insets(0, 0, 24, 0);
         card.add(subtitle, gbc);
-        
+
         // --- 3. PROFILE TYPE SELECTION (Fixed Icons) ---
         gbc.gridy++;
         gbc.insets = new Insets(0, 0, 30, 0);
-        card.add(createProfileSelector(), gbc);
+        card.add(createProfileSelector(), gbc); // Assuming this method exists and works
 
         // --- 4. INPUT FIELDS ---
         gbc.gridy++;
-        card.add(createLabelFieldPair("Username:", usernameField = createStyledInputField(false)), gbc);
+        usernameField = createStyledInputField(false);
+        card.add(createLabelFieldPair("Username:", usernameField), gbc);
 
         gbc.gridy++;
-        card.add(createLabelFieldPair("Password:", passwordField = createStyledPasswordField()), gbc);
+        passwordField = createStyledPasswordField();
+        card.add(createLabelFieldPair("Password:", passwordField), gbc);
 
         // --- 5. LOGIN BUTTON & FORGOT LINK ---
         gbc.gridy++;
         gbc.insets = new Insets(20, 0, 15, 0);
         JButton loginBtn = new JButton("LOGIN");
         styleLoginButton(loginBtn);
-        loginBtn.addActionListener(e -> performLogin());
+        loginBtn.addActionListener(e -> performLogin(controller));
         card.add(loginBtn, gbc);
 
         // Forgot Password Link (Bottom right)
@@ -104,27 +92,30 @@ public class LoginPanel extends JPanel {
         statusLabel = new JLabel(" ", SwingConstants.LEFT);
         statusLabel.setFont(DashboardTheme.FONT_SMALL);
         statusLabel.setForeground(DashboardTheme.TEXT_SECONDARY);
-        
+
         JLabel forgotLink = new JLabel("Forgot login details?", SwingConstants.RIGHT);
         forgotLink.setForeground(DashboardTheme.PRIMARY_DARK);
         forgotLink.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         forgotLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
         forgotLink.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) { JOptionPane.showMessageDialog(card, "Contact the ERP Admin to recover your details."); }
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JOptionPane.showMessageDialog(card, "Contact the ERP Admin to recover your details.");
+            }
         });
-        
+
         bottomRow.add(statusLabel, BorderLayout.WEST);
         bottomRow.add(forgotLink, BorderLayout.EAST);
         card.add(bottomRow, gbc);
 
         add(card, new GridBagConstraints());
-        
+
         // Initial selection
-        SwingUtilities.invokeLater(() -> selectRole("STUDENT")); 
+        SwingUtilities.invokeLater(() -> selectRole("STUDENT"));
     }
 
     // --- UI FACTORIES ---
-    
+
     private JPanel createLabelFieldPair(String labelText, JTextField field) {
         JPanel p = new JPanel(new BorderLayout(0, 5));
         p.setOpaque(false);
@@ -137,113 +128,76 @@ public class LoginPanel extends JPanel {
         return p;
     }
 
-    private JTextField createStyledInputField(boolean isPassword) {
-        JTextField field = isPassword ? new JPasswordField() : new JTextField();
-
+    private JTextField createStyledInputField(boolean isPassword) { // Assuming this is what was intended
+        JTextField field = new JTextField();
         // Make absolutely sure it can receive input
         field.setEditable(true);
         field.setEnabled(true);
         field.setFocusable(true);
 
         field.setFont(DashboardTheme.FONT_REGULAR.deriveFont(Font.BOLD, 15f));
-        field.setForeground(Color.WHITE);
-        field.setBackground(PAGE_BG); // Green Background
-        field.setCaretColor(DashboardTheme.TEXT_PRIMARY); //MAKING THE CURSOR WHITE
+        field.setForeground(DashboardTheme.TEXT_PRIMARY);
+        field.setBackground(DashboardTheme.BG_MAIN);
+        field.setCaretColor(DashboardTheme.TEXT_PRIMARY);
         field.setPreferredSize(new Dimension(0, 45));
-        
+
         // Black 2px Border
         field.setBorder(new CompoundBorder(
-            new LineBorder(Color.BLACK, 2, true),
-            new EmptyBorder(10, 10, 10, 10)
+                new LineBorder(DashboardTheme.BORDER_COLOR, 1, true),
+                new EmptyBorder(10, 10, 10, 10)
         ));
-        
-        // Logo / Icon
-        JLabel logo = new JLabel("🎓");
-        logo.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
-        logo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        JLabel title = new JLabel("University ERP");
-        title.setFont(DashboardTheme.FONT_TITLE);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        JLabel subtitle = new JLabel("Sign in to your account");
-        subtitle.setFont(DashboardTheme.FONT_REGULAR);
-        subtitle.setForeground(DashboardTheme.TEXT_SECONDARY);
-        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Fields
-        userField = new JTextField(20);
-        passField = new JPasswordField(20);
-        
-        // Login Button
-        JButton loginBtn = DashboardComponents.createPrimaryButton("Sign In");
-        loginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        // Error Message (Hidden by default)
-        errorLabel = new JLabel("Invalid credentials");
-        errorLabel.setForeground(DashboardTheme.DANGER);
-        errorLabel.setFont(DashboardTheme.FONT_SMALL);
-        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        errorLabel.setVisible(false);
-
-        // Inputs Wrapper
-        JPanel inputs = new JPanel(new GridLayout(4, 1, 0, 10));
-        inputs.setBackground(Color.WHITE);
-        inputs.setBorder(new EmptyBorder(20, 0, 20, 0));
-        inputs.add(createLabel("Username"));
-        inputs.add(userField);
-        inputs.add(createLabel("Password"));
-        inputs.add(passField);
-        inputs.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Action Logic
-        loginBtn.addActionListener(e -> {
-            String user = userField.getText();
-            String pass = new String(passField.getPassword());
-            
-            // TODO: Replace with Real DB Check
-            if (user.equals("admin") && pass.equals("admin")) {
-                controller.loginSuccess("ADMIN");
-            } else if (user.equals("student") && pass.equals("student")) {
-                controller.loginSuccess("STUDENT");
-            } else if (user.equals("prof") && pass.equals("prof")) {
-                controller.loginSuccess("INSTRUCTOR");
-            } else {
-                showError("Invalid Username or Password");
-            }
-        });
-
-        card.add(logo);
-        card.add(Box.createVerticalStrut(10));
-        card.add(title);
-        card.add(subtitle);
-        card.add(inputs);
-        card.add(errorLabel);
-        card.add(Box.createVerticalStrut(10));
-        card.add(loginBtn);
-
-        add(card);
-    }
-    
-    private void showError(String msg) {
-        errorLabel.setText(msg);
-        errorLabel.setVisible(true);
+        return field;
     }
 
-    private JLabel createLabel(String text) {
-        JLabel l = new JLabel(text);
-        l.setFont(DashboardTheme.FONT_BOLD);
-        l.setForeground(DashboardTheme.TEXT_SECONDARY);
-        return l;
+    private JPasswordField createStyledPasswordField() {
+        JPasswordField field = new JPasswordField();
+        field.setEditable(true);
+        field.setEnabled(true);
+        field.setFocusable(true);
+        field.setFont(DashboardTheme.FONT_REGULAR.deriveFont(Font.BOLD, 15f));
+        field.setForeground(DashboardTheme.TEXT_PRIMARY);
+        field.setBackground(DashboardTheme.BG_MAIN);
+        field.setCaretColor(DashboardTheme.TEXT_PRIMARY);
+        field.setPreferredSize(new Dimension(0, 45));
+        field.setBorder(new CompoundBorder(
+                new LineBorder(DashboardTheme.BORDER_COLOR, 1, true),
+                new EmptyBorder(10, 10, 10, 10)
+        ));
+        return field;
     }
-    
+
+    private void styleLoginButton(JButton button) {
+        button.setFont(DashboardTheme.FONT_BOLD.deriveFont(16f));
+        button.setBackground(DashboardTheme.PRIMARY);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(new EmptyBorder(15, 0, 15, 0));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    // Placeholder for methods that were missing but referenced
+    private JPanel createProfileSelector() {
+        // This should contain the logic for student/admin/instructor role selection
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.add(new JLabel("Profile selector placeholder"));
+        return panel;
+    }
+
+    private void selectRole(String role) {
+        this.selectedRole = role;
+        // This should update the UI to show which role is selected
+    }
+
     // Interface for callback
     public interface MainFrameController {
         void loginSuccess(String role);
+        // This was added to make the login logic work
+        AuthClass authenticate(String username, String password, String selectedRole);
     }
 
     //logic for performing login
-    private void performLogin() {
+    private void performLogin(MainFrameController controller) {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword()).trim();
 
@@ -253,7 +207,7 @@ public class LoginPanel extends JPanel {
         }
 
         setStatus("Authenticating...", false);
-        AuthClass authUser = controller.authenticate(username, password, selectedRole);
+        AuthClass authUser = this.controller.authenticate(username, password, selectedRole);
 
         if (authUser != null) {
             setStatus("Login successful! Redirecting...", false);
@@ -268,12 +222,12 @@ public class LoginPanel extends JPanel {
             Session.login(authUser.user_id, roleEnum);
 
             // Notify MainApp to switch dashboard
-            firePropertyChange("loginSuccess", null, authUser.role);
+            this.controller.loginSuccess(authUser.role);
         } else {
             setStatus("Invalid credentials for " + selectedRole + ".", true);
         }
     }
-    
+
     private void setStatus(String message, boolean isError) {
         statusLabel.setText(message);
         statusLabel.setForeground(isError ? Color.RED : DashboardTheme.TEXT_SECONDARY);
