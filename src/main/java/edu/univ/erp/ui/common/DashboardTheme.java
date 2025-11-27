@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 public class DashboardTheme {
-    // Colors are now non-final to support runtime switching
+    // Colors are non-final to support runtime switching
     public static Color PRIMARY = new Color(0, 150, 136); // IIITD Teal
     public static Color PRIMARY_DARK = new Color(0, 121, 107);
     public static Color ACCENT = new Color(255, 111, 0);
@@ -20,6 +20,9 @@ public class DashboardTheme {
     public static Color SUCCESS = new Color(67, 160, 71);
     public static Color WARNING = new Color(255, 179, 0);
     public static Color DANGER = new Color(229, 57, 53);
+    
+    // FIX: Added INFO back to prevent errors in Admin/Instructor panels
+    public static Color INFO = new Color(33, 150, 243); 
 
     // Fonts remain constant
     public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 24);
@@ -42,9 +45,11 @@ public class DashboardTheme {
             TEXT_SECONDARY = new Color(180, 180, 180);
             BORDER_COLOR = new Color(60, 60, 60);
             
-            // Adjust Primary to be slightly less harsh in dark mode if needed
             PRIMARY = new Color(38, 166, 154); 
             PRIMARY_DARK = new Color(0, 137, 123);
+            
+            // Adjust Status Colors for Dark Mode
+            INFO = new Color(66, 165, 245); 
         } else {
             // Light Mode Palette (Default IIITD)
             BG_MAIN = new Color(240, 242, 245);
@@ -57,6 +62,8 @@ public class DashboardTheme {
             
             PRIMARY = new Color(0, 150, 136);
             PRIMARY_DARK = new Color(0, 121, 107);
+            
+            INFO = new Color(33, 150, 243);
         }
     }
 }

@@ -13,9 +13,16 @@ public class DashboardComponents {
 
     // --- 1. Top Bar with Theme Toggle ---
     public static class TopBarPanel extends JPanel {
+        
+        // COMPATIBILITY CONSTRUCTOR: Keeps existing code working
+        public TopBarPanel(String title, String userInitials) {
+            this(title, userInitials, null, null, null);
+        }
+
+        // FULL CONSTRUCTOR: For new features
         public TopBarPanel(String title, String userInitials, ActionListener onToggleSidebar, ActionListener onProfileClick, ActionListener onThemeSwitch) {
             setLayout(new BorderLayout());
-            setBackground(DashboardTheme.SURFACE); // Dynamic Background
+            setBackground(DashboardTheme.SURFACE); 
             setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, DashboardTheme.BORDER_COLOR),
                 new EmptyBorder(10, 20, 10, 20)
@@ -32,7 +39,7 @@ public class DashboardComponents {
             toggleBtn.setFocusPainted(false);
             toggleBtn.setForeground(DashboardTheme.TEXT_PRIMARY);
             toggleBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            toggleBtn.addActionListener(onToggleSidebar);
+            if(onToggleSidebar != null) toggleBtn.addActionListener(onToggleSidebar);
             
             JLabel lblTitle = new JLabel(title);
             lblTitle.setFont(DashboardTheme.FONT_TITLE);
@@ -54,7 +61,7 @@ public class DashboardComponents {
             themeBtn.setToolTipText("Toggle Dark/Light Mode");
             themeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
             themeBtn.addActionListener(e -> {
-                onThemeSwitch.actionPerformed(e);
+                if(onThemeSwitch != null) onThemeSwitch.actionPerformed(e);
                 themeBtn.setText(DashboardTheme.isDark ? "☀️" : "🌙");
             });
             
@@ -63,12 +70,14 @@ public class DashboardComponents {
             // Profile Avatar
             JPanel profileBadge = new CircleAvatar(userInitials, 40);
             profileBadge.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            profileBadge.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    onProfileClick.actionPerformed(null);
-                }
-            });
+            if(onProfileClick != null) {
+                profileBadge.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        onProfileClick.actionPerformed(null);
+                    }
+                });
+            }
             
             right.add(profileBadge);
 
@@ -89,7 +98,7 @@ public class DashboardComponents {
             updateText();
             setFont(new Font("Segoe UI", Font.BOLD, 16)); 
             setForeground(new Color(176, 190, 197));
-            setBackground(DashboardTheme.BG_SIDEBAR); // Keep Sidebar dark usually, or use BG_SIDEBAR
+            setBackground(DashboardTheme.BG_SIDEBAR); 
             setBorder(new EmptyBorder(15, 20, 15, 20));
             setFocusPainted(false);
             setHorizontalAlignment(SwingConstants.LEFT);
@@ -123,7 +132,50 @@ public class DashboardComponents {
         }
     }
 
-    // --- 3. Card Panel (Updated to use SURFACE color) ---
+    // --- 2.5 Sidebar Panel (RESTORED) ---
+    // This was missing from your snippet but is REQUIRED by Admin/Student/Instructor Dashboards
+    public static class SidebarPanel extends JPanel {
+        private final JPanel menuContainer;
+        private final ActionListener navigationListener;
+
+        public SidebarPanel(String title, ActionListener listener) {
+            this.navigationListener = listener;
+            setLayout(new BorderLayout());
+            setBackground(DashboardTheme.BG_SIDEBAR);
+            setPreferredSize(new Dimension(260, 0));
+
+            // Logo Area
+            JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 25, 25));
+            header.setOpaque(false);
+            JLabel lbl = new JLabel(title);
+            lbl.setFont(new Font("Segoe UI", Font.BOLD, 20));
+            lbl.setForeground(Color.WHITE);
+            header.add(lbl);
+            add(header, BorderLayout.NORTH);
+
+            // Menu Items
+            menuContainer = new JPanel();
+            menuContainer.setLayout(new BoxLayout(menuContainer, BoxLayout.Y_AXIS));
+            menuContainer.setOpaque(false);
+            menuContainer.setBorder(new EmptyBorder(10, 10, 10, 10));
+            add(new JScrollPane(menuContainer) {
+                { setBorder(null); getViewport().setOpaque(false); setOpaque(false); }
+            }, BorderLayout.CENTER);
+        }
+
+        public void addItem(String text, String iconSymbol) {
+            SidebarButton btn = new SidebarButton(text, iconSymbol);
+            btn.setMaximumSize(new Dimension(240, 50));
+            btn.addActionListener(e -> {
+                if(navigationListener != null)
+                    navigationListener.actionPerformed(new java.awt.event.ActionEvent(btn, 1, text));
+            });
+            menuContainer.add(btn);
+            menuContainer.add(Box.createVerticalStrut(5));
+        }
+    }
+
+    // --- 3. Card Panel ---
     public static class CardPanel extends JPanel {
         private int cornerRadius = 15;
         public CardPanel() {
@@ -135,7 +187,7 @@ public class DashboardComponents {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             int width = getWidth() - 10; int height = getHeight() - 10;
             
-            // Shadow (Darker in Dark Mode)
+            // Shadow
             g2.setColor(DashboardTheme.isDark ? new Color(0,0,0, 100) : new Color(200, 200, 200, 80));
             g2.fillRoundRect(8, 5, width, height, cornerRadius, cornerRadius);
             
@@ -195,15 +247,14 @@ public class DashboardComponents {
         }
     }
     
-    // --- 6. Table Panel (Updated Colors) ---
+    // --- 6. Table Panel ---
     public static class TablePanel extends CardPanel {
         public TablePanel(String title, String[] columns, Object[][] data) {
             setLayout(new BorderLayout());
 
-            //header title
             JLabel titleLbl = new JLabel(title);
             titleLbl.setFont(DashboardTheme.FONT_SUBTITLE);
-            titleLbl.setForeground(DashboardTheme.TEXT_PRIMARY); // Use Theme Color
+            titleLbl.setForeground(DashboardTheme.TEXT_PRIMARY); 
             titleLbl.setBorder(new EmptyBorder(15, 20, 15, 20));
             add(titleLbl, BorderLayout.NORTH);
             
@@ -216,8 +267,7 @@ public class DashboardComponents {
             table.setShowVerticalLines(false);
             table.setGridColor(DashboardTheme.BORDER_COLOR);
             table.setFont(DashboardTheme.FONT_REGULAR);
-            //to add a horizontal scrolling to the table
-            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Horizontal scrolling
             
             // Dynamic Table Colors
             table.setBackground(DashboardTheme.SURFACE);
@@ -226,7 +276,7 @@ public class DashboardComponents {
             table.setSelectionForeground(Color.WHITE);
 
             JTableHeader header = table.getTableHeader();
-            header.setBackground(DashboardTheme.SURFACE); // Or slightly offset color
+            header.setBackground(DashboardTheme.SURFACE); 
             header.setForeground(DashboardTheme.TEXT_PRIMARY);
             header.setFont(DashboardTheme.FONT_BOLD);
             header.setPreferredSize(new Dimension(0, 40));
@@ -237,35 +287,11 @@ public class DashboardComponents {
             add(sp, BorderLayout.CENTER);
         }
     }
-    // ... existing imports
-// ADD THIS METHOD TO DashboardComponents class
-
-    // --- 8. Input Styling Helper ---
-    public static void styleControl(JComponent component) {
-        component.setFont(DashboardTheme.FONT_REGULAR);
-        component.setForeground(DashboardTheme.TEXT_PRIMARY);
-        
-        // Input Background (slightly different from Surface for contrast)
-        if (DashboardTheme.isDark) {
-            component.setBackground(new Color(60, 60, 60)); 
-            component.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
-        } else {
-            component.setBackground(Color.WHITE);
-            component.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
-        }
-        
-        // Fix for JComboBox in Dark Mode
-        if (component instanceof JComboBox) {
-            ((JComboBox<?>) component).getEditor().getEditorComponent().setBackground(
-                DashboardTheme.isDark ? new Color(60, 60, 60) : Color.WHITE
-            );
-            ((JComboBox<?>) component).getEditor().getEditorComponent().setForeground(DashboardTheme.TEXT_PRIMARY);
-        }
-    }
 
     // --- 7. Stats Card ---
     public static class StatsCard extends CardPanel {
-        public StatsCard(String title, String value, Color accent) {
+        // COMPATIBILITY CONSTRUCTOR: Added 'icon' argument to match HomePanels
+        public StatsCard(String title, String value, String icon, Color accent) {
             super(); setLayout(new BorderLayout());
             JPanel content = new JPanel(new GridLayout(2, 1)); content.setOpaque(false);
             content.setBorder(new EmptyBorder(15, 20, 15, 20));
@@ -280,10 +306,45 @@ public class DashboardComponents {
             
             content.add(lblTitle); content.add(lblValue);
             
+            // Icon Logic
+            JLabel lblIcon = new JLabel(icon);
+            lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 32));
+            lblIcon.setForeground(accent);
+            lblIcon.setBorder(new EmptyBorder(0, 0, 0, 20));
+            
             JPanel accentBar = new JPanel(); 
             accentBar.setPreferredSize(new Dimension(5, 0)); 
             accentBar.setBackground(accent);
-            add(accentBar, BorderLayout.WEST); add(content, BorderLayout.CENTER);
+            
+            add(accentBar, BorderLayout.WEST); 
+            add(content, BorderLayout.CENTER);
+            add(lblIcon, BorderLayout.EAST);
+        }
+
+        // Simpler constructor (if icon not needed)
+        public StatsCard(String title, String value, Color accent) {
+            this(title, value, "", accent);
+        }
+    }
+
+    // --- 8. Input Styling Helper ---
+    public static void styleControl(JComponent component) {
+        component.setFont(DashboardTheme.FONT_REGULAR);
+        component.setForeground(DashboardTheme.TEXT_PRIMARY);
+        
+        if (DashboardTheme.isDark) {
+            component.setBackground(new Color(60, 60, 60)); 
+            component.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
+        } else {
+            component.setBackground(Color.WHITE);
+            component.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        }
+        
+        if (component instanceof JComboBox) {
+            ((JComboBox<?>) component).getEditor().getEditorComponent().setBackground(
+                DashboardTheme.isDark ? new Color(60, 60, 60) : Color.WHITE
+            );
+            ((JComboBox<?>) component).getEditor().getEditorComponent().setForeground(DashboardTheme.TEXT_PRIMARY);
         }
     }
 }

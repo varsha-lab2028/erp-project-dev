@@ -11,37 +11,46 @@ public class StudentHomePanel extends JPanel {
     public StudentHomePanel() {
         setLayout(new BorderLayout());
         setBackground(DashboardTheme.BG_MAIN);
+        
+        // Clean border definition without "top:", "left:", etc.
         setBorder(new EmptyBorder(30, 30, 30, 30));
 
         JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setBackground(DashboardTheme.BG_MAIN);
 
-        // 1. Stats Grid
-        JPanel grid = new JPanel(new GridLayout(1, 4, 20, 0));
+        // 1. Stats Grid (Student Specific)
+        JPanel grid = new JPanel(new GridLayout(1, 3, 20, 0));
         grid.setBackground(DashboardTheme.BG_MAIN);
-        grid.setMaximumSize(new Dimension(2000, 110));
+        grid.setMaximumSize(new Dimension(2000, 120));
         
-        grid.add(new DashboardComponents.StatsCard("Current CGPA", "8.92", DashboardTheme.PRIMARY));
-        grid.add(new DashboardComponents.StatsCard("Credits Earned", "64", DashboardTheme.ACCENT));
-        grid.add(new DashboardComponents.StatsCard("Attendance", "92%", DashboardTheme.SUCCESS));
-        grid.add(new DashboardComponents.StatsCard("Active Courses", "5", new Color(23, 162, 184)));
+        // Fixed: Added the missing 4th argument (Color) for all cards
+        grid.add(new DashboardComponents.StatsCard("Current CGPA", "3.8", "🎓", DashboardTheme.PRIMARY));
+        grid.add(new DashboardComponents.StatsCard("Credits Earned", "85", "⭐", DashboardTheme.WARNING));
+        grid.add(new DashboardComponents.StatsCard("Attendance", "92%", "✅", DashboardTheme.SUCCESS));
         
         body.add(grid);
         body.add(Box.createVerticalStrut(30));
 
-        // 2. Upcoming Classes (Using TablePanel)
-        String[] cols = {"Time", "Course", "Classroom", "Type"};
-        Object[][] data = {
-            {"10:00 AM", "CSE101: Intro to Programming", "C-01", "Lecture"},
-            {"01:00 PM", "MTH201: Calculus", "S-10", "Tutorial"},
-            {"03:00 PM", "DES301: Design Thinking", "Lab-2", "Lab"}
-        };
+        // 2. Timetable Section
+        // Fixed: Removed "title:" label from constructor
+        JPanel timetableCard = new DashboardComponents.TablePanel(
+            "My Class Schedule", 
+            new String[]{"Time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"},
+            new Object[][]{
+                {"09:00", "CSE101 (C-01)", "-", "CSE101 (C-01)", "-", "Lab"},
+                {"10:00", "MTH202 (S-10)", "PHY101 (S-02)", "MTH202 (S-10)", "PHY101", "-"},
+                {"11:30", "-", "ENG101 (L-05)", "-", "ENG101", "Sports"}
+            }
+        );
         
-        body.add(new DashboardComponents.TablePanel("Today's Schedule", cols, data));
-
-        add(new JScrollPane(body) {
-             { setBorder(null); getViewport().setBackground(DashboardTheme.BG_MAIN); }
-        }, BorderLayout.CENTER);
+        body.add(timetableCard);
+        
+        // Wrap in ScrollPane
+        JScrollPane scroll = new JScrollPane(body);
+        scroll.setBorder(null);
+        scroll.getViewport().setBackground(DashboardTheme.BG_MAIN);
+        
+        add(scroll, BorderLayout.CENTER);
     }
 }

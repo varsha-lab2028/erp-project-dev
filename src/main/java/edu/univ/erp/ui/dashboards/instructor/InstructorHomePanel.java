@@ -5,6 +5,7 @@ import edu.univ.erp.ui.common.DashboardTheme;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class InstructorHomePanel extends JPanel {
@@ -18,13 +19,14 @@ public class InstructorHomePanel extends JPanel {
         body.setBackground(DashboardTheme.BG_MAIN);
 
         // --- 1. Stats Cards ---
+        // FIX: Removed hints
         JPanel grid = new JPanel(new GridLayout(1, 3, 20, 0));
         grid.setBackground(DashboardTheme.BG_MAIN);
-        grid.setMaximumSize(new Dimension(2000, 110));
+        grid.setMaximumSize(new Dimension(2000, 120));
         
-        grid.add(new DashboardComponents.StatsCard("My Sections", "4", DashboardTheme.PRIMARY)); // Blue
-        grid.add(new DashboardComponents.StatsCard("Total Students", "185", DashboardTheme.SUCCESS)); // Green
-        grid.add(new DashboardComponents.StatsCard("Pending Grades", "2", DashboardTheme.WARNING)); // Orange
+        grid.add(new DashboardComponents.StatsCard("My Sections", "4", "📅", DashboardTheme.INFO));
+        grid.add(new DashboardComponents.StatsCard("Total Students", "185", "👥", DashboardTheme.SUCCESS));
+        grid.add(new DashboardComponents.StatsCard("Pending Grades", "2", "📝", DashboardTheme.WARNING));
         body.add(grid);
         
         body.add(Box.createVerticalStrut(30));
@@ -43,14 +45,16 @@ public class InstructorHomePanel extends JPanel {
         };
         split.add(new DashboardComponents.TablePanel("My Active Sections", cols, data));
 
-        // Right: Grade Analytics Chart (Using CardPanel for rounded floating look)
-        DashboardComponents.CardPanel chartCard = new DashboardComponents.CardPanel();
-        chartCard.setLayout(new BorderLayout());
+        // Right: Grade Analytics Chart
+        JPanel chartCard = new JPanel(new BorderLayout());
+        chartCard.setBackground(Color.WHITE);
+        chartCard.setBorder(BorderFactory.createCompoundBorder(
+            new LineBorder(new Color(226, 232, 240), 1),
+            new EmptyBorder(20, 20, 20, 20)
+        ));
         
         JLabel chartTitle = new JLabel("Grade Distribution");
         chartTitle.setFont(DashboardTheme.FONT_SUBTITLE);
-        chartTitle.setForeground(DashboardTheme.TEXT_PRIMARY); // Dynamic Text
-        chartTitle.setBorder(new EmptyBorder(15, 20, 10, 0));
         chartCard.add(chartTitle, BorderLayout.NORTH);
         
         // Custom Graph
@@ -63,32 +67,27 @@ public class InstructorHomePanel extends JPanel {
                 
                 int w = getWidth();
                 int h = getHeight();
-                int[] values = {10, 25, 45, 20, 15}; // F, D, C, B, A
+                int[] values = {10, 25, 45, 20, 15};
                 String[] labels = {"F", "D", "C", "B", "A"};
                 
                 int padding = 20;
                 int barWidth = (w - (padding * 2)) / 5 - 20;
                 int maxVal = 50;
 
-                // Draw Base Line (Dynamic Color)
-                g2.setColor(DashboardTheme.BORDER_COLOR);
-                g2.setStroke(new BasicStroke(2));
+                g2.setColor(new Color(226, 232, 240));
                 g2.drawLine(padding, h - 30, w - padding, h - 30);
                 
-                // Draw Bars
                 for(int i=0; i<5; i++) {
                     int barHeight = (int)((values[i] / (double)maxVal) * (h - 60));
                     int x = padding + i * (barWidth + 20) + 10;
                     int y = h - 30 - barHeight;
                     
-                    // Gradient Fill
                     GradientPaint gp = new GradientPaint(x, y, DashboardTheme.PRIMARY, x, y + barHeight, DashboardTheme.PRIMARY_DARK);
-                    if(i==2) gp = new GradientPaint(x, y, DashboardTheme.SUCCESS, x, y + barHeight, DashboardTheme.SUCCESS.darker()); 
+                    if(i==2) gp = new GradientPaint(x, y, DashboardTheme.SUCCESS, x, y + barHeight, new Color(5, 150, 105));
                     
                     g2.setPaint(gp);
                     g2.fillRoundRect(x, y, barWidth, barHeight, 8, 8);
                     
-                    // Draw Label (Dynamic Color)
                     g2.setColor(DashboardTheme.TEXT_SECONDARY);
                     g2.setFont(DashboardTheme.FONT_BOLD);
                     FontMetrics fm = g2.getFontMetrics();

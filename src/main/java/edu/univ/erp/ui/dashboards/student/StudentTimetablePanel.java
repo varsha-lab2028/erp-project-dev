@@ -18,8 +18,10 @@ public class StudentTimetablePanel extends JPanel {
     private JTable timetable_table;
     private final JLabel status_label = new JLabel(" ");
     private List<TimeTableRow> current_rows = Collections.emptyList();
+    private long student_id;
 
-    public StudentTimetablePanel() {
+    public StudentTimetablePanel(long student_id) {
+        this.student_id = student_id;
         setLayout(new BorderLayout(20, 20));
         setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -82,32 +84,59 @@ public class StudentTimetablePanel extends JPanel {
     }
 
     private void loadingTimeTable() {
-        long student_id = 3L; //hard-coded
-        try {
-            current_rows = student_service.getTimeTable(student_id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Failed to load timetable",
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            current_rows = Collections.emptyList();
-        }
+        // Show loading spinner
+        JDialog loadingDialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), "Loading Timetable", true);
+        loadingDialog.setLayout(new BorderLayout());
+        loadingDialog.setSize(300, 100);
+        loadingDialog.setLocationRelativeTo(this);
+        loadingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
-        DefaultTableModel model = (DefaultTableModel) timetable_table.getModel();
-        model.setRowCount(0); //clearing any old rows
-        //add one row per TimeTableRow
-        for (TimeTableRow row : current_rows) {
-            model.addRow(new Object[]{
-                    row.getDay(),
-                    row.getTimings(),
-                    row.getCourseCode(),
-                    row.getName(),
-                    row.getClassroom()
-            });
-        }
-        status_label.setText(current_rows.size() + " classes scheduled");
+        JPanel loadingPanel = new JPanel();
+        loadingPanel.setLayout(new FlowLayout());
+        loadingPanel.add(new JLabel("Loading timetable..."));
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        loadingPanel.add(progressBar);
+        loadingDialog.add(loadingPanel, BorderLayout.CENTER);
+
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                try {
+                    current_rows = student_service.getTimeTable(StudentTimetablePanel.this.student_id);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(
+                            StudentTimetablePanel.this,
+                            "Failed to load timetable",
+                            "Database Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    current_rows = Collections.emptyList();
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                loadingDialog.dispose();
+                DefaultTableModel model = (DefaultTableModel) timetable_table.getModel();
+                model.setRowCount(0); //clearing any old rows
+                //add one row per TimeTableRow
+                for (TimeTableRow row : current_rows) {
+                    model.addRow(new Object[]{
+                            row.getDay(),
+                            row.getTimings(),
+                            row.getCourseCode(),
+                            row.getName(),
+                            row.getClassroom()
+                    });
+                }
+                status_label.setText(current_rows.size() + " classes scheduled");
+            }
+        };
+
+        worker.execute();
+        loadingDialog.setVisible(true);
     }
 }
