@@ -37,4 +37,29 @@ public class UserDAO {
 
     // Additional CRUD operations for User can be added here: insert, update, delete, findById, etc.
 
+    /**
+     * Find a user by user ID.
+     * @param userId the user ID
+     * @return User object or null if not found
+     * @throws SQLException on database error
+     */
+    public User findByUserId(long userId) throws SQLException {
+        String sql = "SELECT user_id, username, role, status FROM users WHERE user_id = ?";
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                            rs.getLong("user_id"),
+                            rs.getString("username"),
+                            Role.valueOf(rs.getString("role").toUpperCase()),
+                            rs.getString("status")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
 }

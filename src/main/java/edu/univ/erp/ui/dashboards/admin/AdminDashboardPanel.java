@@ -27,7 +27,6 @@ public class AdminDashboardPanel extends JPanel {
 
     private void initUI() {
         removeAll();
-        
         SidebarPanel sidebar = new SidebarPanel(e -> onNavigate(e));
         sidebar.setCollapsed(isSidebarCollapsed);
         add(sidebar, BorderLayout.WEST);
@@ -53,11 +52,11 @@ public class AdminDashboardPanel extends JPanel {
         contentArea.add(new AdminHomePanel(), "Dashboard");
         contentArea.add(new AdminProfilePanel(), "Profile");
         contentArea.add(new UserManagementPanel(), "Students");
-        contentArea.add(new CourseManagementPanel(), "Courses");
+        contentArea.add(new CourseManagementPanel(adminService), "Courses");
         contentArea.add(new SectionManagementPanel(), "Sections");
         
         // --- USING MAINTENANCE PANEL (isAdmin = true) ---
-        contentArea.add(new MaintenancePanel(true), "Settings");
+        contentArea.add(new MaintenancePanel(true, maintenanceService, adminService), "Settings");
 
         cardLayout.show(contentArea, currentScreen);
         mainArea.add(contentArea, BorderLayout.CENTER);

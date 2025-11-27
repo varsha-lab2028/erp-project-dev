@@ -1,6 +1,3 @@
-/*data access class which will read and update key-value pairs stored in settings
-* database table*/
-
 package edu.univ.erp.data;
 
 import java.sql.*;
@@ -10,7 +7,6 @@ public class SettingsDAO {
     //return raw value for key or null if not there
     public static String get(String key) throws SQLException {
         String command = "SELECT value FROM settings WHERE k = ?";
-
         //connect to the ERP Database
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
@@ -55,8 +51,7 @@ public class SettingsDAO {
         }
     }
 
-    //upsert setting, if value doesn't exist insertion will occur
-    //if it does, the value will get updated
+    //upsert setting, if value doesn't exist insertion will occur, if it does, the value will get updated
     public void upsertSetting(String key, String value) throws SQLException {
         final String sql = """
             INSERT INTO settings(k,v) VALUES (?,?)
@@ -68,5 +63,17 @@ public class SettingsDAO {
             ps.setString(2, value);
             ps.executeUpdate();
         }
+    }
+
+    //Read maintenance flag
+    public boolean getMaintenanceMode() throws SQLException {
+        String v = get("maintenance_on");
+        if (v == null) return false;
+        return Boolean.parseBoolean(v.trim());
+    }
+
+    //Update maintenance flag
+    public void setMaintenanceMode(boolean mode) throws SQLException {
+        upsertSetting("maintenance_on", String.valueOf(mode));
     }
 }

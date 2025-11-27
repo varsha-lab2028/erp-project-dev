@@ -3,6 +3,8 @@ package edu.univ.erp.ui.dashboards.student;
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.service.StudentService;
+import edu.univ.erp.ui.dashboards.admin.MaintenancePanel;
+import edu.univ.erp.ui.dashboards.admin.AdminProfilePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,6 +59,9 @@ public class StudentDashboardPanel extends JPanel {
         // Uncomment these as you create the files:
         // contentArea.add(new StudentTranscriptPanel(), "Transcript"); 
         // contentArea.add(new StudentRegistrationPanel(), "Register"); 
+        // Shared Views
+        contentArea.add(new AdminProfilePanel(), "Profile");
+        contentArea.add(new MaintenancePanel(false, null, null), "Settings"); // False = No Maintenance Controls
 
         // 3. Top Bar
         JPanel mainContainer = new JPanel(new BorderLayout());

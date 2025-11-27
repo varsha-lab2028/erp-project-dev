@@ -2,6 +2,8 @@ package edu.univ.erp.service;
 
 import edu.univ.erp.data.*;
 import edu.univ.erp.domain.*;
+import edu.univ.erp.access.AccessControl;
+
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -45,6 +47,10 @@ public class StudentService {
 
     //registering a student into a section
     public void registerForSection(long student_id, long section_id) throws SQLException {
+        //for maintenance
+        AccessControl.checkRole("STUDENT");
+        AccessControl.checkWritable();
+
         if (enrollment_dao.checkRecordExistence(student_id, section_id)) {
             throw new IllegalStateException("You are already registered in this section.");
         }
@@ -62,6 +68,10 @@ public class StudentService {
 
     //drop rule = only after registration ends
     public String dropSection(long student_id, long section_id) throws SQLException{
+        //for maintenance
+        AccessControl.checkRole("STUDENT");
+        AccessControl.checkWritable();
+
         if (!enrollment_dao.checkRecordExistence(student_id, section_id)) {
             return "Not registered in this section";
         }
