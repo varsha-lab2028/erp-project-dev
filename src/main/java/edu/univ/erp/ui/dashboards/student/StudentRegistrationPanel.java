@@ -1,6 +1,6 @@
 package edu.univ.erp.ui.dashboards.student;
 
-import javax="swing.*;
+import javax.swing.*;
 import java.awt.*;
 
 public class StudentRegistrationPanel extends JPanel {

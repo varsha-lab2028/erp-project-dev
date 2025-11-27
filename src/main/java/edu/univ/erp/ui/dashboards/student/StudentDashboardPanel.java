@@ -30,6 +30,7 @@ public class StudentDashboardPanel extends JPanel {
         sidebar.addItem("Transcript", "📜");
         sidebar.addItem("Register", "✍️");
         sidebar.addItem("Profile", "👤");
+        sidebar.addItem("Settings", "⚙️");
         add(sidebar, BorderLayout.WEST);
 
         // 2. Main Area (Top Bar + Content)
@@ -56,6 +57,7 @@ public class StudentDashboardPanel extends JPanel {
         contentArea.add(new StudentRegistrationPanel(), "Register");
         // Shared Views
         contentArea.add(new AdminProfilePanel(), "Profile");
+        contentArea.add(new MaintenancePanel(false, null, null), "Settings");
 
         cardLayout.show(contentArea, currentScreen);
         mainArea.add(contentArea, BorderLayout.CENTER);
