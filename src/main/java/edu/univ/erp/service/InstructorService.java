@@ -89,6 +89,18 @@ public class InstructorService {
         }
     }
 
+    //saving or updating quiz, assignment, midsem, endsem scores
+    public void updateScore(long sectionId, long instructorId, long studentId, String assessmentName, double score) throws SQLException {
+        AccessControl.checkRole("INSTRUCTOR");
+        AccessControl.checkWritable();
+
+        if (!sectionBelongsToInstructor(instructorId, sectionId)) {
+            throw new IllegalStateException("This is not your section.");
+        }
+
+        gradeDAO.upsertComponentScore(sectionId, studentId, assessmentName, score);
+    }
+
     //calculating the final grade using weightage
     public void computeFinalGrades(long section_id, long instructor_id) throws Exception {
         //for maintenance
@@ -100,6 +112,17 @@ public class InstructorService {
         }
 
         gradeDAO.calculateFinalGrades(section_id);
+    }
+
+    // Get section statistics
+    public SectionStats getSectionStats(long sectionId, long instructorId) throws SQLException {
+        AccessControl.checkRole("INSTRUCTOR");
+
+        if (!sectionBelongsToInstructor(instructorId, sectionId)) {
+            throw new IllegalStateException("This is not your section.");
+        }
+
+        return gradeDAO.getSectionStats(sectionId);
     }
 
     //if an instructor wants to add a component in the course

@@ -29,6 +29,10 @@ public class AccessControl {
         return maintenance.isMaintenanceOn();
     }
 
+    public static void requireStudentWriteAccess() {
+        checkWritable();
+    }
+
 
     /*
     public static boolean isReadOnlyNow(){ return maintenance.isMaintenanceOn(); }

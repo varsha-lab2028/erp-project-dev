@@ -1,6 +1,7 @@
 package edu.univ.erp.ui.dashboards.student;
 
 //import com.formdev.flatlaf.ui.FlatListCellBorder;
+import edu.univ.erp.domain.TranscriptRow;
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
@@ -20,14 +21,9 @@ import java.util.List;
 public class StudentTranscriptPanel extends JPanel{
     private final StudentService student_service = new StudentService();
     private JTable transcript_table;
-    private List<Object[]> current_rows = Collections.emptyList();
+    private List<TranscriptRow> transcript_rows = Collections.emptyList();
 
-    //current info
-    private String current_season = "";
-    private int current_sem_no = 0;
-    private int current_year = 0;
-
-    private final JLabel term_label = new JLabel("Current Term: (unknown)");
+    private final JLabel term_label = new JLabel("Transcript");
 
     public StudentTranscriptPanel(){
         setLayout(new BorderLayout(20, 20));
@@ -47,7 +43,7 @@ public class StudentTranscriptPanel extends JPanel{
         add(top_card, BorderLayout.NORTH);
 
         //transcript table
-        String[] columns = {"Course Code", "Course Name", "Course Credits"};
+        String[] columns = {"Course Code", "Course Name", "Credits", "Grade"};
 
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
@@ -129,8 +125,8 @@ public class StudentTranscriptPanel extends JPanel{
 
     //exporting csv
     private void ExportCSV() {
-        if (current_rows.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No registered courses to export.");
+        if (transcript_rows.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No completed courses to export.");
             return;
         }
 
@@ -146,21 +142,18 @@ public class StudentTranscriptPanel extends JPanel{
 
             // header info
             out.println("Student ID," + studentId);
-            out.println("Current Season," + current_season);
-            out.println("Current Semester Number," + current_sem_no);
-            out.println("Current Year," + current_year);
             out.println();
 
             // column headers
-            out.println("Course Code,Course Name,Credits");
+            out.println("Course Code,Course Title,Credits,Final Grade");
 
             // rows
-            for (Object[] row : current_rows) {
-                // row[0] = courseCode, row[1] = courseName, row[2] = credits
-                out.printf("%s,%s,%s%n",
-                        String.valueOf(row[0]),
-                        String.valueOf(row[1]),
-                        String.valueOf(row[2]));
+            for (TranscriptRow row : transcript_rows) {
+                out.printf("%s,%s,%d,%s%n",
+                        row.getCourseCode(),
+                        row.getCourseTitle(),
+                        row.getCredits(),
+                        row.getFinalGrade());
             }
 
             JOptionPane.showMessageDialog(

@@ -214,6 +214,49 @@ public class GradeDAO2 {
         }
         return grades;
     }
+
+    public void upsertComponentScore(long sectionId, long studentId, String assessmentName, double score) throws SQLException {
+        String sql = """
+            INSERT INTO assessment_scores (section_id, student_id, assessment_name, score)
+            VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE score = VALUES(score)
+            """;
+        try (Connection conn = ServerConnector.ERPConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, sectionId);
+            ps.setLong(2, studentId);
+            ps.setString(3, assessmentName);
+            ps.setDouble(4, score);
+            ps.executeUpdate();
+        }
+    }
+
+    public SectionStats getSectionStats(long sectionId) throws SQLException {
+        String sql = """
+            SELECT COUNT(*) as total_students,
+                   AVG(fg.final_score) as avg_score,
+                   MIN(fg.final_score) as min_score,
+                   MAX(fg.final_score) as max_score
+            FROM enrollments e
+            LEFT JOIN final_grades fg ON e.enrollment_id = fg.enrollment_id
+            WHERE e.section_id = ? AND e.e_status = 'REGISTERED'
+            """;
+        try (Connection conn = ServerConnector.ERPConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, sectionId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new SectionStats(
+                        rs.getInt("total_students"),
+                        rs.getDouble("avg_score"),
+                        rs.getDouble("min_score"),
+                        rs.getDouble("max_score")
+                    );
+                }
+            }
+        }
+        return new SectionStats(0, 0.0, 0.0, 0.0);
+    }
 }
 
 

@@ -5,8 +5,6 @@ import edu.univ.erp.domain.*;
 import edu.univ.erp.access.AccessControl;
 
 import java.sql.SQLException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +47,7 @@ public class StudentService {
     public void registerForSection(long student_id, long section_id) throws SQLException {
         //for maintenance
         AccessControl.checkRole("STUDENT");
-        AccessControl.checkWritable();
+        AccessControl.requireStudentWriteAccess();
 
         if (enrollment_dao.checkRecordExistence(student_id, section_id)) {
             throw new IllegalStateException("You are already registered in this section.");
@@ -66,7 +64,7 @@ public class StudentService {
         enrollment_dao.insertStudentEnrollment(student_id, section_id);
     }
 
-    //drop rule = only after registration ends
+    //drop rule = always allow drop
     public String dropSection(long student_id, long section_id) throws SQLException{
         //for maintenance
         AccessControl.checkRole("STUDENT");
@@ -76,39 +74,8 @@ public class StudentService {
             return "Not registered in this section";
         }
 
-        //check the final registration date for the current semester
-        LocalDateTime final_reg_date = SettingsDAO.getDateTime("registration.finalDate");
-        if (final_reg_date == null) {
-            return "Drop policy not configured";
-        }
-
-        //calculating the drop window
-        LocalDateTime start_drop = final_reg_date.toLocalDate().plusDays(1).atStartOfDay();
-        LocalDateTime end_drop = start_drop.plusDays(10).minusSeconds(1);
-        LocalDateTime current_time = LocalDateTime.now();
-
-        if (current_time.isBefore(start_drop)) {
-            return "Drop window has not started yet. It opens on " + start_drop.toLocalDate();
-        }
-        if (current_time.isAfter(end_drop)) {
-            return "Drop deadline has passed. Last date was " + end_drop.toLocalDate();
-        }
-
-        //showing the remaining days before the deadline
-        Duration duration = java.time.Duration.between(current_time, end_drop);
-        long days_left = duration.toDays();
-        String message;
-        if (days_left <= 0) {
-            message = "less than 1 day left";
-        }
-        else if (days_left == 1) {
-            message = "1 day left";
-        }
-        else {
-            message = days_left + " days left";
-        }
         EnrollmentDAO.removeStudentEnrollment(student_id, section_id);
-        return "Dropped successfully (" + message + ")";
+        return "Dropped successfully";
     }
 
     //returning the currently registered sections of a student
@@ -149,5 +116,9 @@ public class StudentService {
 
     public List<Object[]> getRegisteredCourseTranscript(long student_id) throws SQLException {
         return transcript_dao.listCurrentRegistrations(student_id);
+    }
+
+    public List<TranscriptRow> getTranscript(long studentId) throws SQLException {
+        return transcript_dao.fetchTranscript(studentId);
     }
 }

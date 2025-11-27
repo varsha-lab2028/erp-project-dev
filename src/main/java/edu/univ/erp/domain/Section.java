@@ -97,4 +97,9 @@ public class Section{
     public int getYear(){
         return year;
     }
+
+    public String getDisplayName() {
+        // Example: "CS101 - MON 10:00-11:00 (C001)"
+        return course_code + " - " + day + " " + timings + " (" + classroom + ")";
+    }
 }

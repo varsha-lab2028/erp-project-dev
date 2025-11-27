@@ -66,12 +66,12 @@ public class StudentSectionPanel extends JPanel {
             current_sections = Collections.emptyList();
         }
 
-        String[] cols = {"Code", "Instructor", "Day", "Timings", "Room", "Cap"};
+        String[] cols = {"Section", "Instructor", "Day", "Timings", "Room", "Cap"};
         Object[][] data = new Object[current_sections.size()][cols.length];
 
         for (int i = 0; i < current_sections.size(); i++) {
             Section s = current_sections.get(i);
-            data[i][0] = s.getCourseCode();
+            data[i][0] = s.getDisplayName();
             data[i][1] = s.getInstructorName();
             data[i][2] = s.getDay();
             data[i][3] = s.getTimings();

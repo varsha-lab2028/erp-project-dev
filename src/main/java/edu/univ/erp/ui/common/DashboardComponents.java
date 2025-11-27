@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 
 public class DashboardComponents {
 
-    // --- 1. Top Bar with Theme Toggle ---
+    //Top Bar with Theme Toggle
     public static class TopBarPanel extends JPanel {
         
         // COMPATIBILITY CONSTRUCTOR: Keeps existing code working
