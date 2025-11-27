@@ -1,12 +1,6 @@
 package edu.univ.erp.ui.login;
 
 import javax.swing.*;
-import edu.univ.erp.ui.common.DashboardComponents;
-import edu.univ.erp.ui.common.DashboardTheme;
-import edu.univ.erp.auth.session.Session;
-import edu.univ.erp.domain.AuthClass;
-import edu.univ.erp.domain.Role;
-
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -14,19 +8,31 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+// Domain Imports
+import edu.univ.erp.ui.common.DashboardComponents;
+import edu.univ.erp.ui.common.DashboardTheme;
+import edu.univ.erp.auth.session.Session;
+import edu.univ.erp.domain.AuthClass;
+import edu.univ.erp.domain.Role;
+
 public class LoginPanel extends JPanel {
+    // --- LOGIC: Keeping LoginController from the first snippet ---
     private final LoginController controller;
+    
     private final JTextField usernameField;
     private final JPasswordField passwordField;
     private final JLabel statusLabel;
     private String selectedRole = "STUDENT"; // Default role
 
+    // --- LOGIC: Constructor accepts LoginController ---
     public LoginPanel(LoginController controller) {
         this.controller = controller;
+        
+        // --- VISUALS: Applied from the second snippet ---
         setLayout(new GridBagLayout());
         setBackground(DashboardTheme.BG_MAIN);
 
-        // 2. Login Card (White, Size Increased)
+        // 2. Login Card (White, Size Increased to 500x650 as per second snippet)
         JPanel card = new DashboardComponents.CardPanel();
         card.setLayout(new GridBagLayout());
         card.setPreferredSize(new Dimension(500, 650));
@@ -61,10 +67,10 @@ public class LoginPanel extends JPanel {
         gbc.insets = new Insets(0, 0, 24, 0);
         card.add(subtitle, gbc);
 
-        // --- 3. PROFILE TYPE SELECTION (Fixed Icons) ---
+        // --- 3. PROFILE TYPE SELECTION ---
         gbc.gridy++;
         gbc.insets = new Insets(0, 0, 30, 0);
-        card.add(createProfileSelector(), gbc); // Assuming this method exists and works
+        card.add(createProfileSelector(), gbc);
 
         // --- 4. INPUT FIELDS ---
         gbc.gridy++;
@@ -114,7 +120,7 @@ public class LoginPanel extends JPanel {
         SwingUtilities.invokeLater(() -> selectRole("STUDENT"));
     }
 
-    // --- UI FACTORIES ---
+    // --- UI FACTORIES (Visuals from Second Snippet) ---
 
     private JPanel createLabelFieldPair(String labelText, JTextField field) {
         JPanel p = new JPanel(new BorderLayout(0, 5));
@@ -130,7 +136,6 @@ public class LoginPanel extends JPanel {
 
     private JTextField createStyledInputField() {
         JTextField field = new JTextField();
-        // Make absolutely sure it can receive input
         field.setEditable(true);
         field.setEnabled(true);
         field.setFocusable(true);
@@ -175,7 +180,6 @@ public class LoginPanel extends JPanel {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    // Placeholder for methods that were missing but referenced
     private JPanel createProfileSelector() {
         JPanel panel = new JPanel(new GridLayout(1, 3, 15, 0));
         panel.setOpaque(false);
@@ -218,12 +222,11 @@ public class LoginPanel extends JPanel {
 
     private void selectRole(String role) {
         this.selectedRole = role;
-        // Optional: Update a label or UI element to confirm the selected role.
-        // For now, the radio button selection itself provides visual feedback.
-        System.out.println("Selected Role: " + role); // For debugging
+        System.out.println("Selected Role: " + role); 
     }
 
-    //logic for performing login
+    // --- LOGIC: Restored functionality from the first snippet ---
+    
     private void performLogin() {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword()).trim();
@@ -234,6 +237,7 @@ public class LoginPanel extends JPanel {
         }
 
         setStatus("Authenticating...", false);
+        // Using LoginController as per original functionality
         AuthClass authUser = this.controller.authenticate(username, password, selectedRole);
 
         if (authUser != null) {
@@ -248,6 +252,7 @@ public class LoginPanel extends JPanel {
             }
             Session.login(authUser.user_id, roleEnum);
 
+            // Using firePropertyChange as per original functionality
             firePropertyChange("loginSuccess", null, authUser.role);
         } else {
             setStatus("Invalid credentials for " + selectedRole + ".", true);
