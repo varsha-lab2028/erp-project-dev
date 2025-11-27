@@ -231,6 +231,7 @@ public class GradeDAO2 {
         }
     }
 
+    /*
     public SectionStats getSectionStats(long sectionId) throws SQLException {
         String sql = """
             SELECT COUNT(*) as total_students,
@@ -257,6 +258,7 @@ public class GradeDAO2 {
         }
         return new SectionStats(0, 0.0, 0.0, 0.0);
     }
+     */
 }
 
 

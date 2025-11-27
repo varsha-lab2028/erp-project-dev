@@ -1,6 +1,8 @@
 package edu.univ.erp.ui.dashboards.student;
 
 //import com.formdev.flatlaf.ui.FlatListCellBorder;
+import edu.univ.erp.access.AccessControl;
+import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.domain.TranscriptRow;
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.ui.common.DashboardComponents;
@@ -82,9 +84,10 @@ public class StudentTranscriptPanel extends JPanel{
     }
 
     private void loadTranscript(){
-        long student_id = 3L; //hard coded, will change later
+        long student_id = Session.userId();
+
         try{
-            current_rows = student_service.getRegisteredCourseTranscript(student_id);
+            transcript_rows = student_service.getTranscript(student_id);
         } catch (SQLException sqlE){
             JOptionPane.showMessageDialog(
                     this,
@@ -92,35 +95,33 @@ public class StudentTranscriptPanel extends JPanel{
                     "Database Error",
                     JOptionPane.ERROR_MESSAGE
             );
-            current_rows = Collections.emptyList();
+            transcript_rows = Collections.emptyList();
         }
 
         DefaultTableModel model = (DefaultTableModel) transcript_table.getModel();
         model.setRowCount(0);
 
-        if (!current_rows.isEmpty()) {
-            Object[] first = current_rows.get(0);
-            current_season = (String) first[3];
-            current_sem_no  = (Integer) first[4];
-            current_year  = (Integer) first[5];
-        } else {
-            current_season = "";
-            current_sem_no = 0;
-            current_year = 0;
+        for (TranscriptRow row : transcript_rows) {
+            model.addRow(new Object[]{
+                    row.getCourseCode(),
+                    row.getCourseTitle(),
+                    row.getCredits(),
+                    row.getFinalGrade()
+            });
         }
 
         term_label.setText("Current Term: " + formatCurrentTerm());
 
-        for (Object[] row : current_rows) {
-            model.addRow(new Object[] { row[0], row[1], row[2] });
-        }
     }
 
     private String formatCurrentTerm() {
-        if (current_season == null || current_season.isBlank()) {
+        if (Session.getSemesterSeason() == null || Session.getTermYear() == 0) {
             return "(unknown)";
         }
-        return current_season + " " + current_sem_no + " " + current_year;
+
+        return Session.getSemesterSeason() + " " +
+                Session.getSemesterNumber() + " " +
+                Session.getTermYear();
     }
 
     //exporting csv

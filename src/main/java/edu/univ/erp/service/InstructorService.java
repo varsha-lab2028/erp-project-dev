@@ -115,6 +115,7 @@ public class InstructorService {
     }
 
     // Get section statistics
+    /*
     public SectionStats getSectionStats(long sectionId, long instructorId) throws SQLException {
         AccessControl.checkRole("INSTRUCTOR");
 
@@ -124,6 +125,7 @@ public class InstructorService {
 
         return gradeDAO.getSectionStats(sectionId);
     }
+     */
 
     //if an instructor wants to add a component in the course
     //if an instructor wants to remove a component in the course

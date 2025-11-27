@@ -102,6 +102,19 @@ public class CourseManagementPanel extends JPanel {
                 rows[i][2] = c.getCredits();
             }
             return rows;
+        } catch (RuntimeException e){
+            // Not logged in yet → show empty table, no popup
+            if (e.getMessage() != null &&
+                    e.getMessage().toLowerCase().contains("not logged in")) {
+                return new Object[0][3];
+            }
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to load courses: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return new Object[0][3];
         } catch (Exception e) {
             // if something fails, show error and return empty table
             JOptionPane.showMessageDialog(

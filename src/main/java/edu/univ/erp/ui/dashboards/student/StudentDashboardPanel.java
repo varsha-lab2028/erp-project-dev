@@ -53,8 +53,13 @@ public class StudentDashboardPanel extends JPanel {
         contentArea.setBackground(DashboardTheme.BG_MAIN);
 
         contentArea.add(new StudentHomePanel(), "Dashboard");
+        contentArea.add(new StudentCoursePanel(), "Course Catalog");
+        contentArea.add(new StudentSectionPanel(), "Section Catalog");
+        contentArea.add(new StudentRegistrationsPanel(), "Registrations");
+        contentArea.add(new StudentGradesPanel(), "Grades");
+        //contentArea.add(new StudentTimetablePanel(), "Time Table");
         contentArea.add(new StudentTranscriptPanel(), "Transcript");
-        contentArea.add(new StudentRegistrationPanel(), "Register");
+
         // Shared Views
         contentArea.add(new AdminProfilePanel(), "Profile");
         contentArea.add(new MaintenancePanel(false, null, null), "Settings");

@@ -15,13 +15,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class LoginPanel extends JPanel {
-    private final MainFrameController controller;
+    private final LoginController controller;
     private final JTextField usernameField;
     private final JPasswordField passwordField;
     private final JLabel statusLabel;
     private String selectedRole = "STUDENT"; // Default role
 
-    public LoginPanel(MainFrameController controller) {
+    public LoginPanel(LoginController controller) {
         this.controller = controller;
         setLayout(new GridBagLayout());
         setBackground(DashboardTheme.BG_MAIN);
@@ -80,7 +80,7 @@ public class LoginPanel extends JPanel {
         gbc.insets = new Insets(20, 0, 15, 0);
         JButton loginBtn = new JButton("LOGIN");
         styleLoginButton(loginBtn);
-        loginBtn.addActionListener(e -> performLogin(controller));
+        loginBtn.addActionListener(e -> performLogin());
         card.add(loginBtn, gbc);
 
         // Forgot Password Link (Bottom right)
@@ -223,15 +223,8 @@ public class LoginPanel extends JPanel {
         System.out.println("Selected Role: " + role); // For debugging
     }
 
-    // Interface for callback
-    public interface MainFrameController {
-        void loginSuccess(String role);
-        // This was added to make the login logic work
-        AuthClass authenticate(String username, String password, String selectedRole);
-    }
-
     //logic for performing login
-    private void performLogin(MainFrameController controller) {
+    private void performLogin() {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword()).trim();
 
@@ -255,8 +248,7 @@ public class LoginPanel extends JPanel {
             }
             Session.login(authUser.user_id, roleEnum);
 
-            // Notify MainApp to switch dashboard
-            this.controller.loginSuccess(authUser.role);
+            firePropertyChange("loginSuccess", null, authUser.role);
         } else {
             setStatus("Invalid credentials for " + selectedRole + ".", true);
         }

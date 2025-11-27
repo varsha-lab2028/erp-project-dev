@@ -8,10 +8,11 @@ import edu.univ.erp.ui.login.LoginPanel;
 import edu.univ.erp.ui.dashboards.admin.AdminDashboardPanel;
 import edu.univ.erp.ui.dashboards.instructor.InstructorDashboardPanel;
 import edu.univ.erp.ui.dashboards.student.StudentDashboardPanel;
+import edu.univ.erp.auth.AuthenticationService;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainFrame extends JFrame implements LoginPanel.MainFrameController {
+public class MainFrame extends JFrame{
     
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
@@ -21,8 +22,14 @@ public class MainFrame extends JFrame implements LoginPanel.MainFrameController 
     private final StudentService studentService = new StudentService();
     private final MaintenanceService maintenanceService = new MaintenanceService();
     private final AdminService adminService = new AdminService();
+    private final AuthenticationService authenticationService = new AuthenticationService() {
+        @Override
+        public AuthClass login(String username, String password) throws Exception {
+            return null;
+        }
+    };
     private final InstructorService instructorService = new InstructorService();
-    private final LoginController loginController = new LoginController(new edu.univ.erp.auth.AuthenticationService());
+    private final LoginController loginController = new LoginController(authenticationService);
 
     public MainFrame() {
         setTitle("IIITD ERP System");
@@ -56,7 +63,7 @@ public class MainFrame extends JFrame implements LoginPanel.MainFrameController 
         
         // 3. Add Screens
         // FIX 4: Removed 'constraints:' hint from all lines below
-        mainPanel.add(new LoginPanel(this), "LOGIN");
+        mainPanel.add(new LoginPanel(loginController), "LOGIN");
         mainPanel.add(new AdminDashboardPanel(maintenanceService, adminService), "ADMIN");
         mainPanel.add(new InstructorDashboardPanel(instructorService, maintenanceService), "INSTRUCTOR");
         mainPanel.add(new StudentDashboardPanel(studentService), "STUDENT");
@@ -68,36 +75,23 @@ public class MainFrame extends JFrame implements LoginPanel.MainFrameController 
         cardLayout.show(mainPanel, "LOGIN");
     }
 
-    @Override
-    public void loginSuccess(String role) {
-        // Switch view based on role
+    public AuthClass authenticate(String username, String password, String selectedRole) {
+        return loginController.authenticate(username, password, selectedRole);
+    }
+
+    public void showDashboard(String role) {
         switch (role) {
             case "ADMIN" -> cardLayout.show(mainPanel, "ADMIN");
             case "INSTRUCTOR" -> cardLayout.show(mainPanel, "INSTRUCTOR");
             case "STUDENT" -> cardLayout.show(mainPanel, "STUDENT");
         }
-        
-        // Check maintenance mode on login
         checkMaintenance();
-    }
-    
-    @Override
-    public AuthClass authenticate(String username, String password, String selectedRole) {
-        return loginController.authenticate(username, password, selectedRole);
     }
 
     public void checkMaintenance() {
         // Logic to toggle banner based on service
-        boolean isMaintenance = maintenanceService.isMaintenanceMode();
+        boolean isMaintenance = maintenanceService.isMaintenanceOn();
         maintenanceBanner.setVisible(isMaintenance);
     }
 
-    public static void main(String[] args) {
-        try { 
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
-        } catch (Exception ignored) {}
-        
-        // Ensure UI is created on the Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
-    }
 }

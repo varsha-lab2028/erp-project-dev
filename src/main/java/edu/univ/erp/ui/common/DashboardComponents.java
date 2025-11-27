@@ -226,6 +226,65 @@ public class DashboardComponents {
         return btn;
     }
 
+    //secondary buttons
+    public static JButton createSecondaryButton(String text) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                super.paintComponent(g2);
+                g2.dispose();
+            }
+        };
+        btn.setFont(DashboardTheme.FONT_BOLD);
+        btn.setForeground(DashboardTheme.TEXT_PRIMARY);
+        // soft grey-ish background, independent of DashboardTheme extras
+        Color normal = new Color(144, 164, 174);      // blue-grey 400
+        Color hover  = new Color(120, 144, 156);      // blue-grey 500
+        btn.setBackground(normal);
+        btn.setBorder(new EmptyBorder(12, 15, 12, 15));
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) { btn.setBackground(hover); }
+            public void mouseExited(MouseEvent e)  { btn.setBackground(normal); }
+        });
+        return btn;
+    }
+
+    //danger button
+    public static JButton createDangerButton(String text) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                super.paintComponent(g2);
+                g2.dispose();
+            }
+        };
+        btn.setFont(DashboardTheme.FONT_BOLD);
+        btn.setForeground(Color.WHITE);
+        Color normal = new Color(211, 47, 47);        // red 700
+        Color hover  = new Color(198, 40, 40);        // red 800
+        btn.setBackground(normal);
+        btn.setBorder(new EmptyBorder(12, 15, 12, 15));
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) { btn.setBackground(hover); }
+            public void mouseExited(MouseEvent e)  { btn.setBackground(normal); }
+        });
+        return btn;
+    }
+
     // --- 5. Circle Avatar ---
     public static class CircleAvatar extends JPanel {
         private String initials;
