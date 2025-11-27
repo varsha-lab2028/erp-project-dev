@@ -3,6 +3,7 @@ package edu.univ.erp.ui.login;
 import edu.univ.erp.service.*;
 import edu.univ.erp.domain.AuthClass;
 import edu.univ.erp.ui.common.DashboardTheme;
+import edu.univ.erp.ui.login.LoginController;
 import edu.univ.erp.ui.login.LoginPanel;
 import edu.univ.erp.ui.dashboards.admin.AdminDashboardPanel;
 import edu.univ.erp.ui.dashboards.instructor.InstructorDashboardPanel;
@@ -96,8 +97,7 @@ public class MainFrame extends JFrame implements LoginPanel.MainFrameController 
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
         } catch (Exception ignored) {}
         
-        SwingUtilities.invokeLater(() -> {
-            new MainFrame().setVisible(true);
-        });
+        // Ensure UI is created on the Event Dispatch Thread
+        SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
     }
 }

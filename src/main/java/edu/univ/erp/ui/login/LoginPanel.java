@@ -68,7 +68,7 @@ public class LoginPanel extends JPanel {
 
         // --- 4. INPUT FIELDS ---
         gbc.gridy++;
-        usernameField = createStyledInputField(false);
+        usernameField = createStyledInputField();
         card.add(createLabelFieldPair("Username:", usernameField), gbc);
 
         gbc.gridy++;
@@ -128,7 +128,7 @@ public class LoginPanel extends JPanel {
         return p;
     }
 
-    private JTextField createStyledInputField(boolean isPassword) { // Assuming this is what was intended
+    private JTextField createStyledInputField() {
         JTextField field = new JTextField();
         // Make absolutely sure it can receive input
         field.setEditable(true);
@@ -177,16 +177,50 @@ public class LoginPanel extends JPanel {
 
     // Placeholder for methods that were missing but referenced
     private JPanel createProfileSelector() {
-        // This should contain the logic for student/admin/instructor role selection
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new GridLayout(1, 3, 15, 0));
         panel.setOpaque(false);
-        panel.add(new JLabel("Profile selector placeholder"));
+
+        ButtonGroup roleGroup = new ButtonGroup();
+
+        JRadioButton studentRadio = createRoleRadioButton("Student", "STUDENT");
+        JRadioButton instructorRadio = createRoleRadioButton("Instructor", "INSTRUCTOR");
+        JRadioButton adminRadio = createRoleRadioButton("Admin", "ADMIN");
+
+        roleGroup.add(studentRadio);
+        roleGroup.add(instructorRadio);
+        roleGroup.add(adminRadio);
+
+        panel.add(studentRadio);
+        panel.add(instructorRadio);
+        panel.add(adminRadio);
+
+        // Set student as the default selection
+        studentRadio.setSelected(true);
+
         return panel;
+    }
+
+    private JRadioButton createRoleRadioButton(String text, String actionCommand) {
+        JRadioButton radio = new JRadioButton(text);
+        radio.setActionCommand(actionCommand);
+        radio.setFont(DashboardTheme.FONT_REGULAR.deriveFont(14f));
+        radio.setForeground(DashboardTheme.TEXT_SECONDARY);
+        radio.setBackground(DashboardTheme.BG_MAIN);
+        radio.setFocusPainted(false);
+        radio.setHorizontalAlignment(SwingConstants.CENTER);
+        radio.setOpaque(false);
+        radio.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        radio.addActionListener(e -> selectRole(e.getActionCommand()));
+
+        return radio;
     }
 
     private void selectRole(String role) {
         this.selectedRole = role;
-        // This should update the UI to show which role is selected
+        // Optional: Update a label or UI element to confirm the selected role.
+        // For now, the radio button selection itself provides visual feedback.
+        System.out.println("Selected Role: " + role); // For debugging
     }
 
     // Interface for callback

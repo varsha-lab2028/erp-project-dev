@@ -60,6 +60,8 @@ public class MaintenancePanel extends JPanel {
             toggle.addActionListener(e -> {
                 boolean selected = toggle.isSelected();
                 try {
+                    // Update button UI immediately for responsiveness
+                    updateToggleAppearance(toggle, selected);
                     // update DB via admin service
                     adminService.setMaintenanceMode(selected);
 
@@ -69,8 +71,8 @@ public class MaintenancePanel extends JPanel {
 
                 } catch (RuntimeException ex) {
                     // if error (not admin / DB fail / access control), revert toggle
-                    toggle.setSelected(!selected);
-
+                    boolean revertedState = !selected;
+                    updateToggleAppearance(toggle, revertedState);
                     JOptionPane.showMessageDialog(
                             this,
                             ex.getMessage(),
@@ -80,17 +82,7 @@ public class MaintenancePanel extends JPanel {
                 }
             });
 
-            /*
-            toggle.addActionListener(e -> {
-                if(toggle.isSelected()) {
-                    toggle.setText("Enabled");
-                    toggle.setForeground(DashboardTheme.DANGER);
-                } else {
-                    toggle.setText("Disabled");
-                    toggle.setForeground(DashboardTheme.TEXT_PRIMARY);
-                }
-            });
-             */
+            updateToggleAppearance(toggle, maintenanceOn);
 
             togglePanel.add(lblMode);
             togglePanel.add(toggle);
@@ -136,5 +128,11 @@ public class MaintenancePanel extends JPanel {
         box.setForeground(DashboardTheme.TEXT_PRIMARY);
         box.setOpaque(false);
         return box;
+    }
+
+    private void updateToggleAppearance(JToggleButton toggle, boolean isEnabled) {
+        toggle.setSelected(isEnabled);
+        toggle.setText(isEnabled ? "Enabled" : "Disabled");
+        toggle.setForeground(isEnabled ? DashboardTheme.DANGER : DashboardTheme.TEXT_PRIMARY);
     }
 }

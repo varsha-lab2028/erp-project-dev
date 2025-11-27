@@ -5,6 +5,7 @@ import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.service.InstructorService;
 import edu.univ.erp.ui.dashboards.admin.MaintenancePanel;
+import edu.univ.erp.service.AdminService; // Import AdminService
 // Ensure AdminProfilePanel exists, or use the placeholder logic below
 import edu.univ.erp.ui.dashboards.admin.AdminProfilePanel;
 
@@ -15,6 +16,8 @@ public class InstructorDashboardPanel extends JPanel {
     private final InstructorService instructorService;
     private final MaintenanceService maintenanceService;
 
+    private CardLayout cardLayout;
+    private JPanel contentArea;
     private String currentScreen = "Dashboard";
 
     public InstructorDashboardPanel(InstructorService instructorService, MaintenanceService maintenanceService) {
@@ -49,33 +52,25 @@ public class InstructorDashboardPanel extends JPanel {
         mainArea.add(topBar, BorderLayout.NORTH);
 
         // 3. Content Cards
-        CardLayout cardLayout = new CardLayout();
-        JPanel contentArea = new JPanel(cardLayout);
+        cardLayout = new CardLayout();
+        contentArea = new JPanel(cardLayout);
         contentArea.setBackground(DashboardTheme.BG_MAIN);
 
         // --- FIX: REMOVED "constraints:" FROM ALL LINES BELOW ---
         
         contentArea.add(new InstructorHomePanel(), "Dashboard");
         
-        contentArea.add(new MySectionsPanel(instructorService), "My Sections");
+        contentArea.add(new InstructorSectionsPanel(instructorService), "My Sections");
         
         contentArea.add(new GradebookPanel(instructorService), "Gradebook");
         
-        // Placeholder for Profile
-        JPanel profilePlaceholder = new JPanel();
-        profilePlaceholder.add(new JLabel("Profile Page Coming Soon"));
-        contentArea.add(profilePlaceholder, "Profile");
-        
-        contentArea.add(new MaintenancePanel(), "Settings");
-        // --- USING MAINTENANCE PANEL (isAdmin = false) ---
-        contentArea.add(new MaintenancePanel(false, maintenanceService, null), "Settings");
+        // Shared Panels
+        contentArea.add(new AdminProfilePanel(), "Profile");
+        contentArea.add(new MaintenancePanel(false, maintenanceService, null), "Settings"); // AdminService is null for non-admins
 
         // Show default
         cardLayout.show(contentArea, currentScreen);
-        
-        // --- FIX: REMOVED "key:" BELOW ---
-        contentArea.putClientProperty("cardLayout", cardLayout);
-        
+
         mainArea.add(contentArea, BorderLayout.CENTER);
         add(mainArea, BorderLayout.CENTER);
         
@@ -85,16 +80,7 @@ public class InstructorDashboardPanel extends JPanel {
 
     private void onNavigate(String screenName) {
         currentScreen = screenName;
-        Component centerComp = ((BorderLayout)getLayout()).getLayoutComponent(BorderLayout.CENTER);
-        if (centerComp instanceof JPanel) {
-            JPanel mainArea = (JPanel) centerComp;
-            Component contentComp = ((BorderLayout)mainArea.getLayout()).getLayoutComponent(BorderLayout.CENTER);
-            if (contentComp instanceof JPanel) {
-                JPanel contentArea = (JPanel) contentComp;
-                CardLayout cl = (CardLayout) contentArea.getLayout();
-                cl.show(contentArea, screenName);
-            }
-        }
+        cardLayout.show(contentArea, screenName);
     }
 
     private void toggleTheme() {

@@ -77,7 +77,6 @@ public class StudentTranscriptPanel extends JPanel{
         tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
         tableCard.add(sp, BorderLayout.CENTER);
         add(tableCard, BorderLayout.CENTER);
-        add(tableCard, BorderLayout.CENTER);
 
         //loading the data into transcript
         loadTranscript();
