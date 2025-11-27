@@ -13,10 +13,11 @@ import java.awt.*;
 import java.sql.SQLException;
 
 public class StudentCoursePanel extends JPanel {
-    private final StudentService student_service = new StudentService();
+    private final StudentService student_service;
     private JPanel contentPanel;
 
-    public StudentCoursePanel() {
+    public StudentCoursePanel(StudentService student_service) {
+        this.student_service = student_service;
         setLayout(new BorderLayout(20, 20));
         setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(30, 30, 30, 30));

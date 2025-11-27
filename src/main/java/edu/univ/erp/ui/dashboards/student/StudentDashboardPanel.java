@@ -1,5 +1,6 @@
 package edu.univ.erp.ui.dashboards.student;
 
+import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.service.StudentService;
@@ -27,9 +28,11 @@ public class StudentDashboardPanel extends JPanel {
         // 1. Sidebar
         DashboardComponents.SidebarPanel sidebar = new DashboardComponents.SidebarPanel("STUDENT", e -> onNavigate(e.getActionCommand()));
         sidebar.addItem("Dashboard", "🏠");
+        sidebar.addItem("Course Catalog", "📚");
+        sidebar.addItem("Section Catalog", "🗂️");
+        sidebar.addItem("Registrations", "📝");
+        sidebar.addItem("Grades", "🎓");
         sidebar.addItem("Transcript", "📜");
-        sidebar.addItem("Register", "✍️");
-        sidebar.addItem("Profile", "👤");
         sidebar.addItem("Settings", "⚙️");
         add(sidebar, BorderLayout.WEST);
 
@@ -53,11 +56,11 @@ public class StudentDashboardPanel extends JPanel {
         contentArea.setBackground(DashboardTheme.BG_MAIN);
 
         contentArea.add(new StudentHomePanel(), "Dashboard");
-        contentArea.add(new StudentCoursePanel(), "Course Catalog");
+        contentArea.add(new StudentCoursePanel(studentService), "Course Catalog");
         contentArea.add(new StudentSectionPanel(), "Section Catalog");
         contentArea.add(new StudentRegistrationsPanel(), "Registrations");
         contentArea.add(new StudentGradesPanel(), "Grades");
-        //contentArea.add(new StudentTimetablePanel(), "Time Table");
+        contentArea.add(new StudentTimetablePanel(Session.userId()), "Time Table");
         contentArea.add(new StudentTranscriptPanel(), "Transcript");
 
         // Shared Views
@@ -73,9 +76,17 @@ public class StudentDashboardPanel extends JPanel {
     }
     
     private void onNavigate(String screen) {
-        // Switch to the selected card
-        currentScreen = screen;
-        cardLayout.show(contentArea, screen);
+        switch (screen) {
+            case "Dashboard"     -> currentScreen = "Dashboard";
+            case "Courses"       -> currentScreen = "Course Catalog";
+            case "Sections"      -> currentScreen = "Section Catalog";
+            case "Registrations" -> currentScreen = "Registrations";
+            case "Transcript"    -> currentScreen = "Transcript";
+            case "Profile"       -> currentScreen = "Profile";
+            case "Settings"      -> currentScreen = "Settings";
+            default              -> { return; }
+        }
+        cardLayout.show(contentArea, currentScreen);
     }
 
     // Helper to create a placeholder panel
