@@ -87,4 +87,50 @@ public class CourseDAO {
         }
         return courseCode;
     }
+
+    //Admin methods for creating and editing courses
+    // --- ADMIN: CREATE new course ---
+    public void insertCourse(String courseCode, String name, int credits) throws SQLException {
+        final String sql = """
+            INSERT INTO courses (course_code, name, credits)
+            VALUES (?, ?, ?)
+        """;
+
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, courseCode);
+            ps.setString(2, name);
+            ps.setInt(3, credits);
+            ps.executeUpdate();
+        }
+    }
+
+    // --- ADMIN: EDIT existing course ---
+    public void updateCourse(String courseCode, String name, int credits) throws SQLException {
+        final String sql = """
+            UPDATE courses
+               SET name = ?, credits = ?
+             WHERE course_code = ?
+        """;
+
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setInt(2, credits);
+            ps.setString(3, courseCode);
+            ps.executeUpdate();
+        }
+    }
+
+    // --- ADMIN: DELETE course ---
+    public void deleteCourse(String courseCode) throws SQLException {
+        final String sql = "DELETE FROM courses WHERE course_code = ?";
+
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, courseCode);
+            ps.executeUpdate();
+        }
+    }
 }
+

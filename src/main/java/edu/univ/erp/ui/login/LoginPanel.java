@@ -2,16 +2,18 @@ package edu.univ.erp.ui.login;
 
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
+import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.domain.AuthClass;
+import edu.univ.erp.domain.Role;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.border.MatteBorder;
+//import javax.swing.border.MatteBorder;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+//import java.awt.event.FocusAdapter;
+//import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -33,7 +35,6 @@ public class LoginPanel extends JPanel {
         setBackground(PAGE_BG);
 
         // 2. Login Card (White, Size Increased)
-        //JPanel card = new DashboardComponents.RoundedPanel(14, Color.WHITE, true);
         JPanel card = new DashboardComponents.CardPanel();
         card.setLayout(new GridBagLayout());
         card.setPreferredSize(new Dimension(500, 650));
@@ -273,9 +274,7 @@ public class LoginPanel extends JPanel {
         }
     }
 
-
-    // --- LOGIN LOGIC ---
-    
+    //logic for performing login
     private void performLogin() {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword()).trim();
@@ -286,12 +285,21 @@ public class LoginPanel extends JPanel {
         }
 
         setStatus("Authenticating...", false);
-        // Changed from boolean to AuthClass response
         AuthClass authUser = controller.authenticate(username, password, selectedRole);
 
         if (authUser != null) {
             setStatus("Login successful! Redirecting...", false);
-            // Notify login success with role
+
+            Role roleEnum;
+            try {
+                roleEnum = Role.valueOf(authUser.role.toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                setStatus("Login succeeded but role is invalid: " + authUser.role, true);
+                return;
+            }
+            Session.login(authUser.user_id, roleEnum);
+
+            // Notify MainApp to switch dashboard
             firePropertyChange("loginSuccess", null, authUser.role);
         } else {
             setStatus("Invalid credentials for " + selectedRole + ".", true);
@@ -302,4 +310,4 @@ public class LoginPanel extends JPanel {
         statusLabel.setText(message);
         statusLabel.setForeground(isError ? Color.RED : DashboardTheme.TEXT_SECONDARY);
     }
-}//new commit
+}

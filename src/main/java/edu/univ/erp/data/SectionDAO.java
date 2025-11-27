@@ -117,7 +117,7 @@ public class SectionDAO {
                             rs.getInt("year")
                     );
                 }
-        return null;
+                return null;
             }
         }
     }
@@ -155,5 +155,77 @@ public class SectionDAO {
             }
         }
         return sections;
+    }
+
+    // --- ADMIN: INSERT new section ---
+    public void insertSection(Section section) throws SQLException {
+        String sql = """
+            INSERT INTO sections (course_code, instructor_id, instructor_name, day, timings, classroom,
+                                  capacity, sem_no, sem_season, year)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+        try (Connection conn = ServerConnector.ERPConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, section.getCourseCode());
+            ps.setLong(2, section.getInstructorUserID());
+            ps.setString(3, section.getInstructorName());
+            ps.setString(4, section.getDay());
+            ps.setString(5, section.getTimings());
+            ps.setString(6, section.getClassroom());
+            ps.setInt(7, section.getCapacity());
+            ps.setInt(8, section.getSemNumber());
+            ps.setString(9, section.getSemSeason());
+            ps.setInt(10, section.getYear());
+            ps.executeUpdate();
+        }
+    }
+
+    // --- ADMIN: UPDATE existing section ---
+    public void updateSection(Section section) throws SQLException {
+        String sql = """
+            UPDATE sections
+            SET course_code = ?, instructor_id = ?, instructor_name = ?, day = ?, timings = ?,
+                classroom = ?, capacity = ?, sem_no = ?, sem_season = ?, year = ?
+            WHERE section_id = ?
+        """;
+        try (Connection conn = ServerConnector.ERPConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, section.getCourseCode());
+            ps.setLong(2, section.getInstructorUserID());
+            ps.setString(3, section.getInstructorName());
+            ps.setString(4, section.getDay());
+            ps.setString(5, section.getTimings());
+            ps.setString(6, section.getClassroom());
+            ps.setInt(7, section.getCapacity());
+            ps.setInt(8, section.getSemNumber());
+            ps.setString(9, section.getSemSeason());
+            ps.setInt(10, section.getYear());
+            ps.setLong(11, section.getSectionId());
+            ps.executeUpdate();
+        }
+    }
+
+    // --- ADMIN: DELETE section ---
+    public void deleteSection(long sectionId) throws SQLException {
+        String sql = "DELETE FROM sections WHERE section_id = ?";
+        try (Connection conn = ServerConnector.ERPConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, sectionId);
+            ps.executeUpdate();
+        }
+    }
+
+    // --- ADMIN: ASSIGN instructor to section ---
+    public void assignInstructor(long sectionId, long instructorUserId) throws SQLException {
+        UserDAO userDAO = new UserDAO();
+        //String instructorName = userDAO.findByUserId(instructorUserId).getName();
+        String sql = "UPDATE sections SET instructor_id = ?, instructor_name = ? WHERE section_id = ?";
+        try (Connection conn = ServerConnector.ERPConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, instructorUserId);
+            //ps.setString(2, instructorName);
+            ps.setLong(2, sectionId);
+            ps.executeUpdate();
+        }
     }
 }

@@ -1,6 +1,6 @@
 package edu.univ.erp.auth;
 
-public class GenerateHashes {
+public class GeneratingHashes {
     public static void main(String[] args) {
         System.out.println("admin1 / admin123 -> " +
                 PasswordHasher.hash("admin123"));

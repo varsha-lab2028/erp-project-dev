@@ -2,15 +2,24 @@ package edu.univ.erp.ui.dashboards.admin;
 
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
+import edu.univ.erp.service.MaintenanceService;
+import edu.univ.erp.service.AdminService;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class MaintenancePanel extends JPanel {
+    private final boolean isAdmin;
+    private final MaintenanceService maintenanceService;
+    private final AdminService adminService;
 
     // Constructor accepts 'isAdmin' to toggle the maintenance card
-    public MaintenancePanel(boolean isAdmin) {
+    public MaintenancePanel(boolean isAdmin, MaintenanceService maintenanceService, AdminService adminService) {
+        this.isAdmin = isAdmin;
+        this.maintenanceService = maintenanceService;
+        this.adminService = adminService;
+
         setLayout(new BorderLayout());
         setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(30, 30, 30, 30));
@@ -36,9 +45,42 @@ public class MaintenancePanel extends JPanel {
             JLabel lblMode = new JLabel("Maintenance Mode:");
             lblMode.setFont(DashboardTheme.FONT_REGULAR);
             lblMode.setForeground(DashboardTheme.TEXT_PRIMARY);
-            
-            JToggleButton toggle = new JToggleButton("Disabled");
+
+            //initial state of the backend
+            boolean maintenanceOn = false;
+            if (maintenanceService != null) {
+                maintenanceOn = maintenanceService.isMaintenanceOn();
+            }
+
+            JToggleButton toggle = new JToggleButton(maintenanceOn ? "Enabled" : "Disabled");
+            toggle.setSelected(maintenanceOn);
             toggle.setFont(DashboardTheme.FONT_BOLD);
+
+            //new version of the backend
+            toggle.addActionListener(e -> {
+                boolean selected = toggle.isSelected();
+                try {
+                    // update DB via admin service
+                    adminService.setMaintenanceMode(selected);
+
+                    // update button UI
+                    toggle.setText(selected ? "Enabled" : "Disabled");
+                    toggle.setForeground(selected ? DashboardTheme.DANGER : DashboardTheme.TEXT_PRIMARY);
+
+                } catch (RuntimeException ex) {
+                    // if error (not admin / DB fail / access control), revert toggle
+                    toggle.setSelected(!selected);
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            });
+
+            /*
             toggle.addActionListener(e -> {
                 if(toggle.isSelected()) {
                     toggle.setText("Enabled");
@@ -48,6 +90,7 @@ public class MaintenancePanel extends JPanel {
                     toggle.setForeground(DashboardTheme.TEXT_PRIMARY);
                 }
             });
+             */
 
             togglePanel.add(lblMode);
             togglePanel.add(toggle);

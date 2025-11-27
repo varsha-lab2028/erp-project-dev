@@ -7,20 +7,23 @@ import edu.univ.erp.service.InstructorService;
 import edu.univ.erp.service.MaintenanceService;
 import edu.univ.erp.service.StudentService;
 
-// New Service Registry to hold backend services centrally
 public class ServiceRegistry {
     public final StudentService student_service;
     public final MaintenanceService maintenance_service;
     public final AuthenticationService auth_service;
     public final InstructorService instructor_service;
 
-    private static final boolean USE_DUMMY_LOGIN = true; //just for dummy
+    //private static final boolean USE_DUMMY_LOGIN = true; //just for dummy
 
     public ServiceRegistry() {
         this.student_service = new StudentService();
         this.maintenance_service = new MaintenanceService();
         this.instructor_service = new InstructorService();
-        //this.auth_service = new LoginManager(); //actual for login
+
+        //real login process
+        this.auth_service = new LoginManager();
+
+        /*
         if(USE_DUMMY_LOGIN) {
             this.auth_service = (username, password) -> {
                 AuthClass a = new AuthClass();
@@ -48,5 +51,6 @@ public class ServiceRegistry {
             //real login
             this.auth_service = new LoginManager();
         }
+        */
     }
 }

@@ -2,6 +2,7 @@ package edu.univ.erp.service;
 
 import edu.univ.erp.data.*;
 import edu.univ.erp.domain.*;
+import edu.univ.erp.access.AccessControl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +15,7 @@ public class InstructorService {
     private final SectionDAO sectionDAO = new SectionDAO();
     private final EnrollmentDAO enrollmentDAO = new EnrollmentDAO();
     private final GradeDAO2 gradeDAO = new GradeDAO2();
-    private final MaintenanceService maintenanceService = new MaintenanceService();
+    //private final MaintenanceService maintenanceService = new MaintenanceService();
 
     // List sections assigned to the instructor by instructorId
     public List<Section> getSectionsByInstructor(long instructorId) throws SQLException {
@@ -55,12 +56,12 @@ public class InstructorService {
 
     //saving or updating quiz, assignment, midsem, endsem scores
     public void updateComponentScores(long section_id, long instructor_id, String assessment_name, int new_weightage) throws SQLException {
+        //for maintenance mode
+        AccessControl.checkRole("INSTRUCTOR");
+        AccessControl.checkWritable();
+
         if (!sectionBelongsToInstructor(instructor_id, section_id)) {
             throw new IllegalStateException("This is not your section.");
-        }
-
-        if (maintenanceService.isMaintenanceOn()) {
-            throw new IllegalStateException("Maintenance mode is ON. You cannot edit the grades right now.");
         }
 
         String command = """
@@ -70,6 +71,7 @@ public class InstructorService {
                         AND instructor_id = ?
                         AND assessment_name = ?
                 """;
+
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
             ps.setInt(1, new_weightage);
@@ -89,14 +91,14 @@ public class InstructorService {
 
     //calculating the final grade using weightage
     public void computeFinalGrades(long section_id, long instructor_id) throws Exception {
+        //for maintenance
+        AccessControl.checkRole("INSTRUCTOR");
+        AccessControl.checkWritable();
+
         if (!sectionBelongsToInstructor(instructor_id, section_id)) {
             throw new IllegalStateException("This is not your section.");
         }
 
-        if (maintenanceService.isMaintenanceOn()) {
-            throw new IllegalStateException(
-                    "Maintenance mode is ON. You cannot compute final grades right now.");
-        }
         gradeDAO.calculateFinalGrades(section_id);
     }
 

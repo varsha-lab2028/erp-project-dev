@@ -52,7 +52,7 @@ public class BaseDashboard extends JPanel { // Correctly extends JPanel
         // Set Text / Maintenance Logic
         boolean isMaintenance = false;
         try {
-            isMaintenance = AccessControl.isReadOnlyNow();
+            isMaintenance = AccessControl.maintenanceOn();
         } catch (Exception e) {
             isMaintenance = false;
         }

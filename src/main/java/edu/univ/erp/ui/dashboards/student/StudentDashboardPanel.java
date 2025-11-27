@@ -4,9 +4,7 @@ import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.ui.dashboards.admin.MaintenancePanel;
-// Import Shared Views
 import edu.univ.erp.ui.dashboards.admin.AdminProfilePanel;
-import edu.univ.erp.ui.dashboards.admin.MaintenancePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -66,7 +64,7 @@ public class StudentDashboardPanel extends JPanel {
         
         // Shared Views
         contentArea.add(new AdminProfilePanel(), "Profile");
-        contentArea.add(new MaintenancePanel(false), "Settings"); // False = No Maintenance Controls
+        contentArea.add(new MaintenancePanel(false, null, null), "Settings"); // False = No Maintenance Controls
 
         cardLayout.show(contentArea, currentScreen);
         mainArea.add(contentArea, BorderLayout.CENTER);

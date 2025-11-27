@@ -5,7 +5,6 @@ import java.awt.*;
 
 import edu.univ.erp.auth.AuthenticationService;
 import edu.univ.erp.domain.AuthClass;
-import edu.univ.erp.service.InstructorService;
 import edu.univ.erp.ui.login.LoginPanel;
 import edu.univ.erp.ui.login.LoginController;
 import edu.univ.erp.auth.LoginManager;
@@ -16,6 +15,7 @@ import edu.univ.erp.util.LoginTheme;
 
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.service.MaintenanceService;
+import edu.univ.erp.service.InstructorService;
 
 public class MainApp {
     private JFrame frame;

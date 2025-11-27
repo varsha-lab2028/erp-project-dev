@@ -60,7 +60,7 @@ public class InstructorDashboardPanel extends JPanel {
         contentArea.add(new AdminProfilePanel(), "Profile");
         
         // --- USING MAINTENANCE PANEL (isAdmin = false) ---
-        contentArea.add(new MaintenancePanel(false), "Settings");
+        contentArea.add(new MaintenancePanel(false, maintenanceService, null), "Settings");
 
         cardLayout.show(contentArea, currentScreen);
         mainArea.add(contentArea, BorderLayout.CENTER);
