@@ -1,6 +1,5 @@
 package edu.univ.erp.ui.dashboards.student;
 
-import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.service.StudentService;
@@ -14,7 +13,9 @@ public class StudentDashboardPanel extends JPanel {
     private JPanel contentArea;
     private CardLayout cardLayout;
     private final StudentService studentService;
-    private String currentScreen = "Dashboard"; // To hold the current view
+    
+    // Hardcoded ID for testing so the UI loads without a full login session
+    private final long TEST_STUDENT_ID = 3L; 
 
     public StudentDashboardPanel(StudentService studentService) {
         this.studentService = studentService;
@@ -23,17 +24,22 @@ public class StudentDashboardPanel extends JPanel {
     }
 
     private void initUI() {
-        removeAll(); // Clear previous components on re-init
+        removeAll(); 
 
         // 1. Sidebar
+        // The strings here (e.g., "Course Catalog") must match the keys used in contentArea.add() below
         DashboardComponents.SidebarPanel sidebar = new DashboardComponents.SidebarPanel("STUDENT", e -> onNavigate(e.getActionCommand()));
+        
         sidebar.addItem("Dashboard", "🏠");
         sidebar.addItem("Course Catalog", "📚");
         sidebar.addItem("Section Catalog", "🗂️");
         sidebar.addItem("Registrations", "📝");
         sidebar.addItem("Grades", "🎓");
+        sidebar.addItem("Time Table", "📅"); // Added missing Time Table button
         sidebar.addItem("Transcript", "📜");
+        sidebar.addItem("Profile", "👤");    // Added missing Profile button
         sidebar.addItem("Settings", "⚙️");
+        
         add(sidebar, BorderLayout.WEST);
 
         // 2. Main Area (Top Bar + Content)
@@ -43,8 +49,8 @@ public class StudentDashboardPanel extends JPanel {
         // 3. Top Bar
         DashboardComponents.TopBarPanel topBar = new DashboardComponents.TopBarPanel(
                 "Student Portal",
-                "ST", // Placeholder for student initials
-                e -> { /* Sidebar toggle logic if needed */ },
+                "ST", 
+                e -> { /* Sidebar toggle logic */ },
                 e -> onNavigate("Profile"),
                 e -> toggleTheme()
         );
@@ -55,19 +61,24 @@ public class StudentDashboardPanel extends JPanel {
         contentArea = new JPanel(cardLayout);
         contentArea.setBackground(DashboardTheme.BG_MAIN);
 
+        // --- ADD PANELS WITH EXACT MATCHING NAMES ---
         contentArea.add(new StudentHomePanel(), "Dashboard");
         contentArea.add(new StudentCoursePanel(studentService), "Course Catalog");
         contentArea.add(new StudentSectionPanel(), "Section Catalog");
         contentArea.add(new StudentRegistrationsPanel(), "Registrations");
         contentArea.add(new StudentGradesPanel(), "Grades");
-        contentArea.add(new StudentTimetablePanel(Session.userId()), "Time Table");
+        
+        // Pass the TEST_STUDENT_ID so it doesn't crash if Session is null
+        contentArea.add(new StudentTimetablePanel(TEST_STUDENT_ID), "Time Table");
         contentArea.add(new StudentTranscriptPanel(), "Transcript");
 
         // Shared Views
         contentArea.add(new AdminProfilePanel(), "Profile");
         contentArea.add(new MaintenancePanel(false, null, null), "Settings");
 
-        cardLayout.show(contentArea, currentScreen);
+        // Show default
+        cardLayout.show(contentArea, "Dashboard");
+        
         mainArea.add(contentArea, BorderLayout.CENTER);
         add(mainArea, BorderLayout.CENTER);
 
@@ -75,29 +86,18 @@ public class StudentDashboardPanel extends JPanel {
         repaint();
     }
     
-    private void onNavigate(String screen) {
-        switch (screen) {
-            case "Dashboard"     -> currentScreen = "Dashboard";
-            case "Courses"       -> currentScreen = "Course Catalog";
-            case "Sections"      -> currentScreen = "Section Catalog";
-            case "Registrations" -> currentScreen = "Registrations";
-            case "Transcript"    -> currentScreen = "Transcript";
-            case "Profile"       -> currentScreen = "Profile";
-            case "Settings"      -> currentScreen = "Settings";
-            default              -> { return; }
+    private void onNavigate(String screenName) {
+        // Since we ensured the Sidebar names match the Card names exactly, 
+        // we can just pass the name directly to the layout.
+        try {
+            cardLayout.show(contentArea, screenName);
+        } catch (Exception e) {
+            System.err.println("Screen not found: " + screenName);
         }
-        cardLayout.show(contentArea, currentScreen);
-    }
-
-    // Helper to create a placeholder panel
-    private JPanel createPlaceholderPanel(String text) {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.add(new JLabel(text + " - Coming Soon!"));
-        return panel;
     }
 
     private void toggleTheme() {
         DashboardTheme.setTheme(!DashboardTheme.isDark);
-        initUI(); // Re-initialize the entire UI to apply the new theme
+        initUI(); 
     }
 }
