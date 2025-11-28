@@ -8,7 +8,7 @@ public class SeedingUsers {
     public static void main(String[] args) throws Exception {
         AuthDAO auth_dao = new AuthDAO();
 
-        //seeding 4 users in user_auth table
+        //initial stage of seeding users
         try {
             auth_dao.insertUser("admin1", "ADMIN", "admin@123");
         } catch (Exception ignored) {}
@@ -62,6 +62,7 @@ public class SeedingUsers {
 
         System.out.println("Everything seeded successfully");
     }
+
 
     private static long findUserIdByUsername(String username) throws Exception {
         AuthDAO auth_dao = new AuthDAO();

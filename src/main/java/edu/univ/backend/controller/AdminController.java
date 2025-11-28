@@ -1,8 +1,8 @@
 package edu.univ.backend.controller;
 
 import edu.univ.erp.service.AdminService;
-import edu.univ.erp.domain.AuthClass; // <--- ADDED
-import edu.univ.erp.domain.Course;    // <--- ADDED
+import edu.univ.erp.domain.AuthClass;
+import edu.univ.erp.domain.Course;
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.domain.User;
 
@@ -22,7 +22,7 @@ public class AdminController {
         this.adminService = new AdminService();
     }
 
-    // 1. DASHBOARD
+    //dashboard
     public Map<String, String> getDashboardStats() {
         return adminService.getDashboardStats();
     }
@@ -31,7 +31,7 @@ public class AdminController {
         return adminService.getRecentActivity();
     }
 
-    // 2. USERS
+    //user methods
     public List<User> getAllProfiles() throws SQLException {
         return adminService.getAllUsers();
     }
@@ -44,7 +44,7 @@ public class AdminController {
         adminService.createAuthUser(username, password, role);
     }
 
-    // 3. COURSES
+    //course methods
     public List<Course> getAllCourses() throws SQLException {
         return adminService.getAllCourses();
     }
@@ -61,7 +61,7 @@ public class AdminController {
         adminService.deleteCourse(code);
     }
 
-    // 4. SECTIONS
+    //section methods
     public List<Section> getAllSections() throws SQLException {
         return adminService.getAllSections();
     }
@@ -74,7 +74,7 @@ public class AdminController {
         adminService.createSectionFromUI(courseCode, instructorUser, room, day, time, capacity);
     }
 
-    // 5. MAINTENANCE
+    //maintenance methods
     public boolean isMaintenanceMode() {
         return adminService.isMaintenanceOn();
     }
