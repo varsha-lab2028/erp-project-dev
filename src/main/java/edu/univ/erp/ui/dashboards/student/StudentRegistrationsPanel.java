@@ -1,5 +1,7 @@
 package edu.univ.erp.ui.dashboards.student;
 
+import edu.univ.erp.access.AccessControl;
+import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.ui.common.DashboardTheme;
@@ -78,8 +80,7 @@ public class StudentRegistrationsPanel extends JPanel {
 
     // loading currently registered sections into the table
     private void reloadRegistrations() {
-        //long studentId = Session.userId(); -> can't use it right now because login not there
-        long student_id = 3L; //hard-coded
+        long student_id = Session.userId();
         try {
             current_sections = student_service.getRegisteredSectionsList(student_id);
         } catch (SQLException e) {
@@ -123,14 +124,17 @@ public class StudentRegistrationsPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Select a registration to drop.");
             return;
         }
-        /*
-        if (!AccessControl.canAccess("STU_REGISTER")) {
-            JOptionPane.showMessageDialog(this, "Cannot drop now (maintenance ON).");
+
+        try {
+            AccessControl.checkRole("STUDENT");
+            AccessControl.requireStudentWriteAccess();
+        } catch (RuntimeException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Access Denied", JOptionPane.ERROR_MESSAGE);
             return;
-        }*/
+        }
+
         Section s = current_sections.get(row);
-        //long studentId = Session.userId();
-        long student_id = 3L; //just temporary for now, will change later
+        long student_id = Session.userId();
         int confirm = JOptionPane.showConfirmDialog(
                 this,
                 "Drop section " + s.getCourseCode() + " (Section " + s.getSectionId() + ")?",

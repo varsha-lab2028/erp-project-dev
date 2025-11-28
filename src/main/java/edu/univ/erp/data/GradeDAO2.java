@@ -185,29 +185,53 @@ public class GradeDAO2 {
         return final_grades;
     }
 
+    //listing grades by the section
     public List<Object[]> listGradesBySection(long section_id) throws SQLException {
         String command = """
-                SELECT e.student_id, st.first_name, st.last_name, fg.final_score, fg.letter_grade
-                FROM enrollments e
-                JOIN students st ON e.student_id = st.student_id
-                JOIN sections s ON e.section_id = s.section_id
-                LEFT JOIN final_grades fg ON fg.enrollment_id = e.enrollment_id
-                WHERE e.section_id = ? AND e.e_status = 'REGISTERED'
-                ORDER BY st.first_name, st.last_name
-                """;
+            SELECT
+                e.student_id,
+                st.roll_no AS student_name,
+
+                MAX(CASE WHEN a.assessment_name = 'Midsem'      THEN a.ass_score END) AS midsem_score,
+                MAX(CASE WHEN a.assessment_name = 'Endsem'      THEN a.ass_score END) AS endsem_score,
+                MAX(CASE WHEN a.assessment_name = 'Assignments' THEN a.ass_score END) AS assignments_score,
+                MAX(CASE WHEN a.assessment_name = 'Quizzes'     THEN a.ass_score END) AS quizzes_score,
+
+                fg.course_cg    AS final_score,
+                fg.grade_letter AS grade_letter
+            FROM enrollments e
+            JOIN students st
+              ON e.student_id = st.user_id
+            LEFT JOIN assessment_scores a
+              ON a.enrollment_id = e.enrollment_id
+            LEFT JOIN final_grades fg
+              ON fg.enrollment_id = e.enrollment_id
+            WHERE e.section_id = ?
+              AND e.e_status = 'REGISTERED'
+            GROUP BY
+                e.student_id,
+                st.roll_no,
+                fg.course_cg,
+                fg.grade_letter
+            ORDER BY st.roll_no
+            """;
 
         List<Object[]> grades = new ArrayList<>();
+
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
             ps.setLong(1, section_id);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     grades.add(new Object[]{
-                            rs.getLong("student_id"),
-                            rs.getString("first_name"),
-                            rs.getString("last_name"),
-                            rs.getDouble("final_score"),
-                            rs.getString("letter_grade")
+                            rs.getLong("student_id"),             // [0] ID
+                            rs.getString("student_name"),         // [1] roll no
+                            rs.getObject("midsem_score"),         // [2] Midsem
+                            rs.getObject("endsem_score"),         // [3] Endsem
+                            rs.getObject("assignments_score"),    // [4] Internal/Assignments
+                            rs.getObject("quizzes_score"),        // [5] Quizzes
+                            rs.getObject("final_score"),          // [6] Total
+                            rs.getString("grade_letter")          // [7] Grade
                     });
                 }
             }

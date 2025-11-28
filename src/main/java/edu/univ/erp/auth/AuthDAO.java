@@ -6,6 +6,7 @@ import edu.univ.erp.domain.User;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
 
 /*this class is for talking to the database (MYSQL) and allows changes*/
 /*for handling authentication and the user_auth table in MySQL*/
@@ -14,8 +15,7 @@ public class AuthDAO {
     private final DataSource data_source = ServerConnector.auth();
 
     public void insertUser(String username, String role, String raw_password) throws Exception {
-        //command = the sql command
-        String command = "INSERT INTO user_auth(username, role, password_hash, status) VALUES (?,?,?, 'INACTIVE')";
+        String command = "INSERT INTO user_auth(username, role, password_hash, status) VALUES (?,?,?, 'ACTIVE')";
         try (Connection connection = data_source.getConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
             ps.setString(1, username);
@@ -24,6 +24,30 @@ public class AuthDAO {
             ps.executeUpdate();
         }
 
+    }
+
+    //listing the users present
+    public java.util.List<AuthClass> listUsers() throws Exception {
+        String sql = "SELECT user_id, username, role, password_hash, status " +
+                "FROM user_auth ORDER BY user_id";
+
+        java.util.List<AuthClass> users = new ArrayList<>();
+
+        try (Connection connection = data_source.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                AuthClass u = new AuthClass();
+                u.user_id       = rs.getLong("user_id");
+                u.username      = rs.getString("username");
+                u.role          = rs.getString("role");
+                u.password_hash = rs.getString("password_hash");
+                u.auth_status   = rs.getString("status");
+                users.add(u);
+            }
+        }
+        return users;
     }
 
     //finds a user by their username
@@ -78,9 +102,9 @@ public class AuthDAO {
         }
     }
 
-    // converts AuthClass (from DB) → User (used in session/UI)
+    // converts AuthClass (from DB)  to User (used in session/UI)
     public User toUser(AuthClass a) {
-        Role r = Role.valueOf(a.role.toUpperCase());  // converts "student" → Role.STUDENT
+        Role r = Role.valueOf(a.role.toUpperCase());
         return new User(a.user_id, a.username, r, a.auth_status);
     }
 }

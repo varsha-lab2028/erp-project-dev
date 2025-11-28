@@ -1,13 +1,24 @@
 package edu.univ.erp.ui.dashboards.admin;
 
+import edu.univ.erp.domain.AuthClass;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 public class UserManagementPanel extends JPanel {
+
+    private final AdminService adminService = new AdminService();
+
+    private JTextField userTxt;
+    private JPasswordField passTxt;
+    private JComboBox<String> roleBox;
+    private DashboardComponents.TablePanel tablePanel;
 
     public UserManagementPanel() {
         setLayout(new BorderLayout(20, 20));
@@ -17,11 +28,10 @@ public class UserManagementPanel extends JPanel {
         // 1. Form Card
         DashboardComponents.CardPanel formCard = new DashboardComponents.CardPanel();
         formCard.setLayout(new BorderLayout());
-        // REMOVED: formCard.setBackground(Color.WHITE); -> CardPanel now handles this automatically via Theme
 
         JLabel title = new JLabel("Add New User");
         title.setFont(DashboardTheme.FONT_SUBTITLE);
-        title.setForeground(DashboardTheme.TEXT_PRIMARY); // Fix: Dynamic Text Color
+        title.setForeground(DashboardTheme.TEXT_PRIMARY);
         title.setBorder(new EmptyBorder(0, 0, 15, 0));
         formCard.add(title, BorderLayout.NORTH);
 
@@ -51,11 +61,7 @@ public class UserManagementPanel extends JPanel {
 
         // 2. Table Card
         String[] cols = {"ID", "Username", "Role", "Status"};
-        Object[][] data = {
-            {"101", "aman.gupta", "Student", "Active"},
-            {"202", "suresh.kr", "Instructor", "Active"},
-            {"999", "admin", "Admin", "Active"}
-        };
+        Object[][] data = new Object[0][4];   // start empty, load from DB
         
         DashboardComponents.TablePanel tableCard = new DashboardComponents.TablePanel("All Users", cols, data);
 
@@ -68,5 +74,74 @@ public class UserManagementPanel extends JPanel {
         lbl.setFont(DashboardTheme.FONT_BOLD);
         lbl.setForeground(DashboardTheme.TEXT_SECONDARY); // Fix: Gray text in both modes
         return lbl;
+    }
+
+    private void onCreateUser() {
+        String username = userTxt.getText().trim();
+        String password = new String(passTxt.getPassword());
+        String roleLabel = ((String) roleBox.getSelectedItem()).toUpperCase(); // STUDENT / INSTRUCTOR / ADMIN
+
+        try {
+            adminService.createAuthUser(username, password, roleLabel);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "User created successfully.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+            userTxt.setText("");
+            passTxt.setText("");
+
+            loadUsersTable();   // refresh table from DB
+
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    ex.getMessage(),
+                    "Invalid Input",
+                    JOptionPane.WARNING_MESSAGE
+            );
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to create user: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    // --- TABLE LOAD ---------------------------------------------------------
+    private void loadUsersTable() {
+        try {
+            List<AuthClass> users = adminService.listAuthUsers();
+
+            // Get the JTable inside TablePanel (same trick you used elsewhere)
+            JScrollPane scroll = (JScrollPane) tablePanel.getComponent(1);
+            JTable table = (JTable) scroll.getViewport().getView();
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+            model.setRowCount(0);
+            for (AuthClass u : users) {
+                model.addRow(new Object[]{
+                        u.user_id,
+                        u.username,
+                        u.role,
+                        u.auth_status
+                });
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to load users: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 }

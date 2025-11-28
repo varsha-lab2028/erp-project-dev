@@ -1,5 +1,6 @@
 package edu.univ.erp.ui.dashboards.student;
 
+import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.ui.common.DashboardComponents;
@@ -97,7 +98,7 @@ public class StudentGradesPanel extends JPanel {
     }
 
     private void reloadGrades(){
-        long student_id = 3L; //hardcoded
+        long student_id = Session.userId();
         int sem_no = 1;
         String sem_season = "MONSOON";
         int year = 2025;

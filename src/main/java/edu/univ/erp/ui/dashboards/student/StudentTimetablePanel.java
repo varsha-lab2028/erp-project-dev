@@ -1,5 +1,6 @@
 package edu.univ.erp.ui.dashboards.student;
 
+import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.domain.TimeTableRow;
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.ui.common.DashboardComponents;
@@ -20,8 +21,8 @@ public class StudentTimetablePanel extends JPanel {
     private List<TimeTableRow> current_rows = Collections.emptyList();
     private long student_id;
 
-    public StudentTimetablePanel(long student_id) {
-        this.student_id = student_id;
+    public StudentTimetablePanel() {
+        this.student_id = Session.userId();
         setLayout(new BorderLayout(20, 20));
         setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(20, 20, 20, 20));

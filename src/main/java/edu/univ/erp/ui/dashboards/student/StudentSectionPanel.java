@@ -1,5 +1,6 @@
 package edu.univ.erp.ui.dashboards.student;
 
+import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.ui.common.DashboardComponents;
@@ -118,7 +119,7 @@ public class StudentSectionPanel extends JPanel {
             return;
         }
         Section s = current_sections.get(row);
-        long student_id = 3L; 
+        long student_id = Session.userId();
 
         try {
             student_service.registerForSection(student_id, s.getSectionId());

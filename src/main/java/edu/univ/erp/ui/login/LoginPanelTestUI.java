@@ -4,6 +4,7 @@ import javax.swing.*;
 import edu.univ.erp.auth.AuthenticationService;
 import edu.univ.erp.domain.AuthClass;
 
+/*
 public class LoginPanelTestUI {
 
     public static void main(String[] args) {
@@ -52,3 +53,4 @@ public class LoginPanelTestUI {
         return user;
     }
 }
+ */

@@ -3,6 +3,7 @@ package edu.univ.erp.ui.dashboards.student;
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import edu.univ.erp.service.StudentService;
+import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.ui.dashboards.admin.MaintenancePanel;
 import edu.univ.erp.ui.dashboards.admin.AdminProfilePanel;
 
@@ -13,9 +14,7 @@ public class StudentDashboardPanel extends JPanel {
     private JPanel contentArea;
     private CardLayout cardLayout;
     private final StudentService studentService;
-    
-    // Hardcoded ID for testing so the UI loads without a full login session
-    private final long TEST_STUDENT_ID = 3L; 
+
 
     public StudentDashboardPanel(StudentService studentService) {
         this.studentService = studentService;
@@ -35,9 +34,9 @@ public class StudentDashboardPanel extends JPanel {
         sidebar.addItem("Section Catalog", "🗂️");
         sidebar.addItem("Registrations", "📝");
         sidebar.addItem("Grades", "🎓");
-        sidebar.addItem("Time Table", "📅"); // Added missing Time Table button
+        sidebar.addItem("Time Table", "📅");
         sidebar.addItem("Transcript", "📜");
-        sidebar.addItem("Profile", "👤");    // Added missing Profile button
+        sidebar.addItem("Profile", "👤");
         sidebar.addItem("Settings", "⚙️");
         
         add(sidebar, BorderLayout.WEST);
@@ -67,9 +66,8 @@ public class StudentDashboardPanel extends JPanel {
         contentArea.add(new StudentSectionPanel(), "Section Catalog");
         contentArea.add(new StudentRegistrationsPanel(), "Registrations");
         contentArea.add(new StudentGradesPanel(), "Grades");
-        
-        // Pass the TEST_STUDENT_ID so it doesn't crash if Session is null
-        contentArea.add(new StudentTimetablePanel(TEST_STUDENT_ID), "Time Table");
+
+        contentArea.add(new StudentTimetablePanel(), "Time Table");
         contentArea.add(new StudentTranscriptPanel(), "Transcript");
 
         // Shared Views

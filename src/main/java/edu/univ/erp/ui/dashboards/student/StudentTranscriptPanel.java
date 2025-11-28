@@ -1,6 +1,5 @@
 package edu.univ.erp.ui.dashboards.student;
 
-//import com.formdev.flatlaf.ui.FlatListCellBorder;
 import edu.univ.erp.access.AccessControl;
 import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.domain.TranscriptRow;
@@ -130,7 +129,6 @@ public class StudentTranscriptPanel extends JPanel{
             JOptionPane.showMessageDialog(this, "No completed courses to export.");
             return;
         }
-
         JFileChooser chooser = new JFileChooser();
         chooser.setSelectedFile(new File("transcript.csv"));
         int result = chooser.showSaveDialog(this);
@@ -139,7 +137,7 @@ public class StudentTranscriptPanel extends JPanel{
         File file = chooser.getSelectedFile();
 
         try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
-            long studentId = 3L; //hardcoded
+            long studentId = Session.userId();
 
             // header info
             out.println("Student ID," + studentId);

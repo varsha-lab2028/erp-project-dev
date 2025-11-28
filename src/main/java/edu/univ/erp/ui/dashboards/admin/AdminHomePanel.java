@@ -26,9 +26,9 @@ public class AdminHomePanel extends JPanel {
         grid.setMaximumSize(new Dimension(2000, 120));
         
         // FIX: Removed 'title:', 'value:', 'accent:'
-        grid.add(new DashboardComponents.StatsCard("Total Students", "1,204", "👥", DashboardTheme.INFO));
-        grid.add(new DashboardComponents.StatsCard("Active Courses", "48", "📚", DashboardTheme.SUCCESS));
-        grid.add(new DashboardComponents.StatsCard("Instructors", "85", "👨‍🏫", DashboardTheme.WARNING));
+        grid.add(new DashboardComponents.StatsCard("Total Students", "2", "👥", DashboardTheme.INFO));
+        grid.add(new DashboardComponents.StatsCard("Active Courses", "5", "📚", DashboardTheme.SUCCESS));
+        grid.add(new DashboardComponents.StatsCard("Instructors", "10", "👨‍🏫", DashboardTheme.WARNING));
         grid.add(new DashboardComponents.StatsCard("System Status", "Good", "⚡", DashboardTheme.DANGER));
         
         body.add(grid);

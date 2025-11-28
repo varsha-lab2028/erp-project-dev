@@ -1,5 +1,6 @@
 package edu.univ.erp.ui.dashboards.instructor;
 
+import edu.univ.erp.data.ServerConnector;
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.service.InstructorService;
 import edu.univ.erp.ui.common.DashboardComponents;
@@ -8,6 +9,9 @@ import edu.univ.erp.ui.common.DashboardTheme;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -31,20 +35,20 @@ public class GradebookPanel extends JPanel {
         setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(30, 30, 30, 30));
 
-        // 1. Top Controls (Using CardPanel for style)
+        //Top Controls (Using CardPanel for style)
         DashboardComponents.CardPanel controls = new DashboardComponents.CardPanel();
         controls.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 15));
-        
+
         JLabel lbl = new JLabel("Select Section:");
         lbl.setFont(DashboardTheme.FONT_BOLD);
         lbl.setForeground(DashboardTheme.TEXT_PRIMARY);
-        
+
         sectionCombo = new JComboBox<>(new String[]{"IP - Section A", "IP - Section B", "LA - Section A", "LA - Section B", "HCI - Section A", "HCI - Section B", "DC - Section A", "DC - Section B", "COM"});
         sectionCombo.setPreferredSize(new Dimension(250, 35));
         DashboardComponents.styleControl(sectionCombo);
-        
+
         JButton loadBtn = DashboardComponents.createPrimaryButton("Load Data");
-        
+
         controls.add(lbl);
         controls.add(sectionCombo);
         controls.add(loadBtn);
@@ -64,22 +68,22 @@ public class GradebookPanel extends JPanel {
         //Bottom Actions
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottom.setBackground(DashboardTheme.BG_MAIN);
-        
-        JButton exportBtn = new JButton("Export CSV"); 
+
+        JButton exportBtn = new JButton("Export CSV");
         exportBtn.setFont(DashboardTheme.FONT_BOLD);
         exportBtn.setForeground(DashboardTheme.TEXT_PRIMARY);
         exportBtn.setBackground(DashboardTheme.SURFACE);
         exportBtn.setBorder(BorderFactory.createLineBorder(DashboardTheme.BORDER_COLOR));
         exportBtn.setPreferredSize(new Dimension(120, 40));
         exportBtn.setFocusPainted(false);
-        
+
         JButton saveBtn = DashboardComponents.createPrimaryButton("Publish Grades");
-        saveBtn.setBackground(DashboardTheme.SUCCESS); 
-        
+        saveBtn.setBackground(DashboardTheme.SUCCESS);
+
         bottom.add(exportBtn);
         bottom.add(Box.createHorizontalStrut(10));
         bottom.add(saveBtn);
-        
+
         add(bottom, BorderLayout.SOUTH);
 
         //backend portion
@@ -87,7 +91,7 @@ public class GradebookPanel extends JPanel {
         // Fill section dropdown for this instructor
         loadSectionsForInstructor(instructor_id);
 
-        // Load data button → fill table with grades for selected section
+        //loading the grades
         loadBtn.addActionListener(e -> {
             Section s = getSelectedSection();
             if (s == null) {
@@ -171,33 +175,28 @@ public class GradebookPanel extends JPanel {
 
     private void loadGradesForSection(long sectionId) {
         Object[][] data;
+
         try {
-            // GradeDAO2.listGradesBySection returns:
-            // [student_id, first_name, last_name, final_score, letter_grade]
+            // Ask the service for grades. It will talk to GradeDAO2.
             List<Object[]> rows = instructorService.getGradesForSection(sectionId);
             data = new Object[rows.size()][cols.length];
 
             for (int i = 0; i < rows.size(); i++) {
                 Object[] r = rows.get(i);
-                Long studentId = (Long) r[0];
-                String firstName = (String) r[1];
-                String lastName = (String) r[2];
-                Object finalScore = r[3];    // may be null if not computed yet
-                Object letterGrade = r[4];   // may be null
 
-                data[i][0] = studentId;
-                data[i][1] = firstName + " " + lastName;
-
-                // Component scores not stored yet → leave blank
-                data[i][2] = null;  // Midsem (30)
-                data[i][3] = null;  // Endsem (30)
-                data[i][4] = null;  // Internal (20)
-                data[i][5] = null;  // Quizzes (20)
-
-                data[i][6] = finalScore;    // Total
-                data[i][7] = letterGrade;   // Grade
+                // Our DAO returns: [id, name, midsem, endsem, internal, quizzes, total, grade]
+                data[i][0] = r[0];  // Student ID
+                data[i][1] = r[1];  // Name (roll no)
+                data[i][2] = r[2];  // Midsem
+                data[i][3] = r[3];  // Endsem
+                data[i][4] = r[4];  // Internal / Assignments
+                data[i][5] = r[5];  // Quizzes
+                data[i][6] = r[6];  // Total (course_cg)
+                data[i][7] = r[7];  // Grade (letter)
             }
+
         } catch (SQLException e) {
+            // If anything fails, show error and show empty table
             data = new Object[0][cols.length];
             JOptionPane.showMessageDialog(
                     this,
@@ -214,4 +213,6 @@ public class GradebookPanel extends JPanel {
         tableContainer.revalidate();
         tableContainer.repaint();
     }
+
+
 }

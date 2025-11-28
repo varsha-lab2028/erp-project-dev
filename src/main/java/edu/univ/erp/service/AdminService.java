@@ -8,6 +8,8 @@ import edu.univ.erp.domain.Section;
 import edu.univ.erp.domain.User;
 import edu.univ.erp.auth.AuthDAO;
 import edu.univ.erp.access.AccessControl;
+import edu.univ.erp.domain.AuthClass;
+import edu.univ.erp.domain.Role;
 import edu.univ.erp.service.MaintenanceService;
 
 import java.sql.SQLException;
@@ -131,4 +133,30 @@ public class AdminService {
         sectionDAO.assignInstructor(sectionId, instructorUserId);
     }
 
+    //user management
+    public void createAuthUser(String username, String rawPassword, String roleLabel) throws Exception {
+        AccessControl.checkRole("ADMIN");
+        AccessControl.checkWritable();
+
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Username is required");
+        }
+        if (rawPassword == null || rawPassword.isBlank()) {
+            throw new IllegalArgumentException("Password is required");
+        }
+        if (roleLabel == null || roleLabel.isBlank()) {
+            throw new IllegalArgumentException("Role is required");
+        }
+
+        // ensure role is valid according to enum
+        Role.valueOf(roleLabel.toUpperCase());   // throws if invalid
+
+        // AuthDAO.insertUser hashes the password internally
+        auth_dao.insertUser(username.trim(), roleLabel.toUpperCase(), rawPassword);
+    }
+
+    public List<AuthClass> listAuthUsers() throws Exception {
+        AccessControl.checkRole("ADMIN");
+        return auth_dao.listUsers();
+    }
 }
