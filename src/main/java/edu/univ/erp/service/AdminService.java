@@ -112,7 +112,7 @@ public class AdminService {
             ps.setString(1, username);
             ps.executeUpdate();
         } catch (Exception e) {
-            e.printStackTrace(); // Log silently, don't crash UI
+            e.printStackTrace(); 
         }
     }
 
@@ -167,6 +167,12 @@ public class AdminService {
         AccessControl.checkRole("ADMIN");
         AccessControl.checkWritable();
 
+        // --- EDGE CASE FIX: Prevent Negative Capacity ---
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("Capacity must be a positive number.");
+        }
+        // ------------------------------------------------
+
         // 1. Ensure Course Exists (Self-Healing)
         if (course_dao.findByCourseCode(courseCode) == null) {
             throw new IllegalArgumentException("Course '" + courseCode + "' does not exist. Please create it first in the Courses tab.");
@@ -184,7 +190,7 @@ public class AdminService {
         
         AuthClass instructor = instructorOpt.get();
         
-        // 3. FORCE SYNC Instructor (Just in case they were added manually to Auth DB but missed ERP DB)
+        // 3. FORCE SYNC Instructor
         syncUserToERP(instructor.username, "INSTRUCTOR");
 
         // 4. Create Section Object

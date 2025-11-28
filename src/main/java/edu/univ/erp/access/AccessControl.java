@@ -1,26 +1,40 @@
 package edu.univ.erp.access;
 
 import edu.univ.erp.auth.session.Session;
+import edu.univ.erp.service.MaintenanceService;
 
 public class AccessControl {
+    
+    // Connect to the service to check the flag
+    private static final MaintenanceService maintenanceService = new MaintenanceService();
 
     public static void checkRole(String requiredRole) {
-        // 1. Check if logged in
         if (!Session.isLoggedIn()) {
             throw new RuntimeException("Access denied - not logged in");
         }
 
-        // 2. Check if role matches (Case insensitive)
         if (!Session.hasRole(requiredRole)) {
             throw new RuntimeException("Access denied - insufficient permissions. Required: " + requiredRole);
         }
     }
 
+    // --- THIS IS THE FIX ---
     public static void checkWritable() {
-        // Optional maintenance check logic
+        // 1. Check if Maintenance is ON in the database
+        if (maintenanceService.isMaintenanceOn()) {
+            
+            // 2. Admins are exempt (they can still edit things)
+            if (Session.hasRole("ADMIN")) {
+                return; 
+            }
+            
+            // 3. Everyone else gets blocked
+            throw new RuntimeException("System is under maintenance. Actions are temporarily disabled.");
+        }
     }
     
     public static void requireStudentWriteAccess() {
-        // Optional logic
+        checkRole("STUDENT");
+        checkWritable();
     }
 }

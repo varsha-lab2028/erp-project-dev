@@ -129,35 +129,39 @@ public class StudentTranscriptPanel extends JPanel{
             JOptionPane.showMessageDialog(this, "No completed courses to export.");
             return;
         }
+
         JFileChooser chooser = new JFileChooser();
-        chooser.setSelectedFile(new File("transcript.csv"));
+        chooser.setSelectedFile(new java.io.File("Transcript.csv"));
         int result = chooser.showSaveDialog(this);
         if (result != JFileChooser.APPROVE_OPTION) return;
 
-        File file = chooser.getSelectedFile();
+        java.io.File file = chooser.getSelectedFile();
 
-        try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
-            long studentId = Session.userId();
+        try (java.io.PrintWriter out = new java.io.PrintWriter(new java.io.FileWriter(file))) {
+            // FIX: Use the dynamic ID of the logged-in user
+            long studentId = edu.univ.erp.auth.session.Session.userId(); 
 
-            // header info
+            // Header info
+            out.println("University ERP - Official Transcript");
             out.println("Student ID," + studentId);
-            out.println();
+            out.println("Date Generated," + java.time.LocalDate.now());
+            out.println(); // Blank line
 
-            // column headers
+            // CSV Columns
             out.println("Course Code,Course Title,Credits,Final Grade");
 
-            // rows
-            for (TranscriptRow row : transcript_rows) {
+            // Rows
+            for (edu.univ.erp.domain.TranscriptRow row : transcript_rows) {
                 out.printf("%s,%s,%d,%s%n",
                         row.getCourseCode(),
-                        row.getCourseTitle(),
+                        row.getCourseTitle(), // Make sure your CSV doesn't break on commas in titles
                         row.getCredits(),
                         row.getFinalGrade());
             }
 
             JOptionPane.showMessageDialog(
                     this,
-                    "CSV exported to:\n" + file.getAbsolutePath()
+                    "Transcript saved successfully to:\n" + file.getAbsolutePath()
             );
         } catch (Exception ex) {
             ex.printStackTrace();
