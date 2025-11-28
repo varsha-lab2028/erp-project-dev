@@ -5,6 +5,8 @@ import edu.univ.erp.domain.*;
 import edu.univ.erp.auth.AuthDAO;
 import edu.univ.erp.access.AccessControl;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +23,7 @@ public class AdminService {
     private final MaintenanceService maintenanceService = new MaintenanceService();
 
     // ==================================================================================
-    // 1. DASHBOARD STATISTICS (Middleman between DAO and AdminHomePanel)
+    // 1. DASHBOARD STATISTICS
     // ==================================================================================
 
     public Map<String, String> getDashboardStats() {
@@ -29,23 +31,12 @@ public class AdminService {
         Map<String, String> stats = new HashMap<>();
 
         try {
-            // 1. Get raw list from AuthDAO
             List<AuthClass> allUsers = auth_dao.listUsers();
             
-            // 2. Process data (Count Students)
-            long studentCount = allUsers.stream()
-                    .filter(u -> "STUDENT".equalsIgnoreCase(u.role))
-                    .count();
-
-            // 3. Process data (Count Instructors)
-            long instructorCount = allUsers.stream()
-                    .filter(u -> "INSTRUCTOR".equalsIgnoreCase(u.role))
-                    .count();
-
-            // 4. Get Course Count
+            long studentCount = allUsers.stream().filter(u -> "STUDENT".equalsIgnoreCase(u.role)).count();
+            long instructorCount = allUsers.stream().filter(u -> "INSTRUCTOR".equalsIgnoreCase(u.role)).count();
             int courseCount = course_dao.listCourses().size();
 
-            // 5. Pack data for UI
             stats.put("students", String.valueOf(studentCount));
             stats.put("instructors", String.valueOf(instructorCount));
             stats.put("courses", String.valueOf(courseCount));
@@ -58,13 +49,11 @@ public class AdminService {
             stats.put("courses", "0");
             stats.put("status", "Error");
         }
-
         return stats;
     }
 
     public Object[][] getRecentActivity() {
         AccessControl.checkRole("ADMIN");
-        // Mock data for UI table
         return new Object[][]{
             {"System Login", "Admin", "Just Now"},
             {"Dashboard Loaded", "System", "1 min ago"},
@@ -73,7 +62,7 @@ public class AdminService {
     }
 
     // ==================================================================================
-    // 2. USER MANAGEMENT (Middleman between AuthDAO and UserManagementPanel)
+    // 2. USER MANAGEMENT (With Auto-Sync!)
     // ==================================================================================
 
     public List<User> getAllUsers() throws SQLException {
@@ -81,13 +70,11 @@ public class AdminService {
         return userDAO.listAllUsers();
     }
 
-    // Used by UI to list users in table
     public List<AuthClass> listAuthUsers() throws Exception {
         AccessControl.checkRole("ADMIN");
         return auth_dao.listUsers();
     }
 
-    // Used by UI to create a new user
     public void createAuthUser(String username, String rawPassword, String roleLabel) throws Exception {
         AccessControl.checkRole("ADMIN");
         AccessControl.checkWritable();
@@ -101,8 +88,32 @@ public class AdminService {
             throw new IllegalArgumentException("Invalid Role");
         }
 
-        // Delegate to DAO
+        // 1. Create Login
         auth_dao.insertUser(username.trim(), roleLabel.toUpperCase(), rawPassword);
+        
+        // 2. AUTO-SYNC to ERP Database (Fixes the "Appropriate ID" error)
+        syncUserToERP(username.trim(), roleLabel.toUpperCase());
+    }
+
+    private void syncUserToERP(String username, String role) {
+        String sql = "";
+        if ("INSTRUCTOR".equals(role)) {
+            sql = "INSERT IGNORE INTO erp_db.instructors (instructor_id, name, email) " +
+                  "SELECT user_id, username, CONCAT(username, '@univ.edu') FROM auth_db.user_auth WHERE username = ?";
+        } else if ("STUDENT".equals(role)) {
+            sql = "INSERT IGNORE INTO erp_db.students (user_id, name, email) " +
+                  "SELECT user_id, username, CONCAT(username, '@univ.edu') FROM auth_db.user_auth WHERE username = ?";
+        } else {
+            return;
+        }
+
+        try (Connection conn = ServerConnector.ERPConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace(); 
+        }
     }
 
     // ==================================================================================
@@ -133,7 +144,7 @@ public class AdminService {
     }
 
     // ==================================================================================
-    // 4. SECTION MANAGEMENT (Middleman between UI Inputs and DAO)
+    // 4. SECTION MANAGEMENT (With Safety Checks)
     // ==================================================================================
 
     public List<Section> getAllSections() throws SQLException {
@@ -141,10 +152,6 @@ public class AdminService {
         return sectionDAO.listAllSections();
     }
 
-    /**
-     * Used by SectionManagementPanel to fill the "Instructor" dropdown.
-     * Fetches all users from AuthDAO, filters for INSTRUCTOR role.
-     */
     public List<AuthClass> getAllInstructors() throws SQLException {
         AccessControl.checkRole("ADMIN");
         try {
@@ -156,14 +163,22 @@ public class AdminService {
         }
     }
 
-    /**
-     * Takes raw strings from UI, resolves IDs, creates Object, sends to DAO.
-     */
     public void createSectionFromUI(String courseCode, String instructorUsername, String room, String day, String time, int capacity) throws Exception {
         AccessControl.checkRole("ADMIN");
         AccessControl.checkWritable();
 
-        // 1. Logic: Convert UI Username -> Database ID
+        // --- EDGE CASE FIX: Prevent Negative Capacity ---
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("Capacity must be a positive number.");
+        }
+        // ------------------------------------------------
+
+        // 1. Ensure Course Exists (Self-Healing)
+        if (course_dao.findByCourseCode(courseCode) == null) {
+            throw new IllegalArgumentException("Course '" + courseCode + "' does not exist. Please create it first in the Courses tab.");
+        }
+
+        // 2. Find Instructor
         List<AuthClass> instructors = getAllInstructors();
         Optional<AuthClass> instructorOpt = instructors.stream()
                 .filter(u -> u.username.equals(instructorUsername))
@@ -174,24 +189,26 @@ public class AdminService {
         }
         
         AuthClass instructor = instructorOpt.get();
-        long instructorId = instructor.user_id;
+        
+        // 3. FORCE SYNC Instructor
+        syncUserToERP(instructor.username, "INSTRUCTOR");
 
-        // 2. Logic: Create Section Object (Using fixed constructor)
+        // 4. Create Section Object
         Section s = new Section(
-            0L,                 // Auto-increment ID
+            0L,                 
             courseCode,         
-            instructorId,       
+            instructor.user_id,       
             instructor.username,     
             day,                
             time,               
             room,               
             capacity,           
-            1,                  // Default Sem
-            "MONSOON",          // Default Season
-            2025                // Default Year
+            1,                  
+            "MONSOON",          
+            2025                
         );
 
-        // 3. Data Access: Save to DB
+        // 5. Save
         sectionDAO.insertSection(s);
     }
 
