@@ -67,19 +67,18 @@ public class StudentGradesPanel extends JPanel {
 
             g2.dispose();
 
-            // don't call super.paintComponent before custom painting to avoid overpainting rounded corners
             super.paintComponent(g);
             }
 
             @Override
             public boolean isOpaque() {
-            // keep opaque false so rounded corners show properly
             return false;
             }
         };
         tableCard.setBackground(Color.WHITE);
         tableCard.setLayout(new BorderLayout());
         tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+
         //title inside the card
         JLabel title = new JLabel("Course Grade Components");
         title.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -133,7 +132,6 @@ public class StudentGradesPanel extends JPanel {
         grades_table.setModel(model);
         status_label.setText(rows.size() + "courses");
     }
-    // --- ADD THIS TO AUTO-REFRESH GRADES ---
     @Override
     public void setVisible(boolean aFlag) {
         super.setVisible(aFlag);

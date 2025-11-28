@@ -26,7 +26,6 @@ public class StudentSectionPanel extends JPanel {
         setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(30, 30, 30, 30));
 
-        // 1. Top Bar
         DashboardComponents.CardPanel topCard = new DashboardComponents.CardPanel();
         topCard.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 10));
 
@@ -44,15 +43,12 @@ public class StudentSectionPanel extends JPanel {
         
         add(topCard, BorderLayout.NORTH);
 
-        // 2. Table Area
         contentPanel = new JPanel(new BorderLayout());
         contentPanel.setOpaque(false);
         add(contentPanel, BorderLayout.CENTER);
 
-        // Load Data
         reloadSections("");
 
-        // Listeners
         searchBtn.addActionListener(e -> reloadSections(searchField.getText().trim()));
         registerBtn.addActionListener(e -> registerSelected());
     }
@@ -77,7 +73,6 @@ public class StudentSectionPanel extends JPanel {
             data[i][5] = s.getCapacity();
         }
 
-        // Custom Table Creation using Dashboard Styles
         DashboardComponents.CardPanel tableCard = new DashboardComponents.CardPanel();
         tableCard.setLayout(new BorderLayout());
         
@@ -91,8 +86,7 @@ public class StudentSectionPanel extends JPanel {
         sectionTable.setRowHeight(35);
         sectionTable.setFont(DashboardTheme.FONT_REGULAR);
         sectionTable.getTableHeader().setFont(DashboardTheme.FONT_BOLD);
-        
-        // Colors
+
         sectionTable.setBackground(DashboardTheme.SURFACE);
         sectionTable.setForeground(DashboardTheme.TEXT_PRIMARY);
         sectionTable.setGridColor(DashboardTheme.BORDER_COLOR);

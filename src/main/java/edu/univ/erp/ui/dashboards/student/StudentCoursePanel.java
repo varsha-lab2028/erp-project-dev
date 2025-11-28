@@ -22,7 +22,6 @@ public class StudentCoursePanel extends JPanel {
         setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(30, 30, 30, 30));
 
-        // 1. Search Bar (Using CardPanel)
         DashboardComponents.CardPanel searchCard = new DashboardComponents.CardPanel();
         searchCard.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 10));
 
@@ -41,15 +40,12 @@ public class StudentCoursePanel extends JPanel {
         
         add(searchCard, BorderLayout.NORTH);
 
-        // 2. Content Area for Table
         contentPanel = new JPanel(new BorderLayout());
         contentPanel.setOpaque(false);
         add(contentPanel, BorderLayout.CENTER);
 
-        // Initial Load
         loadCourses("");
 
-        // Action Listener
         searchBtn.addActionListener(e -> loadCourses(searchField.getText().trim()));
     }
 

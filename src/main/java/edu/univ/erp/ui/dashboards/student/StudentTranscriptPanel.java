@@ -31,7 +31,7 @@ public class StudentTranscriptPanel extends JPanel{
         setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        //top bar = shows the term label and export csv button
+        //top bar
         JPanel top_card = new JPanel();
         top_card.setBackground(Color.WHITE);
         top_card.setLayout(new BorderLayout());
@@ -75,10 +75,8 @@ public class StudentTranscriptPanel extends JPanel{
         tableCard.add(sp, BorderLayout.CENTER);
         add(tableCard, BorderLayout.CENTER);
 
-        //loading the data into transcript
         loadTranscript();
 
-        //action listeners
         csv_button.addActionListener(e -> ExportCSV());
     }
 
@@ -154,7 +152,7 @@ public class StudentTranscriptPanel extends JPanel{
             for (edu.univ.erp.domain.TranscriptRow row : transcript_rows) {
                 out.printf("%s,%s,%d,%s%n",
                         row.getCourseCode(),
-                        row.getCourseTitle(), // Make sure your CSV doesn't break on commas in titles
+                        row.getCourseTitle(),
                         row.getCredits(),
                         row.getFinalGrade());
             }
@@ -173,7 +171,6 @@ public class StudentTranscriptPanel extends JPanel{
             );
         }
     }
-    // --- ADD THIS TO AUTO-REFRESH TRANSCRIPT ---
     @Override
     public void setVisible(boolean aFlag) {
         super.setVisible(aFlag);

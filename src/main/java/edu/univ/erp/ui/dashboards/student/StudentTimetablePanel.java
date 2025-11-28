@@ -85,7 +85,6 @@ public class StudentTimetablePanel extends JPanel {
     }
 
     private void loadingTimeTable() {
-        // Show loading spinner
         JDialog loadingDialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), "Loading Timetable", true);
         loadingDialog.setLayout(new BorderLayout());
         loadingDialog.setSize(300, 100);
@@ -140,7 +139,6 @@ public class StudentTimetablePanel extends JPanel {
         worker.execute();
         loadingDialog.setVisible(true);
     }
-    // --- ADD THIS TO AUTO-REFRESH TIMETABLE ---
     @Override
     public void setVisible(boolean aFlag) {
         super.setVisible(aFlag);

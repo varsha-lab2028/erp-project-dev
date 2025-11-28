@@ -75,7 +75,6 @@ public class StudentRegistrationsPanel extends JPanel {
         drop_button.addActionListener(e -> onDrop());
     }
 
-    // --- FIX STARTS HERE: Auto-refresh when tab is opened ---
     @Override
     public void setVisible(boolean aFlag) {
         super.setVisible(aFlag);
@@ -83,7 +82,7 @@ public class StudentRegistrationsPanel extends JPanel {
             reloadRegistrations();
         }
     }
-    // --- FIX ENDS HERE ---
+
 
     // loading currently registered sections into the table
     private void reloadRegistrations() {
@@ -91,16 +90,6 @@ public class StudentRegistrationsPanel extends JPanel {
         try {
             current_sections = student_service.getRegisteredSectionsList(student_id);
         } catch (SQLException e) {
-            // Optional: You can uncomment this if you want popup errors, 
-            // but usually silent fail or log is better for auto-refresh
-            /*
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Failed to load registrations: " + e.getMessage(),
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            */
             current_sections = Collections.emptyList();
         }
 
@@ -154,7 +143,6 @@ public class StudentRegistrationsPanel extends JPanel {
         );
         if (confirm != JOptionPane.YES_OPTION) return;
         try {
-            // use your existing dropSection() to enforce policy
             String msg = student_service.dropSection(student_id, s.getSectionId());
             if (!msg.startsWith("Dropped successfully")) {
                 JOptionPane.showMessageDialog(this, msg, "Cannot drop", JOptionPane.WARNING_MESSAGE);

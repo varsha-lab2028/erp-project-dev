@@ -19,8 +19,7 @@ public class StudentHomePanel extends JPanel {
     public StudentHomePanel() {
         setLayout(new BorderLayout());
         setBackground(DashboardTheme.BG_MAIN);
-        
-        // Clean border definition without "top:", "left:", etc.
+
         setBorder(new EmptyBorder(30, 30, 30, 30));
 
         //student who has logged in
@@ -30,12 +29,10 @@ public class StudentHomePanel extends JPanel {
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setBackground(DashboardTheme.BG_MAIN);
 
-        // 1. Stats Grid (Student Specific)
         JPanel grid = new JPanel(new GridLayout(1, 3, 20, 0));
         grid.setBackground(DashboardTheme.BG_MAIN);
         grid.setMaximumSize(new Dimension(2000, 120));
-        
-        // Fixed: Added the missing 4th argument (Color) for all cards
+
         grid.add(new DashboardComponents.StatsCard("Current CGPA", "3.8", "🎓", DashboardTheme.PRIMARY));
         grid.add(new DashboardComponents.StatsCard("Credits Earned", "20", "⭐", DashboardTheme.WARNING));
         grid.add(new DashboardComponents.StatsCard("Attendance", "92%", "✅", DashboardTheme.SUCCESS));
