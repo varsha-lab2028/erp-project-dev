@@ -1,42 +1,36 @@
 package edu.univ.erp.ui.dashboards.admin;
 
 import javax.swing.*;
-import java.awt.*;
 import edu.univ.erp.service.MaintenanceService;
 import edu.univ.erp.service.AdminService;
+import edu.univ.erp.auth.session.Session; // Import Session
+import edu.univ.erp.domain.User; // Import User
 
 public class TestingAdminUI {
     public static void main(String[] args) {
-        // 1. Setup global UI properties for a smoother, professional look
         try {
-            // macOS Specific: Integrates the menu bar with the system top bar & sets App Name
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             System.setProperty("apple.awt.application.name", "IIITD ERP");
-            
-            // Text Rendering: Enables smoother font antialiasing
             System.setProperty("awt.useSystemAAFontSettings", "on");
             System.setProperty("swing.aatext", "true");
-
-            // Look & Feel: Use the native system look (buttons, scrollbars, window borders)
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignored) {
-            // Fallback to default if system L&F fails
-        }
+        } catch (Exception ignored) {}
         
         SwingUtilities.invokeLater(() -> {
+            // --- SIMULATE LOGIN FOR TESTING ---
+            // Create a dummy admin user so AccessControl doesn't block us
+            User mockAdmin = new User(1L, "admin", "admin@univ.edu", "ADMIN");
+            Session.setCurrentUser(mockAdmin);
+            // ----------------------------------
+
             JFrame frame = new JFrame("IIITD University ERP - Admin Portal");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            
-            // Increased resolution slightly to accommodate the sidebar and "floating" UI
             frame.setSize(1280, 850); 
-            frame.setLocationRelativeTo(null); // Center on screen
+            frame.setLocationRelativeTo(null); 
             
-            // Mock Services 
-            // (Assuming these classes exist in your edu.univ.erp.service package)
             MaintenanceService maintenanceService = new MaintenanceService();
             AdminService adminService = new AdminService();
             
-            // Initialize the Main Dashboard Panel
             AdminDashboardPanel dashboard = new AdminDashboardPanel(maintenanceService, adminService);
             frame.add(dashboard);
             
