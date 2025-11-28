@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Map;
 
 public class AdminHomePanel extends JPanel {
@@ -29,19 +30,35 @@ public class AdminHomePanel extends JPanel {
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setBackground(DashboardTheme.BG_MAIN);
 
-        // --- Fetch Real Data ---
-        Map<String, String> stats = adminService.getDashboardStats();
+        // --- Fetch Data with Error Handling ---
+        Map<String, String> stats = new HashMap<>();
+        Object[][] activityData;
+
+        try {
+            // Try to fetch real stats (requires active session)
+            stats = adminService.getDashboardStats();
+            activityData = adminService.getRecentActivity();
+        } catch (RuntimeException e) {
+            // Fallback for Testing/No Session: prevent crash
+            System.err.println("AdminHomePanel: Could not fetch stats (likely not logged in). Using placeholders.");
+            stats.put("students", "-");
+            stats.put("courses", "-");
+            stats.put("instructors", "-");
+            stats.put("status", "Offline");
+            
+            activityData = new Object[][]{ {"No data (Login required)", "-", "-"} };
+        }
 
         // 1. Stats Grid
         JPanel grid = new JPanel(new GridLayout(1, 4, 20, 0));
         grid.setBackground(DashboardTheme.BG_MAIN);
         grid.setMaximumSize(new Dimension(2000, 120));
         
-        grid.add(new DashboardComponents.StatsCard("Total Students", stats.get("students"), "👥", DashboardTheme.INFO));
-        grid.add(new DashboardComponents.StatsCard("Active Courses", stats.get("courses"), "📚", DashboardTheme.SUCCESS));
-        grid.add(new DashboardComponents.StatsCard("Instructors", stats.get("instructors"), "🎓", DashboardTheme.WARNING));
+        grid.add(new DashboardComponents.StatsCard("Total Students", stats.getOrDefault("students", "-"), "👥", DashboardTheme.INFO));
+        grid.add(new DashboardComponents.StatsCard("Active Courses", stats.getOrDefault("courses", "-"), "📚", DashboardTheme.SUCCESS));
+        grid.add(new DashboardComponents.StatsCard("Instructors", stats.getOrDefault("instructors", "-"), "🎓", DashboardTheme.WARNING));
         
-        String status = stats.get("status");
+        String status = stats.getOrDefault("status", "Unknown");
         Color statusColor = "Good".equals(status) ? DashboardTheme.SUCCESS : DashboardTheme.DANGER;
         grid.add(new DashboardComponents.StatsCard("System Status", status, "🖥️", statusColor));
         
@@ -52,13 +69,11 @@ public class AdminHomePanel extends JPanel {
         JPanel splitView = new JPanel(new GridLayout(1, 2, 25, 0));
         splitView.setBackground(DashboardTheme.BG_MAIN);
         
-        // Left: Recent Activity (Fetched from Service)
+        // Left: Recent Activity
         String[] cols = {"Activity Description", "User", "Time"};
-        Object[][] activityData = adminService.getRecentActivity();
-        
         splitView.add(new DashboardComponents.TablePanel("Recent System Activity", cols, activityData));
 
-        // Right: Quick Actions (Static UI controls)
+        // Right: Quick Actions
         JPanel actionsCard = new JPanel(new BorderLayout());
         actionsCard.setBackground(Color.WHITE);
         actionsCard.setBorder(BorderFactory.createCompoundBorder(
@@ -73,7 +88,7 @@ public class AdminHomePanel extends JPanel {
         
         JPanel buttonGrid = new JPanel(new GridLayout(3, 1, 0, 15));
         buttonGrid.setBackground(Color.WHITE);
-        buttonGrid.add(DashboardComponents.createPrimaryButton("Add New Student")); // Can be linked later
+        buttonGrid.add(DashboardComponents.createPrimaryButton("Add New Student"));
         buttonGrid.add(DashboardComponents.createPrimaryButton("Generate Reports"));
         buttonGrid.add(DashboardComponents.createPrimaryButton("System Backup"));
         
