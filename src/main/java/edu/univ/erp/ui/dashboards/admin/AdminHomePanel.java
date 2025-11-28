@@ -1,60 +1,67 @@
 package edu.univ.erp.ui.dashboards.admin;
 
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.ui.common.DashboardComponents;
 import edu.univ.erp.ui.common.DashboardTheme;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.util.Map;
 
 public class AdminHomePanel extends JPanel {
-    public AdminHomePanel() {
+    
+    private final AdminService adminService;
+
+    public AdminHomePanel(AdminService adminService) {
+        this.adminService = adminService;
         setLayout(new BorderLayout());
         setBackground(DashboardTheme.BG_MAIN);
-        // FIX: Removed 'top:', 'left:', etc.
         setBorder(new EmptyBorder(30, 30, 30, 30));
+        
+        initUI();
+    }
+
+    private void initUI() {
+        removeAll();
         
         JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setBackground(DashboardTheme.BG_MAIN);
 
+        // --- Fetch Real Data ---
+        Map<String, String> stats = adminService.getDashboardStats();
+
         // 1. Stats Grid
-        // FIX: Removed 'rows:', 'cols:', 'hgap:', 'vgap:'
         JPanel grid = new JPanel(new GridLayout(1, 4, 20, 0));
         grid.setBackground(DashboardTheme.BG_MAIN);
-        // FIX: Removed 'width:', 'height:'
         grid.setMaximumSize(new Dimension(2000, 120));
         
-        // FIX: Removed 'title:', 'value:', 'accent:'
-        grid.add(new DashboardComponents.StatsCard("Total Students", "2", "👥", DashboardTheme.INFO));
-        grid.add(new DashboardComponents.StatsCard("Active Courses", "5", "📚", DashboardTheme.SUCCESS));
-        grid.add(new DashboardComponents.StatsCard("Instructors", "10", "👨‍🏫", DashboardTheme.WARNING));
-        grid.add(new DashboardComponents.StatsCard("System Status", "Good", "⚡", DashboardTheme.DANGER));
+        grid.add(new DashboardComponents.StatsCard("Total Students", stats.get("students"), "👥", DashboardTheme.INFO));
+        grid.add(new DashboardComponents.StatsCard("Active Courses", stats.get("courses"), "📚", DashboardTheme.SUCCESS));
+        grid.add(new DashboardComponents.StatsCard("Instructors", stats.get("instructors"), "🎓", DashboardTheme.WARNING));
+        
+        String status = stats.get("status");
+        Color statusColor = "Good".equals(status) ? DashboardTheme.SUCCESS : DashboardTheme.DANGER;
+        grid.add(new DashboardComponents.StatsCard("System Status", status, "🖥️", statusColor));
         
         body.add(grid);
-        // FIX: Removed 'height:'
         body.add(Box.createVerticalStrut(30));
 
-        // 2. Split View: Activity & Quick Actions
+        // 2. Split View
         JPanel splitView = new JPanel(new GridLayout(1, 2, 25, 0));
         splitView.setBackground(DashboardTheme.BG_MAIN);
         
-        // Left: Activity Table
+        // Left: Recent Activity (Fetched from Service)
         String[] cols = {"Activity Description", "User", "Time"};
-        Object[][] data = {
-            {"New Course Added (CSE101)", "Admin", "10:00 AM"},
-            {"Student Registered (S. Gupta)", "System", "10:15 AM"},
-            {"Maintenance Scheduled", "Admin", "01:00 PM"},
-            {"Gradebook Locked", "Instructor", "02:30 PM"}
-        };
-        // FIX: Removed 'title:'
-        splitView.add(new DashboardComponents.TablePanel("Recent System Activity", cols, data));
+        Object[][] activityData = adminService.getRecentActivity();
+        
+        splitView.add(new DashboardComponents.TablePanel("Recent System Activity", cols, activityData));
 
-        // Right: Quick Actions
+        // Right: Quick Actions (Static UI controls)
         JPanel actionsCard = new JPanel(new BorderLayout());
         actionsCard.setBackground(Color.WHITE);
         actionsCard.setBorder(BorderFactory.createCompoundBorder(
-             // FIX: Removed 'r:', 'g:', 'b:'
              new LineBorder(new Color(226, 232, 240), 1),
              new EmptyBorder(20, 20, 20, 20)
         ));
@@ -66,7 +73,7 @@ public class AdminHomePanel extends JPanel {
         
         JPanel buttonGrid = new JPanel(new GridLayout(3, 1, 0, 15));
         buttonGrid.setBackground(Color.WHITE);
-        buttonGrid.add(DashboardComponents.createPrimaryButton("Add New Student"));
+        buttonGrid.add(DashboardComponents.createPrimaryButton("Add New Student")); // Can be linked later
         buttonGrid.add(DashboardComponents.createPrimaryButton("Generate Reports"));
         buttonGrid.add(DashboardComponents.createPrimaryButton("System Backup"));
         
@@ -76,10 +83,10 @@ public class AdminHomePanel extends JPanel {
         body.add(splitView);
 
         add(new JScrollPane(body) {
-            { 
-                setBorder(null); 
-                getViewport().setBackground(DashboardTheme.BG_MAIN); 
-            }
+            { setBorder(null); getViewport().setBackground(DashboardTheme.BG_MAIN); }
         }, BorderLayout.CENTER);
+        
+        revalidate();
+        repaint();
     }
 }
