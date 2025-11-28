@@ -16,7 +16,7 @@ public class LoginFrame extends JFrame{
     private final JLabel message = new JLabel(" ");
     private final JButton loginBtn = new JButton("Login");
 
-    //constructor
+
     public LoginFrame(){
         super("University ERP — Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -24,7 +24,7 @@ public class LoginFrame extends JFrame{
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        JPanel form = new JPanel(null); // use setBounds positioning
+        JPanel form = new JPanel(null); 
         add(form, BorderLayout.CENTER);
 
         JLabel uLbl = new JLabel("Username:");
@@ -73,8 +73,7 @@ public class LoginFrame extends JFrame{
     private void routeToDashboard(){
         switch (Session.user().getRole()){
             case STUDENT: new StudentDashboardPanel(new StudentService()).setVisible(true); break;
-            //case INSTRUCTOR: new InstructorDashboard().setVisible(true); break;
-            //case ADMIN: new AdminDashboard().setVisible(true); break;
+            
         }
         dispose();
     }

@@ -25,6 +25,6 @@ public class PropertyUtil {
         return prop.getProperty(key);
     }
 
-    // Prevent instantiation
+   
     private PropertyUtil() {}
 }

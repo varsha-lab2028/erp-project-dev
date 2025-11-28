@@ -18,9 +18,7 @@ public class InstructorHomePanel extends JPanel {
     private final InstructorController controller;
     private final long instructorId;
 
-    /**
-     * Constructor now requires Controller and Instructor ID to fetch data.
-     */
+    
     public InstructorHomePanel(InstructorController controller, long instructorId) {
         this.controller = controller;
         this.instructorId = instructorId;
@@ -37,24 +35,22 @@ public class InstructorHomePanel extends JPanel {
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setBackground(DashboardTheme.BG_MAIN);
 
-        // --- Data Fetching ---
+       
         String secCount = "-";
         String stuCount = "-";
         String penCount = "-";
         Object[][] tableData = new Object[0][4];
 
         try {
-            // 1. Fetch Summary Stats (Sections, Students, Pending)
-            // Ensure your InstructorController has the getDashboardStats method implemented
+       
             Map<String, Integer> stats = controller.getDashboardStats(instructorId);
             secCount = String.valueOf(stats.getOrDefault("sections", 0));
             stuCount = String.valueOf(stats.getOrDefault("students", 0));
             penCount = String.valueOf(stats.getOrDefault("pending", 0));
 
-            // 2. Fetch Active Sections for the Summary Table
             List<Section> sections = controller.getSectionsByInstructor(instructorId);
             
-            // Limit the table to show only the top 4 sections to fit the UI layout
+     
             int limit = Math.min(sections.size(), 4);
             tableData = new Object[limit][4];
 
@@ -68,15 +64,14 @@ public class InstructorHomePanel extends JPanel {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            // In a real app, you might show a notification or error label here
+
         }
 
-        // --- 1. Stats Cards ---
+
         JPanel grid = new JPanel(new GridLayout(1, 3, 20, 0));
         grid.setBackground(DashboardTheme.BG_MAIN);
         grid.setMaximumSize(new Dimension(2000, 120));
 
-        // Injecting the fetched data into the cards
         grid.add(new DashboardComponents.StatsCard("My Sections", secCount, "📅", DashboardTheme.INFO));
         grid.add(new DashboardComponents.StatsCard("Total Students", stuCount, "👥", DashboardTheme.SUCCESS));
         grid.add(new DashboardComponents.StatsCard("Pending Grades", penCount, "📝", DashboardTheme.WARNING));
@@ -84,15 +79,14 @@ public class InstructorHomePanel extends JPanel {
 
         body.add(Box.createVerticalStrut(30));
 
-        // --- 2. Split View (Table + Chart) ---
+
         JPanel split = new JPanel(new GridLayout(1, 2, 25, 0));
         split.setBackground(DashboardTheme.BG_MAIN);
 
-        // Left: Active Sections Table (Dynamic Data)
+
         String[] cols = {"Course", "Section", "Room", "Time"};
         split.add(new DashboardComponents.TablePanel("My Active Sections", cols, tableData));
 
-        // Right: Grade Analytics Chart (Visuals preserved, data remains static for now)
         JPanel chartCard = createChartCard();
         split.add(chartCard);
 
@@ -106,9 +100,7 @@ public class InstructorHomePanel extends JPanel {
         }, BorderLayout.CENTER);
     }
 
-    /**
-     * Helper method to create the visual chart component.
-     */
+   
     private JPanel createChartCard() {
         JPanel chartCard = new JPanel(new BorderLayout());
         chartCard.setBackground(Color.WHITE);
@@ -121,7 +113,7 @@ public class InstructorHomePanel extends JPanel {
         chartTitle.setFont(DashboardTheme.FONT_SUBTITLE);
         chartCard.add(chartTitle, BorderLayout.NORTH);
 
-        // Custom Graph Painting Logic
+  
         JPanel graph = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -131,7 +123,7 @@ public class InstructorHomePanel extends JPanel {
 
                 int w = getWidth();
                 int h = getHeight();
-                // Static demo values for the chart
+  
                 int[] values = {10, 25, 45, 20, 15};
                 String[] labels = {"F", "D", "C", "B", "A"};
 

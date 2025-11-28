@@ -29,21 +29,21 @@ public class MainApp {
     private InstructorDashboardPanel instructorDashboard;
 
     public MainApp() {
-        //applying the theme first
+     
         LoginTheme.applyTheme();
 
-        // Initialize backend services centrally
+       
         services = new ServiceRegistry();
         edu.univ.erp.auth.session.Session.setSemesterContext(1, edu.univ.erp.domain.SemesterSeason.MONSOON, 2025);
 
-        //create the main window
+     
         frame = new JFrame("University ERP System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 600);
         frame.setLocationRelativeTo(null);
         frame.setResizable(true);
 
-        //Use CardLayout for panel navigation
+      
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
@@ -54,28 +54,27 @@ public class MainApp {
     }
 
     private void initPanels() {
-        // Provide centralized AuthenticationService to LoginController
+      
         LoginController loginController = new LoginController(services.auth_service);
         LoginPanel loginPanel = new LoginPanel(loginController);
 
-        // Add property change listener for login success
+        
         loginPanel.addPropertyChangeListener("loginSuccess", evt -> {
             String role = (String) evt.getNewValue();
             showDashboard(role);
         });
 
-        //create dashboards with service injection
         studentDashboard = new StudentDashboardPanel(services.student_service);
         adminDashboard = new AdminDashboardPanel(services.maintenance_service, new edu.univ.erp.service.AdminService());
         instructorDashboard = new InstructorDashboardPanel(services.instructor_service, services.maintenance_service);
 
-        //register all cards with the layout
+      
         mainPanel.add("login", loginPanel);
         mainPanel.add("studentDashboard", studentDashboard);
         mainPanel.add("adminDashboard", adminDashboard);
         mainPanel.add("instructorDashboard", instructorDashboard);
 
-        //showing the login window first
+ 
         cardLayout.show(mainPanel, "login");
     }
 
@@ -91,7 +90,7 @@ public class MainApp {
                 cardLayout.show(mainPanel, "adminDashboard");
                 break;
             default:
-                cardLayout.show(mainPanel, "login"); // fallback to login
+                cardLayout.show(mainPanel, "login");
                 break;
         }
     }

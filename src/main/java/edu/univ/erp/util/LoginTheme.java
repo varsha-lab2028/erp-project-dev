@@ -7,8 +7,8 @@ public final class LoginTheme {
     private LoginTheme() {}
 
     public static final Color PRIMARY_WHITE = Color.WHITE;
-    public static final Color SEA_GREEN = new Color(178, 255, 228); // light sea green
-    public static final Color DEEP_SEA = new Color(0, 128, 128);     // accent
+    public static final Color SEA_GREEN = new Color(178, 255, 228); 
+    public static final Color DEEP_SEA = new Color(0, 128, 128);    
     public static final Color TEXT_DARK = new Color(34, 34, 34);
 
     public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 22);

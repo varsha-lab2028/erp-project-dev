@@ -14,7 +14,7 @@ public class MaintenancePanel extends JPanel {
     private final MaintenanceService maintenanceService;
     private final AdminService adminService;
 
-    // Constructor accepts 'isAdmin' to toggle the maintenance card
+    
     public MaintenancePanel(boolean isAdmin, MaintenanceService maintenanceService, AdminService adminService) {
         this.isAdmin = isAdmin;
         this.maintenanceService = maintenanceService;
@@ -28,7 +28,7 @@ public class MaintenancePanel extends JPanel {
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
         container.setBackground(DashboardTheme.BG_MAIN);
 
-        // --- 1. System Maintenance Card (ADMIN ONLY) ---
+        
         if (isAdmin) {
             DashboardComponents.CardPanel sysCard = new DashboardComponents.CardPanel();
             sysCard.setLayout(new BorderLayout());
@@ -46,7 +46,7 @@ public class MaintenancePanel extends JPanel {
             lblMode.setFont(DashboardTheme.FONT_REGULAR);
             lblMode.setForeground(DashboardTheme.TEXT_PRIMARY);
 
-            //initial state of the backend
+            
             boolean maintenanceOn = false;
             if (maintenanceService != null) {
                 maintenanceOn = maintenanceService.isMaintenanceOn();
@@ -56,21 +56,21 @@ public class MaintenancePanel extends JPanel {
             toggle.setSelected(maintenanceOn);
             toggle.setFont(DashboardTheme.FONT_BOLD);
 
-            //new version of the backend
+            
             toggle.addActionListener(e -> {
                 boolean selected = toggle.isSelected();
                 try {
-                    // Update button UI immediately for responsiveness
+                    
                     updateToggleAppearance(toggle, selected);
-                    // update DB via admin service
+                    
                     adminService.setMaintenanceMode(selected);
 
-                    // update button UI
+                    
                     toggle.setText(selected ? "Enabled" : "Disabled");
                     toggle.setForeground(selected ? DashboardTheme.DANGER : DashboardTheme.TEXT_PRIMARY);
 
                 } catch (RuntimeException ex) {
-                    // if error (not admin / DB fail / access control), revert toggle
+                    
                     boolean revertedState = !selected;
                     updateToggleAppearance(toggle, revertedState);
                     JOptionPane.showMessageDialog(
@@ -92,7 +92,7 @@ public class MaintenancePanel extends JPanel {
             container.add(Box.createVerticalStrut(20));
         }
 
-        // --- 2. Preferences Card (SHARED) ---
+        
         DashboardComponents.CardPanel prefCard = new DashboardComponents.CardPanel();
         prefCard.setLayout(new BorderLayout());
         
@@ -113,7 +113,7 @@ public class MaintenancePanel extends JPanel {
         if (isAdmin) {
             opts.add(createOption("Auto-Backup Database", true));
         } else {
-            opts.add(new JLabel("")); // Spacer
+            opts.add(new JLabel("")); 
         }
         
         prefCard.add(opts, BorderLayout.CENTER);

@@ -37,41 +37,38 @@ public class MainFrame extends JFrame{
         setSize(1280, 800);
         setLocationRelativeTo(null);
         
-        // Root Layout
+
         setLayout(new BorderLayout());
         
-        // 1. Maintenance Banner
+   
         maintenanceBanner = new JPanel();
         maintenanceBanner.setBackground(DashboardTheme.DANGER);
         
-        // FIX 1: Removed 'width:' and 'height:' hints
+     
         maintenanceBanner.setPreferredSize(new Dimension(100, 30));
         
-        // FIX 2: Removed 'text:' hint
+
         JLabel mLabel = new JLabel("⚠️ SYSTEM IS IN MAINTENANCE MODE - READ ONLY ACCESS");
         mLabel.setForeground(Color.WHITE);
         mLabel.setFont(DashboardTheme.FONT_BOLD);
         maintenanceBanner.add(mLabel);
         
-        // FIX 3: Removed 'aFlag:' hint
+
         maintenanceBanner.setVisible(false); 
         add(maintenanceBanner, BorderLayout.NORTH);
 
-        // 2. Card Layout for Screens
+
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
         
-        // 3. Add Screens
-        // FIX 4: Removed 'constraints:' hint from all lines below
+
         mainPanel.add(new LoginPanel(loginController), "LOGIN");
         mainPanel.add(new AdminDashboardPanel(maintenanceService, adminService), "ADMIN");
         mainPanel.add(new InstructorDashboardPanel(instructorService, maintenanceService), "INSTRUCTOR");
         mainPanel.add(new StudentDashboardPanel(studentService), "STUDENT");
 
         add(mainPanel, BorderLayout.CENTER);
-        
-        // Show Login First
-        // FIX 5: Removed 'name:' hint
+
         cardLayout.show(mainPanel, "LOGIN");
     }
 
@@ -89,7 +86,7 @@ public class MainFrame extends JFrame{
     }
 
     public void checkMaintenance() {
-        // Logic to toggle banner based on service
+     
         boolean isMaintenance = maintenanceService.isMaintenanceOn();
         maintenanceBanner.setVisible(isMaintenance);
     }

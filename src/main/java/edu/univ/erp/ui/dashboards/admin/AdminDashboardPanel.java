@@ -49,7 +49,7 @@ public class AdminDashboardPanel extends JPanel {
         JPanel contentArea = new JPanel(cardLayout);
         contentArea.setBackground(DashboardTheme.BG_MAIN);
 
-        // PASS adminService TO CONSTRUCTORS HERE:
+       
         contentArea.add(new AdminHomePanel(adminService), "Dashboard"); // Updated
         contentArea.add(new AdminProfilePanel(), "Profile");
         contentArea.add(new UserManagementPanel(), "Students");
@@ -58,7 +58,7 @@ public class AdminDashboardPanel extends JPanel {
 
 contentArea.add(new MaintenancePanel(true, maintenanceService, adminService), "Settings");
         
-        // --- USING MAINTENANCE PANEL (isAdmin = true) ---
+        
         contentArea.add(new MaintenancePanel(true, maintenanceService, adminService), "Settings");
 
         cardLayout.show(contentArea, currentScreen);

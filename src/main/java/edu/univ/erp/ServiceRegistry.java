@@ -12,7 +12,7 @@ public class ServiceRegistry {
     public MaintenanceService maintenance_service;
 
     public ServiceRegistry() {
-        // Initialize all services
+      
         this.auth_service = new AuthenticationService();
         this.student_service = new StudentService();
         this.instructor_service = new InstructorService();

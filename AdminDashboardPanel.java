@@ -20,7 +20,7 @@ public class AdminDashboardPanel extends JPanel {
         this.adminService = adminService;
         setLayout(new BorderLayout());
 
-        // 1. Sidebar
+     
         DashboardComponents.SidebarPanel sidebar = new DashboardComponents.SidebarPanel("ADMIN", e -> onNavigate(e.getActionCommand()));
         sidebar.addItem("Dashboard", "🏠");
         sidebar.addItem("Courses", "📚");
@@ -29,11 +29,11 @@ public class AdminDashboardPanel extends JPanel {
         sidebar.addItem("Settings", "⚙️");
         add(sidebar, BorderLayout.WEST);
 
-        // 2. Main Content Area
+       
         JPanel mainArea = new JPanel(new BorderLayout());
         mainArea.setBackground(DashboardTheme.BG_MAIN);
 
-        // Top Bar
+       
         DashboardComponents.TopBarPanel topBar = new DashboardComponents.TopBarPanel(
                 "Admin Portal",
                 "AD",
@@ -43,12 +43,12 @@ public class AdminDashboardPanel extends JPanel {
         );
         mainArea.add(topBar, BorderLayout.NORTH);
 
-        // CardLayout for content
+        
         cardLayout = new CardLayout();
         contentArea = new JPanel(cardLayout);
         contentArea.setOpaque(false);
 
-        // Add placeholder panels
+      
         contentArea.add(createPlaceholderPanel("Admin Dashboard"), "Dashboard");
         contentArea.add(createPlaceholderPanel("Course Management"), "Courses");
         contentArea.add(createPlaceholderPanel("Section Management"), "Sections");
@@ -67,7 +67,7 @@ public class AdminDashboardPanel extends JPanel {
     }
 
     private void onMaintenanceToggle(boolean isEnabled) {
-        // This would be called by the MaintenancePanel to trigger the backend service
+   
         System.out.println("Maintenance mode toggled to: " + isEnabled);
     }
 

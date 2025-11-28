@@ -18,13 +18,13 @@ public class EditProfilePanel extends JPanel {
         
         setLayout(new BorderLayout());
         setBackground(DashboardTheme.BG_MAIN);
-        setBorder(new EmptyBorder(0, 0, 0, 0)); // Padding handled by container
+        setBorder(new EmptyBorder(0, 0, 0, 0)); 
 
-        // Main Card
+        
         DashboardComponents.CardPanel card = new DashboardComponents.CardPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        // --- Header ---
+       
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setBorder(new EmptyBorder(10, 20, 20, 20));
@@ -36,28 +36,28 @@ public class EditProfilePanel extends JPanel {
         header.add(title, BorderLayout.WEST);
         card.add(header);
 
-        // --- Form Content ---
+       
         JPanel formGrid = new JPanel(new GridBagLayout());
         formGrid.setOpaque(false);
         formGrid.setBorder(new EmptyBorder(0, 20, 20, 20));
         
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 0, 15, 20); // Spacing
+        gbc.insets = new Insets(0, 0, 15, 20); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 0.5;
 
-        // Row 1
+        
         addFormField(formGrid, "Full Name", "Aman Gupta", 0, 0, gbc);
         addFormField(formGrid, "Email Address", "admin.sys@iiitd.ac.in", 1, 0, gbc);
         
-        // Row 2
+        
         addFormField(formGrid, "Phone Number", "+91 98765 43210", 0, 1, gbc);
         addFormField(formGrid, "Office Location", "Academic Block, Room 204", 1, 1, gbc);
 
         card.add(formGrid);
         
-        // --- Security Section (Divider) ---
+        
         JSeparator sep = new JSeparator();
         sep.setForeground(DashboardTheme.BORDER_COLOR);
         sep.setMaximumSize(new Dimension(2000, 1));
@@ -76,13 +76,13 @@ public class EditProfilePanel extends JPanel {
         secGrid.setOpaque(false);
         secGrid.setBorder(new EmptyBorder(0, 20, 20, 20));
         
-        // Row 3 (Passwords)
+        
         addPassField(secGrid, "New Password", 0, 0, gbc);
         addPassField(secGrid, "Confirm Password", 1, 0, gbc);
         
         card.add(secGrid);
 
-        // --- Buttons ---
+       
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         btnPanel.setOpaque(false);
         btnPanel.setBorder(new EmptyBorder(10, 20, 20, 20));
@@ -103,7 +103,7 @@ public class EditProfilePanel extends JPanel {
         btnPanel.add(btnSave);
         card.add(btnPanel);
 
-        // Wrapper to center it slightly
+       
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(DashboardTheme.BG_MAIN);
         wrapper.add(card, BorderLayout.NORTH);
@@ -115,13 +115,13 @@ public class EditProfilePanel extends JPanel {
 
     private void addFormField(JPanel panel, String label, String value, int gridx, int gridy, GridBagConstraints gbc) {
         gbc.gridx = gridx;
-        gbc.gridy = gridy * 2; // Label row
+        gbc.gridy = gridy * 2; 
         JLabel lbl = new JLabel(label);
         lbl.setFont(DashboardTheme.FONT_BOLD);
         lbl.setForeground(DashboardTheme.TEXT_SECONDARY);
         panel.add(lbl, gbc);
 
-        gbc.gridy = gridy * 2 + 1; // Field row
+        gbc.gridy = gridy * 2 + 1; 
         JTextField field = new JTextField(value);
         DashboardComponents.styleControl(field);
         field.setPreferredSize(new Dimension(200, 35));

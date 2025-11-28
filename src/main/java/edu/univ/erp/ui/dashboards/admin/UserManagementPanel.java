@@ -15,18 +15,18 @@ public class UserManagementPanel extends JPanel {
 
     private final AdminService adminService = new AdminService();
 
-    // Fields must be class-level to be accessed by methods
+    
     private JTextField userTxt;
     private JPasswordField passTxt;
     private JComboBox<String> roleBox;
-    private DashboardComponents.TablePanel tablePanel; // Class reference
+    private DashboardComponents.TablePanel tablePanel; 
 
     public UserManagementPanel() {
         setLayout(new BorderLayout(20, 20));
         setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(30, 30, 30, 30));
 
-        // 1. Form Card
+        
         DashboardComponents.CardPanel formCard = new DashboardComponents.CardPanel();
         formCard.setLayout(new BorderLayout());
 
@@ -39,7 +39,7 @@ public class UserManagementPanel extends JPanel {
         JPanel fields = new JPanel(new GridLayout(2, 4, 15, 15));
         fields.setOpaque(false);
         
-        // --- FIX 1: Assign to class fields, not local vars ---
+       
         fields.add(createLabel("Username:"));
         userTxt = new JTextField();
         DashboardComponents.styleControl(userTxt);
@@ -55,26 +55,26 @@ public class UserManagementPanel extends JPanel {
         DashboardComponents.styleControl(roleBox);
         fields.add(roleBox);
         
-        fields.add(new JLabel("")); // Spacer
+        fields.add(new JLabel("")); 
         
-        // --- FIX 2: Attach Listener to Button ---
+        
         JButton createBtn = DashboardComponents.createPrimaryButton("Create User");
         createBtn.addActionListener(e -> onCreateUser());
         fields.add(createBtn);
         
         formCard.add(fields, BorderLayout.CENTER);
 
-        // 2. Table Card
-        String[] cols = {"ID", "Username", "Role", "Status"};
-        Object[][] data = new Object[0][4]; // Start empty
         
-        // --- FIX 3: Assign to class variable ---
+        String[] cols = {"ID", "Username", "Role", "Status"};
+        Object[][] data = new Object[0][4]; 
+        
+        
         this.tablePanel = new DashboardComponents.TablePanel("All Users", cols, data);
 
         add(formCard, BorderLayout.NORTH);
         add(this.tablePanel, BorderLayout.CENTER);
         
-        // Load initial data
+      
         loadUsersTable();
     }
     
@@ -123,14 +123,13 @@ public class UserManagementPanel extends JPanel {
         try {
             List<AuthClass> users = adminService.listAuthUsers();
 
-            // We need to access the JTable inside the TablePanel component
-            // Structure: TablePanel -> JScrollPane (index 1) -> JViewport -> JTable
+            
             if (tablePanel.getComponentCount() > 1 && tablePanel.getComponent(1) instanceof JScrollPane) {
                 JScrollPane scroll = (JScrollPane) tablePanel.getComponent(1);
                 JTable table = (JTable) scroll.getViewport().getView();
                 DefaultTableModel model = (DefaultTableModel) table.getModel();
 
-                model.setRowCount(0); // Clear old data
+                model.setRowCount(0); 
                 for (AuthClass u : users) {
                     model.addRow(new Object[]{
                             u.user_id,

@@ -262,10 +262,10 @@ public class LoginPanel extends JPanel {
         button.setPreferredSize(new Dimension(200, 45));
     }
     private void performLogin() {
-        // 1. Change userField -> usernameField
+      
         String user = usernameField.getText().trim();
         
-        // 2. Change passField -> passwordField
+       
         String pass = new String(passwordField.getPassword()).trim();
 
         if (user.isEmpty() || pass.isEmpty()) {
@@ -275,13 +275,13 @@ public class LoginPanel extends JPanel {
 
         statusLabel.setText("Authenticating...");
 
-        // 3. Change loginController -> controller (matches line 21)
+
         User authenticatedUser = controller.authenticate(user, pass);
 
         if (authenticatedUser != null) {
             statusLabel.setText("Success!");
             
-            // This is the critical line that switches the screen
+
             firePropertyChange("loginSuccess", null, authenticatedUser.getRole());
         } else {
             statusLabel.setText("Invalid username or password.");

@@ -30,12 +30,12 @@ public class AdminHomePanel extends JPanel {
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setBackground(DashboardTheme.BG_MAIN);
 
-        // --- Fetch Data with Error Handling ---
+       
         Map<String, String> stats = new HashMap<>();
         Object[][] activityData;
 
         try {
-            // Try to fetch real stats (requires active session)
+            
             stats = adminService.getDashboardStats();
             activityData = adminService.getRecentActivity();
         } catch (RuntimeException e) {

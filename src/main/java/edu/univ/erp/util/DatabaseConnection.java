@@ -8,7 +8,7 @@ public class DatabaseConnection {
     // UPDATED: Pointing to 'auth_db'
     private static final String URL = "jdbc:mysql://192.168.41.50:3306/auth_db";
     private static final String USER = "Disha";
-    private static final String PASSWORD = "2003"; // <--- TYPE PASSWORD
+    private static final String PASSWORD = "2003"; 
 
     public static Connection getConnection() throws SQLException {
         try {

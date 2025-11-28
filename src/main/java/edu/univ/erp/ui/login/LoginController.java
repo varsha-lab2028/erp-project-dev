@@ -12,12 +12,11 @@ public class LoginController {
     }
 
     public User authenticate(String username, String password) {
-        // 1. Call DB
+      
         User user = authService.login(username, password);
-        
-        // 2. Save to Session (CRITICAL STEP)
+
         if (user != null) {
-            // CRITICAL: This saves your login state so AccessControl works!
+      
             Session.login(user); 
             System.out.println("DEBUG: Logged in as " + user.getUsername() + " (" + user.getRole() + ")");
         } else {

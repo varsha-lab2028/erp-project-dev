@@ -18,12 +18,12 @@ import java.util.List;
 public class GradebookPanel extends JPanel {
     private final InstructorService instructorService;
 
-    //we keep references for later
+    
     private JComboBox<String> sectionCombo;
     private JPanel tableContainer;
     private List<Section> currentSections;
 
-    //fixed columns
+    
     private static final String[] cols = {
             "Student ID", "Name", "Midsem (30)", "Endsem (30)", "Internal (20)", "Quizzes (20)", "Total", "Grade"
     };
@@ -35,7 +35,7 @@ public class GradebookPanel extends JPanel {
         setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(30, 30, 30, 30));
 
-        //Top Controls (Using CardPanel for style)
+        
         DashboardComponents.CardPanel controls = new DashboardComponents.CardPanel();
         controls.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 15));
 
@@ -54,7 +54,7 @@ public class GradebookPanel extends JPanel {
         controls.add(loadBtn);
         add(controls, BorderLayout.NORTH);
 
-        //Grading Table
+        
         tableContainer = new JPanel(new BorderLayout());
         tableContainer.setOpaque(false);
 
@@ -65,7 +65,7 @@ public class GradebookPanel extends JPanel {
 
         add(tableContainer, BorderLayout.CENTER);
 
-        //Bottom Actions
+        
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottom.setBackground(DashboardTheme.BG_MAIN);
 
@@ -86,12 +86,12 @@ public class GradebookPanel extends JPanel {
 
         add(bottom, BorderLayout.SOUTH);
 
-        //backend portion
-        long instructor_id = 2L; //hard-coded
-        // Fill section dropdown for this instructor
+        
+        long instructor_id = 2L; 
+        
         loadSectionsForInstructor(instructor_id);
 
-        //loading the grades
+        
         loadBtn.addActionListener(e -> {
             Section s = getSelectedSection();
             if (s == null) {
@@ -106,7 +106,7 @@ public class GradebookPanel extends JPanel {
             loadGradesForSection(s.getSectionId());
         });
 
-        // Publish Grades button → compute final grades then reload
+        
         saveBtn.addActionListener(e -> {
             Section s = getSelectedSection();
             if (s == null) {
@@ -137,7 +137,7 @@ public class GradebookPanel extends JPanel {
             }
         });
 
-        // Export CSV – stub for now
+        
         exportBtn.addActionListener(e ->
                 JOptionPane.showMessageDialog(
                         this,
@@ -177,7 +177,7 @@ public class GradebookPanel extends JPanel {
         Object[][] data;
 
         try {
-            // Ask the service for grades. It will talk to GradeDAO2.
+            
             List<Object[]> rows = instructorService.getGradesForSection(sectionId);
             data = new Object[rows.size()][cols.length];
 
@@ -196,7 +196,7 @@ public class GradebookPanel extends JPanel {
             }
 
         } catch (SQLException e) {
-            // If anything fails, show error and show empty table
+            
             data = new Object[0][cols.length];
             JOptionPane.showMessageDialog(
                     this,

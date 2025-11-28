@@ -14,7 +14,7 @@ import java.util.List;
 public class SectionManagementPanel extends JPanel {
     private final AdminService adminService;
     
-    // CLASS LEVEL VARIABLES (Required for button logic)
+   
     private JTextField cCode;
     private JComboBox<String> instrBox;
     private JTextField roomTxt;
@@ -39,12 +39,11 @@ public class SectionManagementPanel extends JPanel {
         title.setBorder(new EmptyBorder(0, 0, 20, 0));
         formCard.add(title, BorderLayout.NORTH);
 
-        // FIX: Use GridLayout(0, 4) to allow unlimited rows, keeping 4 columns fixed.
-        // [Label] [Input] [Label] [Input]
+        
         JPanel fields = new JPanel(new GridLayout(0, 4, 15, 15));
         fields.setOpaque(false);
         
-        // Row 1
+        
         fields.add(createLabel("Course Code:"));
         cCode = new JTextField();
         DashboardComponents.styleControl(cCode);
@@ -55,7 +54,7 @@ public class SectionManagementPanel extends JPanel {
         DashboardComponents.styleControl(instrBox);
         fields.add(instrBox);
         
-        // Row 2
+        
         fields.add(createLabel("Room:"));
         roomTxt = new JTextField();
         DashboardComponents.styleControl(roomTxt);
@@ -66,7 +65,7 @@ public class SectionManagementPanel extends JPanel {
         DashboardComponents.styleControl(timeTxt);
         fields.add(timeTxt);
         
-        // Row 3
+        
         fields.add(createLabel("Day:"));
         String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
         dayBox = new JComboBox<>(days);
@@ -78,10 +77,10 @@ public class SectionManagementPanel extends JPanel {
         DashboardComponents.styleControl(capTxt);
         fields.add(capTxt);
         
-        // Row 4 (Buttons)
-        fields.add(new JLabel("")); // Spacer
-        fields.add(new JLabel("")); // Spacer
-        fields.add(new JLabel("")); // Spacer
+        
+        fields.add(new JLabel("")); 
+        fields.add(new JLabel("")); 
+        fields.add(new JLabel("")); 
         
         JButton addBtn = DashboardComponents.createPrimaryButton("Add Section");
         addBtn.addActionListener(e -> onAddSection());
@@ -89,19 +88,19 @@ public class SectionManagementPanel extends JPanel {
         
         formCard.add(fields, BorderLayout.CENTER);
 
-        // 2. Table Card
+        
         String[] cols = {"ID", "Course", "Room", "Time", "Capacity"};
-        // Initialize table reference
+        
         tablePanel = new DashboardComponents.TablePanel("Active Sections", cols, new Object[0][5]);
 
         add(formCard, BorderLayout.NORTH);
         add(tablePanel, BorderLayout.CENTER);
         
-        // Initial load
+       
         loadData();
     }
     
-    // --- AUTO REFRESH ---
+    
     @Override
     public void setVisible(boolean aFlag) {
         super.setVisible(aFlag);
@@ -128,7 +127,7 @@ public class SectionManagementPanel extends JPanel {
                 }
             }
         } catch (Exception e) {
-            // Silent fail on init
+            
         }
     }
 
@@ -151,7 +150,7 @@ public class SectionManagementPanel extends JPanel {
             
             JOptionPane.showMessageDialog(this, "Section Created Successfully!");
             
-            // Clear fields
+            
             cCode.setText(""); 
             roomTxt.setText(""); 
             timeTxt.setText("");
@@ -179,8 +178,7 @@ public class SectionManagementPanel extends JPanel {
                 data[i][4] = s.getCapacity();
             }
             
-            // Access the JTable inside TablePanel to update model directly
-            // This prevents UI flickering
+         
             if (tablePanel.getComponentCount() > 1) {
                 JScrollPane scroll = (JScrollPane) tablePanel.getComponent(1);
                 JTable table = (JTable) scroll.getViewport().getView();
@@ -188,7 +186,7 @@ public class SectionManagementPanel extends JPanel {
                 
                 model.setRowCount(0);
                 String[] cols = {"ID", "Course", "Room", "Time", "Capacity"};
-                model.setColumnIdentifiers(cols); // Ensure cols are correct
+                model.setColumnIdentifiers(cols); 
                 
                 for (Object[] row : data) {
                     model.addRow(row);
@@ -196,7 +194,7 @@ public class SectionManagementPanel extends JPanel {
             }
             
         } catch (Exception e) {
-            // e.printStackTrace();
+            
         }
     }
     

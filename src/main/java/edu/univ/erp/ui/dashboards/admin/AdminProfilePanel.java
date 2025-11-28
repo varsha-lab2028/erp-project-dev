@@ -21,14 +21,13 @@ public class AdminProfilePanel extends JPanel {
         contentContainer = new JPanel(cardLayout);
         contentContainer.setBackground(DashboardTheme.BG_MAIN);
 
-        // 1. Add View Mode
+        
         contentContainer.add(createViewPanel(), "VIEW");
         
-        // 2. Add Edit Mode
-        // We pass navigation callbacks to the Edit Panel
+        
         contentContainer.add(new EditProfilePanel(
-            () -> showView(),   // On Save
-            () -> showView()    // On Cancel
+            () -> showView(),   
+            () -> showView()    
         ), "EDIT");
 
         add(contentContainer, BorderLayout.CENTER);
@@ -42,13 +41,13 @@ public class AdminProfilePanel extends JPanel {
         cardLayout.show(contentContainer, "EDIT");
     }
 
-    // --- Extracted your existing View Logic into this method ---
+   
     private JPanel createViewPanel() {
         JPanel viewPanel = new JPanel();
         viewPanel.setLayout(new BoxLayout(viewPanel, BoxLayout.Y_AXIS));
         viewPanel.setBackground(DashboardTheme.BG_MAIN);
 
-        // 1. Header Card
+      
         DashboardComponents.CardPanel headerCard = new DashboardComponents.CardPanel();
         headerCard.setLayout(new BorderLayout());
         
@@ -79,13 +78,13 @@ public class AdminProfilePanel extends JPanel {
         profileContainer.add(textInfo);
         headerCard.add(profileContainer, BorderLayout.CENTER);
         
-        // Edit Button -> Now triggers showEdit()
+        
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnPanel.setOpaque(false);
         btnPanel.setBorder(new EmptyBorder(30,0,0,30));
         
         JButton editBtn = DashboardComponents.createPrimaryButton("Edit Profile");
-        editBtn.addActionListener(e -> showEdit()); // <--- LINKED HERE
+        editBtn.addActionListener(e -> showEdit()); 
         
         btnPanel.add(editBtn);
         headerCard.add(btnPanel, BorderLayout.EAST);
@@ -93,7 +92,7 @@ public class AdminProfilePanel extends JPanel {
         viewPanel.add(headerCard);
         viewPanel.add(Box.createVerticalStrut(25));
 
-        // 2. Details Grid
+        
         JPanel detailsGrid = new JPanel(new GridLayout(1, 2, 25, 0));
         detailsGrid.setBackground(DashboardTheme.BG_MAIN);
         detailsGrid.setMaximumSize(new Dimension(2000, 300));
@@ -123,7 +122,7 @@ public class AdminProfilePanel extends JPanel {
 
         JLabel title = new JLabel(titleStr);
         title.setFont(DashboardTheme.FONT_SUBTITLE);
-        title.setForeground(DashboardTheme.TEXT_PRIMARY); // Fixed Color
+        title.setForeground(DashboardTheme.TEXT_PRIMARY); 
         title.setBorder(new EmptyBorder(15, 25, 15, 25));
         card.add(title, BorderLayout.NORTH);
 
@@ -138,7 +137,7 @@ public class AdminProfilePanel extends JPanel {
             
             JLabel val = new JLabel(row[1]);
             val.setFont(DashboardTheme.FONT_REGULAR);
-            val.setForeground(DashboardTheme.TEXT_PRIMARY); // Fixed Color
+            val.setForeground(DashboardTheme.TEXT_PRIMARY); 
             
             form.add(lbl);
             form.add(val);
