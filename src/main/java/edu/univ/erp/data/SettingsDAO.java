@@ -4,19 +4,26 @@ import java.sql.*;
 import java.time.LocalDateTime;
 
 public class SettingsDAO {
-    //return raw value for key or null if not there
+    
+    // Return raw value for key or null if not there
     public static String get(String key) throws SQLException {
         String command = "SELECT value FROM settings WHERE k = ?";
 
         //connect to the ERP Database
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
+        // --- FIX: Changed 'value' to 'v' to match the database ---
+        String command = "SELECT v FROM settings WHERE k = ?";
+        
+        try (Connection connection = ServerConnector.ERPConnection();
+             PreparedStatement ps = connection.prepareStatement(command)) {
+            
             ps.setString(1, key);
 
             try (ResultSet rs = ps.executeQuery()) {
-                //if matching key found, then it will return
                 if (rs.next()) {
-                    return rs.getString("value");
+                    // --- FIX: Changed 'value' to 'v' here too ---
+                    return rs.getString("v");
                 }
                 else {
                     return null;
@@ -25,7 +32,7 @@ public class SettingsDAO {
         }
     }
 
-    //parse integer setting, will return null if empty or not valid integer
+    // Parse integer setting, will return null if empty or not valid integer
     public Integer getInt(String key) throws SQLException {
         String v = get(key);
         if (v == null) {
@@ -38,7 +45,7 @@ public class SettingsDAO {
         }
     }
 
-    //parsing the date time, this is static
+    // Parsing the date time, this is static
     public static LocalDateTime getDateTime(String key) throws SQLException {
         String v = get(key);
         if (v == null || v.isBlank()) {
@@ -51,7 +58,7 @@ public class SettingsDAO {
         }
     }
 
-    //upsert setting, if value doesn't exist insertion will occur, if it does, the value will get updated
+    // Upsert setting: if value doesn't exist insertion will occur, if it does, the value will get updated
     public void upsertSetting(String key, String value) throws SQLException {
         final String sql = """
             INSERT INTO settings(k,v) VALUES (?,?)
@@ -65,14 +72,14 @@ public class SettingsDAO {
         }
     }
 
-    //Read maintenance flag
+    // Read maintenance flag
     public boolean getMaintenanceMode() throws SQLException {
         String v = get("maintenance_on");
         if (v == null) return false;
         return Boolean.parseBoolean(v.trim());
     }
 
-    //Update maintenance flag
+    // Update maintenance flag
     public void setMaintenanceMode(boolean mode) throws SQLException {
         upsertSetting("maintenance_on", String.valueOf(mode));
     }
