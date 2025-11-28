@@ -7,7 +7,8 @@ public final class PasswordHasher {
     }
     public static boolean verifyHash(String raw_password, String hash){
         if (hash == null || hash.isBlank()) {
-            return false; //doing a safety check
+            //checking just to be safe
+            return false;
         }
         try {
             return BCrypt.checkpw(raw_password, hash);

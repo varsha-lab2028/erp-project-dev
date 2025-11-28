@@ -12,10 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AuthDAO {
-
-    // 1. Login Method
     public User login(String username, String password) throws SQLException {
-        // Updated table name to 'user_auth'
         String sql = "SELECT * FROM user_auth WHERE username = ? AND password_hash = ? AND status = 'ACTIVE'";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -35,13 +32,12 @@ public class AuthDAO {
                 }
             }
         }
-        return null; // Login failed
+        return null;
     }
 
-    // 2. List All Users (For Admin Dashboard)
+    //listing all users for the admin dashboard
     public List<AuthClass> listUsers() throws SQLException {
         List<AuthClass> list = new ArrayList<>();
-        // FIX: Changed 'users' to 'user_auth'
         String sql = "SELECT user_id, username, role, status FROM user_auth";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -60,9 +56,7 @@ public class AuthDAO {
         return list;
     }
 
-    // 3. Insert New User
     public void insertUser(String username, String role, String password) throws SQLException {
-        // FIX: Changed 'users' to 'user_auth'
         String sql = "INSERT INTO user_auth (username, password_hash, role, status) VALUES (?, ?, ?, 'ACTIVE')";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -76,9 +70,7 @@ public class AuthDAO {
         }
     }
 
-    // 4. Update User Status
     public void updateStatus(long userId, String status) throws SQLException {
-        // FIX: Changed 'users' to 'user_auth'
         String sql = "UPDATE user_auth SET status = ? WHERE user_id = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();

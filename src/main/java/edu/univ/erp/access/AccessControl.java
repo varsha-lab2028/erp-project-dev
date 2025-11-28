@@ -9,6 +9,7 @@ public class AccessControl {
     private static final MaintenanceService maintenanceService = new MaintenanceService();
 
     public static void checkRole(String requiredRole) {
+        //check if logged in
         if (!Session.isLoggedIn()) {
             throw new RuntimeException("Access denied - not logged in");
         }
@@ -20,6 +21,11 @@ public class AccessControl {
 
     // --- THIS IS THE FIX ---
     public static void checkWritable() {
+
+    }
+    
+    public static void requireStudentWriteAccess() {
+
         // 1. Check if Maintenance is ON in the database
         if (maintenanceService.isMaintenanceOn()) {
             

@@ -57,7 +57,7 @@ public class TranscriptDAO {
           AND e.e_status = 'COMPLETED'
         ORDER BY c.course_code
         """;
-        // Adjust table/column names to match actual schema.
+
 
         List<TranscriptRow> rows = new ArrayList<>();
         try (Connection conn = ServerConnector.ERPConnection();

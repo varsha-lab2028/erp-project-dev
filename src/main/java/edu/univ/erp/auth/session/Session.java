@@ -5,34 +5,29 @@ import edu.univ.erp.domain.User;
 
 public final class Session {
     private static User current_user;
-    
-    // Store auth context
-    private static long current_user_id = -1;
-    private static String current_role = null; // Changed to String to match Database
 
-    // --- GETTERS ---
+    private static long current_user_id = -1;
+    private static String current_role = null;
+
     public static User user() {
         return current_user;
     }
-    
-    // Alias for compatibility with other controllers
+
     public static User getCurrentUser() {
         return current_user;
     }
 
-    // --- LOGIN LOGIC ---
     public static void login(User user) {
         current_user = user;
         if(user != null) {
             current_user_id = user.getUserId();
-            current_role = user.getRole(); // Assuming User.getRole() returns String
+            current_role = user.getRole();
         } else {
             current_user_id = -1;
             current_role = null;
         }
     }
-    
-    // Alias for compatibility
+
     public static void setCurrentUser(User user) {
         login(user);
     }
@@ -47,7 +42,7 @@ public final class Session {
         return current_user_id != -1 || current_user != null;
     }
 
-    // --- ROLE CHECKING ---
+    //checking the role of the person who logged in
     public static boolean hasRole(String role) {
         if (current_role == null) return false;
         return current_role.equalsIgnoreCase(role);
@@ -63,7 +58,7 @@ public final class Session {
         }
     }
 
-    // --- SEMESTER CONTEXT (Preserved from your code) ---
+    //about the semester
     private static int semester_number;
     private static SemesterSeason semester_season;
     private static int year;

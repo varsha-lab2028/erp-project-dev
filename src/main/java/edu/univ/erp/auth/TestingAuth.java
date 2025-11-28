@@ -9,7 +9,8 @@ public class TestingAuth {
         tryLogin(svc, "inst1",  "inst@123");
         tryLogin(svc, "stu1",   "stu1@123");
         tryLogin(svc, "stu2",   "stu2@123");
-        tryLogin(svc, "stu2",   "wrong"); // should fail
+        //to test if it fails
+        tryLogin(svc, "stu2",   "wrong");
     }
 
     private static void tryLogin(LoginManager svc, String u, String p) {
