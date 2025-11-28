@@ -108,7 +108,7 @@ contentArea.add(new MaintenancePanel(true, maintenanceService, adminService), "S
             addButton("Courses", "📖");
             addButton("Sections", "📅");
             add(Box.createVerticalGlue());
-            addButton("Settings", "⚙");
+            addButton("Settings", "⚙️");
             
             add(Box.createVerticalStrut(20));
         }

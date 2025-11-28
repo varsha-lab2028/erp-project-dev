@@ -40,11 +40,10 @@ public class InstructorDashboardPanel extends JPanel {
         
         // 1. Sidebar
         DashboardComponents.SidebarPanel sidebar = new DashboardComponents.SidebarPanel("INSTRUCTOR", e -> onNavigate(e.getActionCommand()));
-        sidebar.addItem("Dashboard", "匠");
-        sidebar.addItem("My Sections", "答");
-        sidebar.addItem("Gradebook", "統");
-        sidebar.addItem("Profile", "側");
-        sidebar.addItem("Settings", "笞呻ｸ");
+        sidebar.addItem("Dashboard", "⣿");
+        sidebar.addItem("My Sections", "📅");
+        sidebar.addItem("Gradebook", "📖");
+        sidebar.addItem("Settings", "⚙️");
         add(sidebar, BorderLayout.WEST);
 
         // 2. Main Area

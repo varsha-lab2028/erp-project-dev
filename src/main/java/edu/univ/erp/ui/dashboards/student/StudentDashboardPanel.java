@@ -36,7 +36,6 @@ public class StudentDashboardPanel extends JPanel {
         sidebar.addItem("Grades", "🎓");
         sidebar.addItem("Time Table", "📅");
         sidebar.addItem("Transcript", "📜");
-        sidebar.addItem("Profile", "👤");
         sidebar.addItem("Settings", "⚙️");
         
         add(sidebar, BorderLayout.WEST);

@@ -1,0 +1,107 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+           
+            "type": "java",
+            "name": "MainApp",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.MainApp",
+            "projectName": "erp",
+            "console": "internalConsole"  // <--- ADD THIS LINE
+        },
+        {
+            "type": "java",
+            "name": "TestingPasswordUtils",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.auth.TestingPasswordUtils",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "GeneratingHashes",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.auth.GeneratingHashes",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "SeedingUsers",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.auth.SeedingUsers",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "TestingAuth",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.auth.TestingAuth",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "SQLConnectionTest",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.data.SQLConnectionTest",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "SeedingGradeInfo",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.data.SeedingGradeInfo",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "MainERPFrame",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.common.MainERPFrame",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "TestingBaseDashboardUI",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.common.TestingBaseDashboardUI",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "TestingDashboards",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.dashboards.TestingDashboards",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "TestingAdminUI",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.dashboards.admin.TestingAdminUI",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "TestingInstructorUI",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.dashboards.instructor.TestingInstructorUI",
+            "projectName": "erp"
+        },
+        {
+            "type": "java",
+            "name": "TestingStudentUI",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.dashboards.student.TestingStudentUI",
+            "projectName": "erp"
+        }
+    ]
+}
