@@ -18,10 +18,7 @@ public class StudentSectionPanel extends JPanel {
     private JPanel contentPanel;
     private List<Section> current_sections;
     
-    // We need to keep track of the table to get selected rows
-    // Since TablePanel encapsulates JTable, for this specific panel where we need interaction,
-    // we might need to modify TablePanel or just use a custom implementation using style helpers.
-    // For simplicity, I will use a custom implementation of the table here to support selection.
+
     private JTable sectionTable;
 
     public StudentSectionPanel() {
