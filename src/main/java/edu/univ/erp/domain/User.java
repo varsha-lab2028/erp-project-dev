@@ -1,24 +1,25 @@
 package edu.univ.erp.domain;
 
-
-//refers to any logged in person
 public class User {
-    private final long user_id;
-    private final String username;
-    private final Role role;
-    private final String status;
+    private long userId;
+    private String username;
+    private String email;
+    private String role;
 
+    // Default constructor
+    public User() {}
 
-    public User(long userId, String username, Role role, String status) {
-        this.user_id = userId;
+    // The Constructor used by AuthDAO
+    public User(long userId, String username, String email, String role) {
+        this.userId = userId;
         this.username = username;
+        this.email = email;
         this.role = role;
-        this.status = status;
     }
 
-
-    public long getUserId() { return user_id; }
+    // Getters
+    public long getUserId() { return userId; }
     public String getUsername() { return username; }
-    public Role getRole() { return role; }
-    public String getStatus() { return status; }
+    public String getEmail() { return email; }
+    public String getRole() { return role; }
 }

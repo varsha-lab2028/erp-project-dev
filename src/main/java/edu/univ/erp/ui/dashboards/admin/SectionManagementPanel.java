@@ -108,11 +108,15 @@ public class SectionManagementPanel extends JPanel {
     
     private void loadInstructors() {
         try {
-            List<AuthClass> instructors = adminService.getAllInstructors();
+            // Try to fetch instructors
+            java.util.List<edu.univ.erp.domain.AuthClass> instructors = adminService.getAllInstructors();
             instrBox.removeAllItems();
-            for(AuthClass u : instructors) {
+            for(edu.univ.erp.domain.AuthClass u : instructors) {
                 instrBox.addItem(u.username);
             }
+        } catch (RuntimeException e) {
+            // SILENTLY FAIL if not logged in (startup phase)
+            // This prevents the "Access denied" crash
         } catch (Exception e) {
             e.printStackTrace();
         }

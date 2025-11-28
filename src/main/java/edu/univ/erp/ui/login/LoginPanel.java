@@ -13,12 +13,14 @@ import java.awt.geom.Ellipse2D;
 
 // Domain Imports
 import edu.univ.erp.ui.common.DashboardTheme;
+import edu.univ.erp.domain.User;
 import edu.univ.erp.auth.session.Session;
 import edu.univ.erp.domain.AuthClass;
 import edu.univ.erp.domain.Role;
 
 public class LoginPanel extends JPanel {
     private final LoginController controller;
+
     
     // UI Components
     private final JTextField usernameField;
@@ -259,30 +261,30 @@ public class LoginPanel extends JPanel {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(new Dimension(200, 45));
     }
-
     private void performLogin() {
-        String username = usernameField.getText().trim();
-        String password = new String(passwordField.getPassword()).trim();
+        // 1. Change userField -> usernameField
+        String user = usernameField.getText().trim();
+        
+        // 2. Change passField -> passwordField
+        String pass = new String(passwordField.getPassword()).trim();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            setStatus("Please enter both username and password.", true);
+        if (user.isEmpty() || pass.isEmpty()) {
+            statusLabel.setText("Please enter credentials.");
             return;
         }
 
-        setStatus("Authenticating...", false);
-        AuthClass authUser = this.controller.authenticate(username, password, selectedRole);
+        statusLabel.setText("Authenticating...");
 
-        if (authUser != null) {
-            setStatus("Success! Redirecting...", false);
-            try {
-                Role roleEnum = Role.valueOf(authUser.role.toUpperCase());
-                Session.login(authUser.user_id, roleEnum);
-                firePropertyChange("loginSuccess", null, authUser.role);
-            } catch (Exception ex) {
-                setStatus("System Error: Role undefined.", true);
-            }
+        // 3. Change loginController -> controller (matches line 21)
+        User authenticatedUser = controller.authenticate(user, pass);
+
+        if (authenticatedUser != null) {
+            statusLabel.setText("Success!");
+            
+            // This is the critical line that switches the screen
+            firePropertyChange("loginSuccess", null, authenticatedUser.getRole());
         } else {
-            setStatus("Invalid credentials for " + selectedRole, true);
+            statusLabel.setText("Invalid username or password.");
         }
     }
 

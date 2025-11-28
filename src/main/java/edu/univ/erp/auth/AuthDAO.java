@@ -1,110 +1,92 @@
 package edu.univ.erp.auth;
-import edu.univ.erp.data.ServerConnector;
+
 import edu.univ.erp.domain.AuthClass;
-import edu.univ.erp.domain.Role;
 import edu.univ.erp.domain.User;
+import edu.univ.erp.util.DatabaseConnection; 
 
-import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-
-/*this class is for talking to the database (MYSQL) and allows changes*/
-/*for handling authentication and the user_auth table in MySQL*/
+import java.util.List;
 
 public class AuthDAO {
-    private final DataSource data_source = ServerConnector.auth();
 
-    public void insertUser(String username, String role, String raw_password) throws Exception {
-        String command = "INSERT INTO user_auth(username, role, password_hash, status) VALUES (?,?,?, 'ACTIVE')";
-        try (Connection connection = data_source.getConnection();
-             PreparedStatement ps = connection.prepareStatement(command)) {
-            ps.setString(1, username);
-            ps.setString(2, role);
-            ps.setString(3, PasswordHasher.hash(raw_password));
-            ps.executeUpdate();
-        }
-
-    }
-
-    //listing the users present
-    public java.util.List<AuthClass> listUsers() throws Exception {
-        String sql = "SELECT user_id, username, role, password_hash, status " +
-                "FROM user_auth ORDER BY user_id";
-
-        java.util.List<AuthClass> users = new ArrayList<>();
-
-        try (Connection connection = data_source.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                AuthClass u = new AuthClass();
-                u.user_id       = rs.getLong("user_id");
-                u.username      = rs.getString("username");
-                u.role          = rs.getString("role");
-                u.password_hash = rs.getString("password_hash");
-                u.auth_status   = rs.getString("status");
-                users.add(u);
+    // 1. Login Method
+    public User login(String username, String password) throws SQLException {
+        // Updated table name to 'user_auth'
+        String sql = "SELECT * FROM user_auth WHERE username = ? AND password_hash = ? AND status = 'ACTIVE'";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, username);
+            stmt.setString(2, password); 
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                        rs.getLong("user_id"), 
+                        rs.getString("username"), 
+                        rs.getString("username") + "@univ.edu", 
+                        rs.getString("role")
+                    );
+                }
             }
         }
-        return users;
+        return null; // Login failed
     }
 
-    //finds a user by their username
-    public AuthClass findByUsername(String username) throws Exception {
-        String command = "SELECT user_id, username, role, password_hash, status FROM user_auth WHERE username=?";
-        try (Connection connection = data_source.getConnection();
-             PreparedStatement ps = connection.prepareStatement(command)) {
-            ps.setString(1, username);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return null;
+    // 2. List All Users (For Admin Dashboard)
+    public List<AuthClass> listUsers() throws SQLException {
+        List<AuthClass> list = new ArrayList<>();
+        // FIX: Changed 'users' to 'user_auth'
+        String sql = "SELECT user_id, username, role, status FROM user_auth";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
                 AuthClass u = new AuthClass();
                 u.user_id = rs.getLong("user_id");
                 u.username = rs.getString("username");
                 u.role = rs.getString("role");
-                u.password_hash = rs.getString("password_hash");
                 u.auth_status = rs.getString("status");
-                return u;
+                list.add(u);
             }
         }
+        return list;
     }
 
-    //updates the last login timestamp after logging in
-    public void updateLastLogin(long user_id) throws Exception {
-        String command = "UPDATE user_auth SET last_login = CURRENT_TIMESTAMP WHERE user_id=?";
-        try (Connection connection = data_source.getConnection();
-             PreparedStatement ps = connection.prepareStatement(command)) {
-            ps.setLong(1, user_id);
-            ps.executeUpdate();
+    // 3. Insert New User
+    public void insertUser(String username, String role, String password) throws SQLException {
+        // FIX: Changed 'users' to 'user_auth'
+        String sql = "INSERT INTO user_auth (username, password_hash, role, status) VALUES (?, ?, ?, 'ACTIVE')";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, username);
+            stmt.setString(2, password); 
+            stmt.setString(3, role);
+            
+            stmt.executeUpdate();
         }
     }
 
-    //updates the password for a user
-    public boolean updatePassword(long user_id, String newPasswordHash) throws Exception {
-        String command = "UPDATE user_auth SET password_hash = ? WHERE user_id=?";
-        try (Connection connection = data_source.getConnection();
-             PreparedStatement ps = connection.prepareStatement(command)) {
-            ps.setString(1, newPasswordHash);
-            ps.setLong(2, user_id);
-            int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
+    // 4. Update User Status
+    public void updateStatus(long userId, String status) throws SQLException {
+        // FIX: Changed 'users' to 'user_auth'
+        String sql = "UPDATE user_auth SET status = ? WHERE user_id = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, status);
+            stmt.setLong(2, userId);
+            stmt.executeUpdate();
         }
-    }
-
-    public void updateStatus(long user_id, String new_status) throws SQLException{
-        //like switching account from "ACTIVE" to "INACTIVE" if a student drops out or instructor leaves
-        String command = "UPDATE user_auth SET status = ? WHERE user_id = ?";
-        try (java.sql.Connection connection = data_source.getConnection();
-             java.sql.PreparedStatement ps = connection.prepareStatement(command)) {
-            ps.setString(1, new_status);
-            ps.setLong(2, user_id);
-            ps.executeUpdate();
-        }
-    }
-
-    // converts AuthClass (from DB)  to User (used in session/UI)
-    public User toUser(AuthClass a) {
-        Role r = Role.valueOf(a.role.toUpperCase());
-        return new User(a.user_id, a.username, r, a.auth_status);
     }
 }

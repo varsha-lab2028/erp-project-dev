@@ -1,68 +1,55 @@
-/*this class is made to manage and reuse database connections safely
-across the whole project. and connects to the MySQL server (main)*/
 package edu.univ.erp.data;
 
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-
 import javax.sql.DataSource;
+import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.logging.Logger;
 
-public class ServerConnector {
-    private static HikariDataSource auth_datasource;
-    private static HikariDataSource erp_datasource;
+// Simple DataSource implementation to remove HikariCP dependency
+public class ServerConnector implements DataSource {
+    private static final String URL_AUTH = "jdbc:mysql://192.168.41.50:3306/auth_db";
+    private static final String URL_ERP = "jdbc:mysql://192.168.41.50:3306/erp_db";
+    private static final String USER = "Disha";
+    private static final String PASS = "2003"; // Your password
 
-    private static HikariDataSource make(String url_key, String user_key, String pass_key){
-        String URL = System.getProperty(url_key, PropertyClass.get(url_key));
-        String User = System.getProperty(user_key, PropertyClass.get(user_key));
-        String Pass = System.getProperty(pass_key, PropertyClass.get(pass_key));
+    private final String url;
 
-        if (URL == null) {
-            throw new IllegalArgumentException(url_key + " missing");
-        }
-        if(User == null){
-            throw new IllegalArgumentException(user_key + " missing");
-        }
-
-        HikariConfig cfg = new HikariConfig();
-        cfg.setJdbcUrl(URL);
-        cfg.setUsername(User);
-        cfg.setPassword(Pass);
-        cfg.setMaximumPoolSize(5);
-        cfg.setMinimumIdle(1);
-        cfg.setPoolName(url_key+"_pool");
-        cfg.addDataSourceProperty("cachePrepStmts", "true");
-        cfg.addDataSourceProperty("prepStmtCacheSize", "250");
-        cfg.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        return new HikariDataSource(cfg);
+    public ServerConnector(String url) {
+        this.url = url;
     }
 
+    @Override
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(url, USER, PASS);
+    }
+
+    @Override
+    public Connection getConnection(String username, String password) throws SQLException {
+        return DriverManager.getConnection(url, username, password);
+    }
+
+    // Static helpers for your app
     public static DataSource auth() {
-        if (auth_datasource == null) auth_datasource = make("auth.jdbc.url","auth.jdbc.user","auth.jdbc.pass");
-        return auth_datasource;
+        return new ServerConnector(URL_AUTH);
     }
 
     public static DataSource erp() {
-        if (erp_datasource == null) erp_datasource = make("erp.jdbc.url","erp.jdbc.user","erp.jdbc.pass");
-        return erp_datasource;
+        return new ServerConnector(URL_ERP);
     }
 
-    //getting one ERP connection directly
     public static Connection ERPConnection() throws SQLException {
-        return erp().getConnection();
+        return DriverManager.getConnection(URL_ERP, USER, PASS);
     }
 
-    //closing pools at app shutdown
-    public static void closeAll() {
-        if (auth_datasource != null) {
-            auth_datasource.close();
-        }
-        if (erp_datasource  != null) {
-            erp_datasource.close();
-        }
-    }
-
-    private ServerConnector() {}
+    // Dummy implementations for interface compliance
+    @Override public PrintWriter getLogWriter() { return null; }
+    @Override public void setLogWriter(PrintWriter out) {}
+    @Override public void setLoginTimeout(int seconds) {}
+    @Override public int getLoginTimeout() { return 0; }
+    @Override public Logger getParentLogger() throws SQLFeatureNotSupportedException { return null; }
+    @Override public <T> T unwrap(Class<T> iface) throws SQLException { return null; }
+    @Override public boolean isWrapperFor(Class<?> iface) throws SQLException { return false; }
 }
