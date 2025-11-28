@@ -13,7 +13,14 @@ import java.util.List;
 
 public class SectionManagementPanel extends JPanel {
     private final AdminService adminService;
+    
+    // CLASS LEVEL VARIABLES (Required for button logic)
+    private JTextField cCode;
     private JComboBox<String> instrBox;
+    private JTextField roomTxt;
+    private JTextField timeTxt;
+    private JComboBox<String> dayBox;
+    private JTextField capTxt;
     private DashboardComponents.TablePanel tablePanel;
 
     public SectionManagementPanel(AdminService adminService) {
@@ -29,113 +36,140 @@ public class SectionManagementPanel extends JPanel {
         JLabel title = new JLabel("Manage Sections");
         title.setFont(DashboardTheme.FONT_SUBTITLE);
         title.setForeground(DashboardTheme.TEXT_PRIMARY);
-        title.setBorder(new EmptyBorder(0, 0, 15, 0));
+        title.setBorder(new EmptyBorder(0, 0, 20, 0));
         formCard.add(title, BorderLayout.NORTH);
 
-        JPanel fields = new JPanel(new GridLayout(2, 4, 15, 15));
+        // FIX: Use GridLayout(0, 4) to allow unlimited rows, keeping 4 columns fixed.
+        // [Label] [Input] [Label] [Input]
+        JPanel fields = new JPanel(new GridLayout(0, 4, 15, 15));
         fields.setOpaque(false);
         
+        // Row 1
         fields.add(createLabel("Course Code:"));
-        JTextField cCode = new JTextField();
+        cCode = new JTextField();
         DashboardComponents.styleControl(cCode);
         fields.add(cCode);
         
         fields.add(createLabel("Instructor:"));
         instrBox = new JComboBox<>();
         DashboardComponents.styleControl(instrBox);
-        loadInstructors(); // Populate dropdown dynamically
         fields.add(instrBox);
         
+        // Row 2
         fields.add(createLabel("Room:"));
-        JTextField roomTxt = new JTextField();
+        roomTxt = new JTextField();
         DashboardComponents.styleControl(roomTxt);
         fields.add(roomTxt);
         
         fields.add(createLabel("Time:"));
-        JTextField timeTxt = new JTextField();
+        timeTxt = new JTextField();
         DashboardComponents.styleControl(timeTxt);
         fields.add(timeTxt);
         
+        // Row 3
         fields.add(createLabel("Day:"));
         String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
-        JComboBox<String> dayBox = new JComboBox<>(days);
+        dayBox = new JComboBox<>(days);
         DashboardComponents.styleControl(dayBox);
         fields.add(dayBox);
 
         fields.add(createLabel("Capacity:"));
-        JTextField capTxt = new JTextField("50");
+        capTxt = new JTextField("50");
         DashboardComponents.styleControl(capTxt);
         fields.add(capTxt);
         
-        JButton addBtn = DashboardComponents.createPrimaryButton("Add Section");
-        addBtn.addActionListener(e -> {
-            try {
-                String code = cCode.getText().trim();
-                String instr = (String) instrBox.getSelectedItem();
-                String room = roomTxt.getText().trim();
-                String time = timeTxt.getText().trim();
-                String day = (String) dayBox.getSelectedItem();
-                int cap = Integer.parseInt(capTxt.getText().trim());
-
-                adminService.createSectionFromUI(code, instr, room, day, time, cap);
-                
-                JOptionPane.showMessageDialog(this, "Section Created!");
-                cCode.setText(""); roomTxt.setText(""); timeTxt.setText("");
-                reloadTable(); // Refresh table
-                
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        // Row 4 (Buttons)
+        fields.add(new JLabel("")); // Spacer
+        fields.add(new JLabel("")); // Spacer
+        fields.add(new JLabel("")); // Spacer
         
-        // Add button to grid (last slot)
-        fields.add(new JLabel("")); 
+        JButton addBtn = DashboardComponents.createPrimaryButton("Add Section");
+        addBtn.addActionListener(e -> onAddSection());
         fields.add(addBtn);
         
         formCard.add(fields, BorderLayout.CENTER);
 
-        // 2. Table Card container
-        JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.setOpaque(false);
-        
-        // Initial Table Load
-        reloadTable();
-        centerPanel.add(tablePanel, BorderLayout.CENTER);
+        // 2. Table Card
+        String[] cols = {"ID", "Course", "Room", "Time", "Capacity"};
+        // Initialize table reference
+        tablePanel = new DashboardComponents.TablePanel("Active Sections", cols, new Object[0][5]);
 
         add(formCard, BorderLayout.NORTH);
-        add(centerPanel, BorderLayout.CENTER);
+        add(tablePanel, BorderLayout.CENTER);
+        
+        // Initial load
+        loadData();
+    }
+    
+    // --- AUTO REFRESH ---
+    @Override
+    public void setVisible(boolean aFlag) {
+        super.setVisible(aFlag);
+        if (aFlag) {
+            loadData();
+        }
+    }
+
+    private void loadData() {
+        loadInstructors();
+        reloadTable();
     }
     
     private void loadInstructors() {
         try {
-            // Try to fetch instructors
-            java.util.List<edu.univ.erp.domain.AuthClass> instructors = adminService.getAllInstructors();
+            List<AuthClass> instructors = adminService.getAllInstructors();
             instrBox.removeAllItems();
-            for(edu.univ.erp.domain.AuthClass u : instructors) {
-                instrBox.addItem(u.username);
+            
+            if (instructors.isEmpty()) {
+                instrBox.addItem("No Instructors Found");
+            } else {
+                for(AuthClass u : instructors) {
+                    instrBox.addItem(u.username);
+                }
             }
-        } catch (RuntimeException e) {
-            // SILENTLY FAIL if not logged in (startup phase)
-            // This prevents the "Access denied" crash
         } catch (Exception e) {
-            e.printStackTrace();
+            // Silent fail on init
+        }
+    }
+
+    private void onAddSection() {
+        try {
+            String code = cCode.getText().trim();
+            String instr = (String) instrBox.getSelectedItem();
+            String room = roomTxt.getText().trim();
+            String time = timeTxt.getText().trim();
+            String day = (String) dayBox.getSelectedItem();
+            
+            if (code.isEmpty() || room.isEmpty() || time.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill all fields.");
+                return;
+            }
+
+            int cap = Integer.parseInt(capTxt.getText().trim());
+
+            adminService.createSectionFromUI(code, instr, room, day, time, cap);
+            
+            JOptionPane.showMessageDialog(this, "Section Created Successfully!");
+            
+            // Clear fields
+            cCode.setText(""); 
+            roomTxt.setText(""); 
+            timeTxt.setText("");
+            
+            reloadTable();
+            
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Capacity must be a number.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void reloadTable() {
-        // Clear old table if exists
-        Container parent = null;
-        if(tablePanel != null) {
-            parent = tablePanel.getParent();
-            if(parent != null) parent.remove(tablePanel);
-        }
-
-        String[] cols = {"ID", "Course", "Room", "Time", "Capacity"};
-        Object[][] data;
-        
         try {
             List<Section> sections = adminService.getAllSections();
-            data = new Object[sections.size()][cols.length];
+            Object[][] data = new Object[sections.size()][5];
+            
             for(int i=0; i<sections.size(); i++) {
                 Section s = sections.get(i);
                 data[i][0] = s.getSectionId();
@@ -144,16 +178,25 @@ public class SectionManagementPanel extends JPanel {
                 data[i][3] = s.getDay() + " " + s.getTimings();
                 data[i][4] = s.getCapacity();
             }
+            
+            // Access the JTable inside TablePanel to update model directly
+            // This prevents UI flickering
+            if (tablePanel.getComponentCount() > 1) {
+                JScrollPane scroll = (JScrollPane) tablePanel.getComponent(1);
+                JTable table = (JTable) scroll.getViewport().getView();
+                javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) table.getModel();
+                
+                model.setRowCount(0);
+                String[] cols = {"ID", "Course", "Room", "Time", "Capacity"};
+                model.setColumnIdentifiers(cols); // Ensure cols are correct
+                
+                for (Object[] row : data) {
+                    model.addRow(row);
+                }
+            }
+            
         } catch (Exception e) {
-            data = new Object[0][5];
-        }
-
-        tablePanel = new DashboardComponents.TablePanel("Active Sections", cols, data);
-        
-        if(parent != null) {
-            parent.add(tablePanel, BorderLayout.CENTER);
-            parent.revalidate();
-            parent.repaint();
+            // e.printStackTrace();
         }
     }
     

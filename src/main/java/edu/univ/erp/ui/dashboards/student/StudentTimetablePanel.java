@@ -140,4 +140,12 @@ public class StudentTimetablePanel extends JPanel {
         worker.execute();
         loadingDialog.setVisible(true);
     }
+    // --- ADD THIS TO AUTO-REFRESH TIMETABLE ---
+    @Override
+    public void setVisible(boolean aFlag) {
+        super.setVisible(aFlag);
+        if (aFlag) {
+            loadingTimeTable(); 
+        }
+    }
 }

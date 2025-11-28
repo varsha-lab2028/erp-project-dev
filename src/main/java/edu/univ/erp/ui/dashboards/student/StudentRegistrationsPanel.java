@@ -38,7 +38,6 @@ public class StudentRegistrationsPanel extends JPanel {
         //drop button
         drop_button = new RoundedButton("Drop Selected");
         drop_button.setPreferredSize(new Dimension(160, 35));
-        //drop_button.setEnabled(AccessControl.canAccess("STU_REGISTER"));
         top.add(drop_button);
         add(top, BorderLayout.NORTH);
 
@@ -64,8 +63,6 @@ public class StudentRegistrationsPanel extends JPanel {
         tableCard.setBorder(new EmptyBorder(10, 10, 10, 10));
         tableCard.add(sp, BorderLayout.CENTER);
         add(tableCard, BorderLayout.CENTER);
-        tableCard.add(sp, BorderLayout.CENTER);
-        add(tableCard, BorderLayout.CENTER);
 
         //adding status label to the bottom of the interface
         status_label.setFont(DashboardTheme.FONT_SMALL);
@@ -78,18 +75,32 @@ public class StudentRegistrationsPanel extends JPanel {
         drop_button.addActionListener(e -> onDrop());
     }
 
+    // --- FIX STARTS HERE: Auto-refresh when tab is opened ---
+    @Override
+    public void setVisible(boolean aFlag) {
+        super.setVisible(aFlag);
+        if (aFlag) {
+            reloadRegistrations();
+        }
+    }
+    // --- FIX ENDS HERE ---
+
     // loading currently registered sections into the table
     private void reloadRegistrations() {
         long student_id = Session.userId();
         try {
             current_sections = student_service.getRegisteredSectionsList(student_id);
         } catch (SQLException e) {
+            // Optional: You can uncomment this if you want popup errors, 
+            // but usually silent fail or log is better for auto-refresh
+            /*
             JOptionPane.showMessageDialog(
                     this,
                     "Failed to load registrations: " + e.getMessage(),
                     "Database Error",
                     JOptionPane.ERROR_MESSAGE
             );
+            */
             current_sections = Collections.emptyList();
         }
 
@@ -162,5 +173,3 @@ public class StudentRegistrationsPanel extends JPanel {
         }
     }
 }
-
-

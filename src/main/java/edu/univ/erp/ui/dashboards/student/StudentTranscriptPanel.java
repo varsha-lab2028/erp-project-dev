@@ -169,4 +169,12 @@ public class StudentTranscriptPanel extends JPanel{
             );
         }
     }
+    // --- ADD THIS TO AUTO-REFRESH TRANSCRIPT ---
+    @Override
+    public void setVisible(boolean aFlag) {
+        super.setVisible(aFlag);
+        if (aFlag) {
+            loadTranscript(); 
+        }
+    }
 }

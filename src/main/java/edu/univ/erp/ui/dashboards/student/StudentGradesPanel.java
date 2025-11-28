@@ -133,6 +133,14 @@ public class StudentGradesPanel extends JPanel {
         grades_table.setModel(model);
         status_label.setText(rows.size() + "courses");
     }
+    // --- ADD THIS TO AUTO-REFRESH GRADES ---
+    @Override
+    public void setVisible(boolean aFlag) {
+        super.setVisible(aFlag);
+        if (aFlag) {
+            reloadGrades(); 
+        }
+    }
 
 }
 

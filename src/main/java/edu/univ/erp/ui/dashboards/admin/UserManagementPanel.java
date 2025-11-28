@@ -15,14 +15,15 @@ public class UserManagementPanel extends JPanel {
 
     private final AdminService adminService = new AdminService();
 
+    // Fields must be class-level to be accessed by methods
     private JTextField userTxt;
     private JPasswordField passTxt;
     private JComboBox<String> roleBox;
-    private DashboardComponents.TablePanel tablePanel;
+    private DashboardComponents.TablePanel tablePanel; // Class reference
 
     public UserManagementPanel() {
         setLayout(new BorderLayout(20, 20));
-        setBackground(DashboardTheme.BG_MAIN); // Dynamic Background
+        setBackground(DashboardTheme.BG_MAIN);
         setBorder(new EmptyBorder(30, 30, 30, 30));
 
         // 1. Form Card
@@ -38,48 +39,61 @@ public class UserManagementPanel extends JPanel {
         JPanel fields = new JPanel(new GridLayout(2, 4, 15, 15));
         fields.setOpaque(false);
         
-        // Helper for labels
+        // --- FIX 1: Assign to class fields, not local vars ---
         fields.add(createLabel("Username:"));
-        JTextField userTxt = new JTextField();
-        DashboardComponents.styleControl(userTxt); // Fix: Style Input
+        userTxt = new JTextField();
+        DashboardComponents.styleControl(userTxt);
         fields.add(userTxt);
         
         fields.add(createLabel("Password:"));
-        JPasswordField passTxt = new JPasswordField();
-        DashboardComponents.styleControl(passTxt); // Fix: Style Input
+        passTxt = new JPasswordField();
+        DashboardComponents.styleControl(passTxt);
         fields.add(passTxt);
         
         fields.add(createLabel("Role:"));
-        JComboBox<String> roleBox = new JComboBox<>(new String[]{"Student", "Instructor", "Admin"});
-        DashboardComponents.styleControl(roleBox); // Fix: Style Input
+        roleBox = new JComboBox<>(new String[]{"Student", "Instructor", "Admin"});
+        DashboardComponents.styleControl(roleBox);
         fields.add(roleBox);
         
-        fields.add(new JLabel("")); 
-        fields.add(DashboardComponents.createPrimaryButton("Create User"));
+        fields.add(new JLabel("")); // Spacer
+        
+        // --- FIX 2: Attach Listener to Button ---
+        JButton createBtn = DashboardComponents.createPrimaryButton("Create User");
+        createBtn.addActionListener(e -> onCreateUser());
+        fields.add(createBtn);
         
         formCard.add(fields, BorderLayout.CENTER);
 
         // 2. Table Card
         String[] cols = {"ID", "Username", "Role", "Status"};
-        Object[][] data = new Object[0][4];   // start empty, load from DB
+        Object[][] data = new Object[0][4]; // Start empty
         
-        DashboardComponents.TablePanel tableCard = new DashboardComponents.TablePanel("All Users", cols, data);
+        // --- FIX 3: Assign to class variable ---
+        this.tablePanel = new DashboardComponents.TablePanel("All Users", cols, data);
 
         add(formCard, BorderLayout.NORTH);
-        add(tableCard, BorderLayout.CENTER);
+        add(this.tablePanel, BorderLayout.CENTER);
+        
+        // Load initial data
+        loadUsersTable();
     }
     
     private JLabel createLabel(String text) {
         JLabel lbl = new JLabel(text);
         lbl.setFont(DashboardTheme.FONT_BOLD);
-        lbl.setForeground(DashboardTheme.TEXT_SECONDARY); // Fix: Gray text in both modes
+        lbl.setForeground(DashboardTheme.TEXT_SECONDARY);
         return lbl;
     }
 
     private void onCreateUser() {
         String username = userTxt.getText().trim();
         String password = new String(passTxt.getPassword());
-        String roleLabel = ((String) roleBox.getSelectedItem()).toUpperCase(); // STUDENT / INSTRUCTOR / ADMIN
+        String roleLabel = ((String) roleBox.getSelectedItem()).toUpperCase(); 
+
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username and Password required.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         try {
             adminService.createAuthUser(username, password, roleLabel);
@@ -93,55 +107,41 @@ public class UserManagementPanel extends JPanel {
 
             userTxt.setText("");
             passTxt.setText("");
-
-            loadUsersTable();   // refresh table from DB
+            
+            // Refresh table
+            loadUsersTable();   
 
         } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    ex.getMessage(),
-                    "Invalid Input",
-                    JOptionPane.WARNING_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Invalid Input", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Failed to create user: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "Failed to create user: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    // --- TABLE LOAD ---------------------------------------------------------
     private void loadUsersTable() {
         try {
             List<AuthClass> users = adminService.listAuthUsers();
 
-            // Get the JTable inside TablePanel (same trick you used elsewhere)
-            JScrollPane scroll = (JScrollPane) tablePanel.getComponent(1);
-            JTable table = (JTable) scroll.getViewport().getView();
-            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            // We need to access the JTable inside the TablePanel component
+            // Structure: TablePanel -> JScrollPane (index 1) -> JViewport -> JTable
+            if (tablePanel.getComponentCount() > 1 && tablePanel.getComponent(1) instanceof JScrollPane) {
+                JScrollPane scroll = (JScrollPane) tablePanel.getComponent(1);
+                JTable table = (JTable) scroll.getViewport().getView();
+                DefaultTableModel model = (DefaultTableModel) table.getModel();
 
-            model.setRowCount(0);
-            for (AuthClass u : users) {
-                model.addRow(new Object[]{
-                        u.user_id,
-                        u.username,
-                        u.role,
-                        u.auth_status
-                });
+                model.setRowCount(0); // Clear old data
+                for (AuthClass u : users) {
+                    model.addRow(new Object[]{
+                            u.user_id,
+                            u.username,
+                            u.role,
+                            u.auth_status
+                    });
+                }
             }
-
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Failed to load users: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
         }
     }
 }

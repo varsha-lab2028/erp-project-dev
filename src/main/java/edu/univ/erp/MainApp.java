@@ -34,6 +34,7 @@ public class MainApp {
 
         // Initialize backend services centrally
         services = new ServiceRegistry();
+        edu.univ.erp.auth.session.Session.setSemesterContext(1, edu.univ.erp.domain.SemesterSeason.MONSOON, 2025);
 
         //create the main window
         frame = new JFrame("University ERP System");

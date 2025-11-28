@@ -17,10 +17,11 @@ public class LoginController {
         
         // 2. Save to Session (CRITICAL STEP)
         if (user != null) {
-            Session.login(user);
-            System.out.println("Login Success: " + user.getUsername() + " [" + user.getRole() + "]");
+            // CRITICAL: This saves your login state so AccessControl works!
+            Session.login(user); 
+            System.out.println("DEBUG: Logged in as " + user.getUsername() + " (" + user.getRole() + ")");
         } else {
-            System.out.println("Login Failed for: " + username);
+            System.out.println("DEBUG: Login failed for " + username);
         }
         
         return user;
