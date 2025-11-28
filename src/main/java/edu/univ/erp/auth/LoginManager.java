@@ -18,6 +18,6 @@ public class LoginManager implements AuthenticationService {
             throw new IllegalArgumentException("Incorrect username or password");
         }
         auth_dao.updateLastLogin(u.user_id);
-        return u; // contains the user_id + role
+        return u;
     }
 }

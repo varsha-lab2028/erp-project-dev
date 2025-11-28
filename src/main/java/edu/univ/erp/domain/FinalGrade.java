@@ -4,7 +4,7 @@ public class FinalGrade {
     private long course_id;
     private long section_id;
     private long enrollment_id; //linking the result to a particular student in the section, it is like an identification
-    private LetterGrade grade_letter; //getting an A, B
+    private LetterGrade grade_letter;
     private double course_cg;
 
     public FinalGrade(long course_id, long section_id, long enrollment_id, LetterGrade grade_letter, double course_cg){

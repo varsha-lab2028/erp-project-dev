@@ -7,16 +7,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for User entities.
- */
-public class UserDAO {
 
-    /**
-     * List all users in the system.
-     * @return List of User objects
-     * @throws SQLException on database error
-     */
+public class UserDAO {
     public List<User> listAllUsers() throws SQLException {
         String sql = "SELECT user_id, username, role, status FROM users ORDER BY username";
         List<User> users = new ArrayList<>();
@@ -35,14 +27,6 @@ public class UserDAO {
         return users;
     }
 
-    // Additional CRUD operations for User can be added here: insert, update, delete, findById, etc.
-
-    /**
-     * Find a user by user ID.
-     * @param userId the user ID
-     * @return User object or null if not found
-     * @throws SQLException on database error
-     */
     public User findByUserId(long userId) throws SQLException {
         String sql = "SELECT user_id, username, role, status FROM users WHERE user_id = ?";
         try (Connection connection = ServerConnector.ERPConnection();

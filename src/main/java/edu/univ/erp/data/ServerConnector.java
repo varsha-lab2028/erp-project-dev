@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 // Simple DataSource implementation to remove HikariCP dependency
 public class ServerConnector implements DataSource {
+    //did this to connect to each other devices so that we could access the databases
     private static final String URL_AUTH = "jdbc:mysql://192.168.41.50:3306/auth_db";
     private static final String URL_ERP = "jdbc:mysql://192.168.41.50:3306/erp_db";
     private static final String USER = "Disha";

@@ -27,6 +27,7 @@ public class UserManagementPanel extends JPanel {
         setBorder(new EmptyBorder(30, 30, 30, 30));
 
         
+        //form card
         DashboardComponents.CardPanel formCard = new DashboardComponents.CardPanel();
         formCard.setLayout(new BorderLayout());
 
@@ -40,6 +41,7 @@ public class UserManagementPanel extends JPanel {
         fields.setOpaque(false);
         
        
+
         fields.add(createLabel("Username:"));
         userTxt = new JTextField();
         DashboardComponents.styleControl(userTxt);
@@ -58,6 +60,8 @@ public class UserManagementPanel extends JPanel {
         fields.add(new JLabel("")); 
         
         
+        fields.add(new JLabel("")); // Spacer
+
         JButton createBtn = DashboardComponents.createPrimaryButton("Create User");
         createBtn.addActionListener(e -> onCreateUser());
         fields.add(createBtn);
@@ -69,12 +73,16 @@ public class UserManagementPanel extends JPanel {
         Object[][] data = new Object[0][4]; 
         
         
+        String[] cols = {"ID", "Username", "Role", "Status"};
+        Object[][] data = new Object[0][4];
+
         this.tablePanel = new DashboardComponents.TablePanel("All Users", cols, data);
 
         add(formCard, BorderLayout.NORTH);
         add(this.tablePanel, BorderLayout.CENTER);
         
       
+
         loadUsersTable();
     }
     
@@ -107,8 +115,7 @@ public class UserManagementPanel extends JPanel {
 
             userTxt.setText("");
             passTxt.setText("");
-            
-            // Refresh table
+
             loadUsersTable();   
 
         } catch (IllegalArgumentException ex) {
@@ -130,6 +137,7 @@ public class UserManagementPanel extends JPanel {
                 DefaultTableModel model = (DefaultTableModel) table.getModel();
 
                 model.setRowCount(0); 
+                model.setRowCount(0);
                 for (AuthClass u : users) {
                     model.addRow(new Object[]{
                             u.user_id,

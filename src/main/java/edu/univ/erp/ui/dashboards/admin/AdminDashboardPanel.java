@@ -56,9 +56,10 @@ public class AdminDashboardPanel extends JPanel {
         contentArea.add(new CourseManagementPanel(adminService), "Courses");
         contentArea.add(new SectionManagementPanel(adminService), "Sections"); // Updated
 
-contentArea.add(new MaintenancePanel(true, maintenanceService, adminService), "Settings");
+        contentArea.add(new MaintenancePanel(true, maintenanceService, adminService), "Settings");
         
         
+
         contentArea.add(new MaintenancePanel(true, maintenanceService, adminService), "Settings");
 
         cardLayout.show(contentArea, currentScreen);

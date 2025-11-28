@@ -9,7 +9,6 @@ public class User {
     // Default constructor
     public User() {}
 
-    // The Constructor used by AuthDAO
     public User(long userId, String username, String email, String role) {
         this.userId = userId;
         this.username = username;
