@@ -12,11 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * AdminService acts as the bridge between the Admin UI panels and the Database Layer.
- * It enforces RBAC and aggregates data for dashboards.
- */
 public class AdminService {
+    // DATA ACCESS OBJECTS (The "Backend")
     private final UserDAO userDAO = new UserDAO();
     private final SectionDAO sectionDAO = new SectionDAO();
     private final AuthDAO auth_dao = new AuthDAO();
@@ -24,7 +21,7 @@ public class AdminService {
     private final MaintenanceService maintenanceService = new MaintenanceService();
 
     // ==================================================================================
-    // 1. DASHBOARD STATISTICS (For AdminHomePanel)
+    // 1. DASHBOARD STATISTICS (Middleman between DAO and AdminHomePanel)
     // ==================================================================================
 
     public Map<String, String> getDashboardStats() {
@@ -32,19 +29,23 @@ public class AdminService {
         Map<String, String> stats = new HashMap<>();
 
         try {
-            // Fetch live counts from DB
+            // 1. Get raw list from AuthDAO
             List<AuthClass> allUsers = auth_dao.listUsers();
             
+            // 2. Process data (Count Students)
             long studentCount = allUsers.stream()
                     .filter(u -> "STUDENT".equalsIgnoreCase(u.role))
                     .count();
 
+            // 3. Process data (Count Instructors)
             long instructorCount = allUsers.stream()
                     .filter(u -> "INSTRUCTOR".equalsIgnoreCase(u.role))
                     .count();
 
+            // 4. Get Course Count
             int courseCount = course_dao.listCourses().size();
 
+            // 5. Pack data for UI
             stats.put("students", String.valueOf(studentCount));
             stats.put("instructors", String.valueOf(instructorCount));
             stats.put("courses", String.valueOf(courseCount));
@@ -63,7 +64,7 @@ public class AdminService {
 
     public Object[][] getRecentActivity() {
         AccessControl.checkRole("ADMIN");
-        // Placeholder: In a real app, you would query an 'audit_logs' table here.
+        // Mock data for UI table
         return new Object[][]{
             {"System Login", "Admin", "Just Now"},
             {"Dashboard Loaded", "System", "1 min ago"},
@@ -72,14 +73,21 @@ public class AdminService {
     }
 
     // ==================================================================================
-    // 2. USER MANAGEMENT
+    // 2. USER MANAGEMENT (Middleman between AuthDAO and UserManagementPanel)
     // ==================================================================================
 
+    public List<User> getAllUsers() throws SQLException {
+        AccessControl.checkRole("ADMIN");
+        return userDAO.listAllUsers();
+    }
+
+    // Used by UI to list users in table
     public List<AuthClass> listAuthUsers() throws Exception {
         AccessControl.checkRole("ADMIN");
         return auth_dao.listUsers();
     }
 
+    // Used by UI to create a new user
     public void createAuthUser(String username, String rawPassword, String roleLabel) throws Exception {
         AccessControl.checkRole("ADMIN");
         AccessControl.checkWritable();
@@ -87,13 +95,13 @@ public class AdminService {
         if (username == null || username.isBlank()) throw new IllegalArgumentException("Username is required");
         if (rawPassword == null || rawPassword.isBlank()) throw new IllegalArgumentException("Password is required");
         
-        // Validate Role
         try {
             Role.valueOf(roleLabel.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid Role");
         }
 
+        // Delegate to DAO
         auth_dao.insertUser(username.trim(), roleLabel.toUpperCase(), rawPassword);
     }
 
@@ -125,7 +133,7 @@ public class AdminService {
     }
 
     // ==================================================================================
-    // 4. SECTION MANAGEMENT (Dynamic Integration)
+    // 4. SECTION MANAGEMENT (Middleman between UI Inputs and DAO)
     // ==================================================================================
 
     public List<Section> getAllSections() throws SQLException {
@@ -134,7 +142,8 @@ public class AdminService {
     }
 
     /**
-     * Helper to fetch instructor names for the UI Dropdown.
+     * Used by SectionManagementPanel to fill the "Instructor" dropdown.
+     * Fetches all users from AuthDAO, filters for INSTRUCTOR role.
      */
     public List<AuthClass> getAllInstructors() throws SQLException {
         AccessControl.checkRole("ADMIN");
@@ -148,16 +157,13 @@ public class AdminService {
     }
 
     /**
-     * Bridges UI strings to Database logic for creating a section.
-     */
-    /**
-     * Bridges UI strings to Database logic for creating a section.
+     * Takes raw strings from UI, resolves IDs, creates Object, sends to DAO.
      */
     public void createSectionFromUI(String courseCode, String instructorUsername, String room, String day, String time, int capacity) throws Exception {
         AccessControl.checkRole("ADMIN");
         AccessControl.checkWritable();
 
-        // 1. Find Instructor ID based on the username selected in UI
+        // 1. Logic: Convert UI Username -> Database ID
         List<AuthClass> instructors = getAllInstructors();
         Optional<AuthClass> instructorOpt = instructors.stream()
                 .filter(u -> u.username.equals(instructorUsername))
@@ -169,25 +175,23 @@ public class AdminService {
         
         AuthClass instructor = instructorOpt.get();
         long instructorId = instructor.user_id;
-        String instructorName = instructor.username; // Using username as name for now
 
-        // 2. Create Section Object using the FULL Constructor
-        // Order: ID, Code, InstrID, InstrName, Day, Time, Room, Cap, SemNo, Season, Year
+        // 2. Logic: Create Section Object (Using fixed constructor)
         Section s = new Section(
-            0L,                 // sectionId (0 for new entry, DB handles auto-increment)
-            courseCode,         // courseCode
-            instructorId,       // instructorId
-            instructorName,     // instructorName
-            day,                // day
-            time,               // timings
-            room,               // classroom
-            capacity,           // capacity
-            1,                  // semesterNumber (Hardcoded defaults)
-            "MONSOON",          // semesterSeason
-            2025                // year
+            0L,                 // Auto-increment ID
+            courseCode,         
+            instructorId,       
+            instructor.username,     
+            day,                
+            time,               
+            room,               
+            capacity,           
+            1,                  // Default Sem
+            "MONSOON",          // Default Season
+            2025                // Default Year
         );
 
-        // 3. Persist
+        // 3. Data Access: Save to DB
         sectionDAO.insertSection(s);
     }
 

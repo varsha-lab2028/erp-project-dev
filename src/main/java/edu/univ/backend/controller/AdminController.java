@@ -1,8 +1,8 @@
 package edu.univ.backend.controller;
 
 import edu.univ.erp.service.AdminService;
-import edu.univ.erp.domain.AuthClass; // <--- ADD THIS
-import edu.univ.erp.domain.Course;    // <--- ADD THIS
+import edu.univ.erp.domain.AuthClass; // <--- ADDED
+import edu.univ.erp.domain.Course;    // <--- ADDED
 import edu.univ.erp.domain.Section;
 import edu.univ.erp.domain.User;
 
@@ -10,28 +10,19 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controller for admin dashboard backend operations.
- * Acts as a bridge between the UI/API and AdminService.
- */
 public class AdminController {
 
     private final AdminService adminService;
 
-    // Constructor Injection
     public AdminController(AdminService adminService) {
         this.adminService = adminService;
     }
 
-    // Default Constructor
     public AdminController() {
         this.adminService = new AdminService();
     }
 
-    // ==================================================================================
-    // 1. DASHBOARD & STATS
-    // ==================================================================================
-
+    // 1. DASHBOARD
     public Map<String, String> getDashboardStats() {
         return adminService.getDashboardStats();
     }
@@ -40,10 +31,7 @@ public class AdminController {
         return adminService.getRecentActivity();
     }
 
-    // ==================================================================================
-    // 2. USER MANAGEMENT
-    // ==================================================================================
-
+    // 2. USERS
     public List<User> getAllProfiles() throws SQLException {
         return adminService.getAllUsers();
     }
@@ -56,10 +44,7 @@ public class AdminController {
         adminService.createAuthUser(username, password, role);
     }
 
-    // ==================================================================================
-    // 3. COURSE MANAGEMENT
-    // ==================================================================================
-
+    // 3. COURSES
     public List<Course> getAllCourses() throws SQLException {
         return adminService.getAllCourses();
     }
@@ -76,10 +61,7 @@ public class AdminController {
         adminService.deleteCourse(code);
     }
 
-    // ==================================================================================
-    // 4. SECTION MANAGEMENT
-    // ==================================================================================
-
+    // 4. SECTIONS
     public List<Section> getAllSections() throws SQLException {
         return adminService.getAllSections();
     }
@@ -92,10 +74,7 @@ public class AdminController {
         adminService.createSectionFromUI(courseCode, instructorUser, room, day, time, capacity);
     }
 
-    // ==================================================================================
     // 5. MAINTENANCE
-    // ==================================================================================
-
     public boolean isMaintenanceMode() {
         return adminService.isMaintenanceOn();
     }
