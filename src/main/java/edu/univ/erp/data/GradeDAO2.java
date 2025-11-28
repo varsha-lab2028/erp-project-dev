@@ -56,7 +56,6 @@ public class GradeDAO2 {
 
     //computing the final grades of the student, method is used by the Instructor
     public void calculateFinalGrades(long section_id) throws SQLException{
-        //for a section, finding the numerical final score per enrollment
         String aggregate_command = """
         SELECT
             a.course_id,
@@ -111,7 +110,6 @@ public class GradeDAO2 {
                     }
                 }
 
-                // ----- STEP 4: execute batch + commit -----
                 upsertPs.executeBatch();
                 conn.commit();
 
@@ -224,14 +222,14 @@ public class GradeDAO2 {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     grades.add(new Object[]{
-                            rs.getLong("student_id"),             // [0] ID
-                            rs.getString("student_name"),         // [1] roll no
-                            rs.getObject("midsem_score"),         // [2] Midsem
-                            rs.getObject("endsem_score"),         // [3] Endsem
-                            rs.getObject("assignments_score"),    // [4] Internal/Assignments
-                            rs.getObject("quizzes_score"),        // [5] Quizzes
-                            rs.getObject("final_score"),          // [6] Total
-                            rs.getString("grade_letter")          // [7] Grade
+                            rs.getLong("student_id"),
+                            rs.getString("student_name"),
+                            rs.getObject("midsem_score"),
+                            rs.getObject("endsem_score"),
+                            rs.getObject("assignments_score"),
+                            rs.getObject("quizzes_score"),
+                            rs.getObject("final_score"),
+                            rs.getString("grade_letter")
                     });
                 }
             }
@@ -254,35 +252,6 @@ public class GradeDAO2 {
             ps.executeUpdate();
         }
     }
-
-    /*
-    public SectionStats getSectionStats(long sectionId) throws SQLException {
-        String sql = """
-            SELECT COUNT(*) as total_students,
-                   AVG(fg.final_score) as avg_score,
-                   MIN(fg.final_score) as min_score,
-                   MAX(fg.final_score) as max_score
-            FROM enrollments e
-            LEFT JOIN final_grades fg ON e.enrollment_id = fg.enrollment_id
-            WHERE e.section_id = ? AND e.e_status = 'REGISTERED'
-            """;
-        try (Connection conn = ServerConnector.ERPConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, sectionId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new SectionStats(
-                        rs.getInt("total_students"),
-                        rs.getDouble("avg_score"),
-                        rs.getDouble("min_score"),
-                        rs.getDouble("max_score")
-                    );
-                }
-            }
-        }
-        return new SectionStats(0, 0.0, 0.0, 0.0);
-    }
-     */
 }
 
 

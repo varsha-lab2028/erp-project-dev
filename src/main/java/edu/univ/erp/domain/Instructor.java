@@ -2,9 +2,8 @@ package edu.univ.erp.domain;
 import java.util.*;
 
 //links to Auth DB
-//keeps department, status
 public class Instructor {
-    private long user_id; //instructor will also have user_id
+    private long user_id;
     private String instructor_name;
     private String department;
     OnlineStatus status;

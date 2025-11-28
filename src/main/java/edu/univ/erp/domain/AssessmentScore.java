@@ -5,9 +5,9 @@ public class AssessmentScore{
     private long course_id;
     private long section_id;
     private String assessment_name;
-    private long enrollment_id; //score that a student of a specific enrollment id will get here
-    private int ass_weightage; //weightage of the particular assessment
-    private double ass_score; //what the student scored
+    private long enrollment_id;
+    private int ass_weightage;
+    private double ass_score;
 
     public AssessmentScore(long course_id, long section_id, String assessment_name,
                            long enrollment_id, int ass_weightage, double ass_score){

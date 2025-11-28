@@ -38,15 +38,12 @@ public class SeedingGradeInfo {
                         long course_id = rs.getLong("course_id");
                         long instructor_id = rs.getLong("instructor_id");
 
-                        /*System.out.println("Seeding components for Section "
-                                + section_id + " (course_id=" + course_id + ")");*/
-
                         for (String[] comp : grade_components) {
                             ins.setLong(1, course_id);
                             ins.setLong(2, section_id);
                             ins.setLong(3, instructor_id);
-                            ins.setString(4, comp[0]);      // assessment_name
-                            ins.setInt(5, Integer.parseInt(comp[1])); // weightage
+                            ins.setString(4, comp[0]);
+                            ins.setInt(5, Integer.parseInt(comp[1]));
                             ins.addBatch();
                         }
                     }

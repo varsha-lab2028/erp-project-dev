@@ -7,10 +7,10 @@ public class SettingsDAO {
     //return raw value for key or null if not there
     public static String get(String key) throws SQLException {
         String command = "SELECT value FROM settings WHERE k = ?";
+
         //connect to the ERP Database
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
-            // Replace the ? with the key we’re searching for
             ps.setString(1, key);
 
             try (ResultSet rs = ps.executeQuery()) {

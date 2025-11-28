@@ -3,9 +3,10 @@ package edu.univ.erp.ui.dashboards.admin;
 import javax.swing.*;
 import edu.univ.erp.service.MaintenanceService;
 import edu.univ.erp.service.AdminService;
-import edu.univ.erp.auth.session.Session; // Import Session
-import edu.univ.erp.domain.User; // Import User
+import edu.univ.erp.auth.session.Session;
+import edu.univ.erp.domain.User;
 
+//has been made to test whether admin is working or not
 public class TestingAdminUI {
     public static void main(String[] args) {
         try {
@@ -17,11 +18,8 @@ public class TestingAdminUI {
         } catch (Exception ignored) {}
         
         SwingUtilities.invokeLater(() -> {
-            // --- SIMULATE LOGIN FOR TESTING ---
-            // Create a dummy admin user so AccessControl doesn't block us
             User mockAdmin = new User(1L, "admin", "admin@univ.edu", "ADMIN");
             Session.setCurrentUser(mockAdmin);
-            // ----------------------------------
 
             JFrame frame = new JFrame("IIITD University ERP - Admin Portal");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

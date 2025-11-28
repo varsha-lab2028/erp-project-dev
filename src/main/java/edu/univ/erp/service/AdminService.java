@@ -15,17 +15,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AdminService {
-    // DATA ACCESS OBJECTS (The "Backend")
     private final UserDAO userDAO = new UserDAO();
     private final SectionDAO sectionDAO = new SectionDAO();
     private final AuthDAO auth_dao = new AuthDAO();
     private final CourseDAO course_dao = new CourseDAO();
     private final MaintenanceService maintenanceService = new MaintenanceService();
 
-    // ==================================================================================
-    // 1. DASHBOARD STATISTICS
-    // ==================================================================================
-
+    //dashboard statistics
     public Map<String, String> getDashboardStats() {
         AccessControl.checkRole("ADMIN"); 
         Map<String, String> stats = new HashMap<>();
@@ -61,10 +57,7 @@ public class AdminService {
         };
     }
 
-    // ==================================================================================
-    // 2. USER MANAGEMENT (With Auto-Sync!)
-    // ==================================================================================
-
+    //user management
     public List<User> getAllUsers() throws SQLException {
         AccessControl.checkRole("ADMIN");
         return userDAO.listAllUsers();
@@ -88,10 +81,10 @@ public class AdminService {
             throw new IllegalArgumentException("Invalid Role");
         }
 
-        // 1. Create Login
+        //create login
         auth_dao.insertUser(username.trim(), roleLabel.toUpperCase(), rawPassword);
         
-        // 2. AUTO-SYNC to ERP Database (Fixes the "Appropriate ID" error)
+        //auto sync
         syncUserToERP(username.trim(), roleLabel.toUpperCase());
     }
 
@@ -116,10 +109,7 @@ public class AdminService {
         }
     }
 
-    // ==================================================================================
-    // 3. COURSE MANAGEMENT
-    // ==================================================================================
-
+    //course management
     public List<Course> getAllCourses() throws SQLException {
         AccessControl.checkRole("ADMIN");
         return course_dao.listCourses();
@@ -143,10 +133,7 @@ public class AdminService {
         course_dao.deleteCourse(courseCode);
     }
 
-    // ==================================================================================
-    // 4. SECTION MANAGEMENT (With Safety Checks)
-    // ==================================================================================
-
+    //section management
     public List<Section> getAllSections() throws SQLException {
         AccessControl.checkRole("ADMIN");
         return sectionDAO.listAllSections();
@@ -167,18 +154,16 @@ public class AdminService {
         AccessControl.checkRole("ADMIN");
         AccessControl.checkWritable();
 
-        // --- EDGE CASE FIX: Prevent Negative Capacity ---
         if (capacity <= 0) {
             throw new IllegalArgumentException("Capacity must be a positive number.");
         }
-        // ------------------------------------------------
 
-        // 1. Ensure Course Exists (Self-Healing)
+        //ensuring course exists
         if (course_dao.findByCourseCode(courseCode) == null) {
             throw new IllegalArgumentException("Course '" + courseCode + "' does not exist. Please create it first in the Courses tab.");
         }
 
-        // 2. Find Instructor
+        //finding the instructor
         List<AuthClass> instructors = getAllInstructors();
         Optional<AuthClass> instructorOpt = instructors.stream()
                 .filter(u -> u.username.equals(instructorUsername))
@@ -190,10 +175,9 @@ public class AdminService {
         
         AuthClass instructor = instructorOpt.get();
         
-        // 3. FORCE SYNC Instructor
+        //sync instructor
         syncUserToERP(instructor.username, "INSTRUCTOR");
 
-        // 4. Create Section Object
         Section s = new Section(
             0L,                 
             courseCode,         
@@ -212,10 +196,7 @@ public class AdminService {
         sectionDAO.insertSection(s);
     }
 
-    // ==================================================================================
-    // 5. MAINTENANCE
-    // ==================================================================================
-
+    //maintenance
     public boolean isMaintenanceOn() {
         return maintenanceService.isMaintenanceOn();
     }

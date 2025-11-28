@@ -5,9 +5,6 @@ import java.sql.*;
 import java.util.*;
 
 public class SectionDAO {
-
-    // --- HELPER: JOIN QUERY ---
-    // FIXED: Changed 'semester_number' -> 'sem_no' and 'semester_season' -> 'sem_season'
     private static final String BASE_QUERY = """
         SELECT s.section_id, s.course_code, s.instructor_id, i.name as instructor_name,
                s.day, s.timings, s.classroom, s.capacity, 
@@ -16,7 +13,7 @@ public class SectionDAO {
         JOIN instructors i ON s.instructor_id = i.instructor_id
     """;
 
-    // 1. List all sections
+    //all the required methods for section showing
     public List<Section> listAllSections() throws SQLException {
         String command = BASE_QUERY + " ORDER BY s.course_code, s.section_id";
         
@@ -32,7 +29,6 @@ public class SectionDAO {
         return sections;
     }
 
-    // 2. Get Capacity
     public int capacityOfSection(long sectionId) throws SQLException {
         String command = "SELECT capacity FROM sections WHERE section_id = ?";
         try (Connection connection = ServerConnector.ERPConnection();
@@ -47,7 +43,6 @@ public class SectionDAO {
         }
     }
 
-    // 3. Search Sections
     public List<Section> searchSection(String keyword) throws SQLException {
         String command = BASE_QUERY + " WHERE s.course_code LIKE ? ORDER BY s.course_code, s.section_id";
         
@@ -67,7 +62,6 @@ public class SectionDAO {
         return searched_section;
     }
 
-    // 4. Find By ID
     public Section findBySectionId(long section_id) throws SQLException {
         String sql = BASE_QUERY + " WHERE s.section_id = ?";
 
@@ -83,7 +77,6 @@ public class SectionDAO {
         }
     }
 
-    // 5. List By Instructor (Using JOIN)
     public List<Section> listSectionsByInstructor(long instructorId) throws SQLException {
         String command = BASE_QUERY + " WHERE s.instructor_id = ? ORDER BY s.course_code, s.section_id";
 
@@ -100,8 +93,7 @@ public class SectionDAO {
         return sections;
     }
 
-    // --- ADMIN WRITE METHODS ---
-
+    //admin write methods for section
     public void insertSection(Section section) throws SQLException {
         // FIXED: Column names in INSERT
         String sql = """
@@ -125,7 +117,6 @@ public class SectionDAO {
     }
 
     public void updateSection(Section section) throws SQLException {
-        // FIXED: Column names in UPDATE
         String sql = """
             UPDATE sections
             SET course_code = ?, instructor_id = ?, classroom = ?, day = ?, timings = ?,
@@ -178,7 +169,6 @@ public class SectionDAO {
         }
     }
 
-    // --- HELPER: Map ResultSet to Object ---
     private Section mapRowToSection(ResultSet rs) throws SQLException {
         return new Section(
                 rs.getLong("section_id"),
@@ -189,8 +179,8 @@ public class SectionDAO {
                 rs.getString("timings"),
                 rs.getString("classroom"),
                 rs.getInt("capacity"),
-                rs.getInt("sem_no"),        // FIXED: Matches DB
-                rs.getString("sem_season"), // FIXED: Matches DB
+                rs.getInt("sem_no"),
+                rs.getString("sem_season"),
                 rs.getInt("year")
         );
     }

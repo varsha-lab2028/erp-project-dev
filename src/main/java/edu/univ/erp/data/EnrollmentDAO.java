@@ -66,8 +66,7 @@ public class EnrollmentDAO {
         }
     }
 
-    //if a student has completed the course in a section
-    //this info will be used by the instructor or admin later
+    //if a student has completed the course in a section, this info will be used by the instructor or admin later
     public void markCourseComplete(long student_id, long section_id) throws SQLException{
         String command = """
             UPDATE enrollments SET e_status='COMPLETED', completed_when=NOW()
