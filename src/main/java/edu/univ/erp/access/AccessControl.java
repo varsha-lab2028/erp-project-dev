@@ -19,23 +19,10 @@ public class AccessControl {
         }
     }
 
-    // --- THIS IS THE FIX ---
+    //blocks every change while maintenance is ON. Admin is an exception to this though
     public static void checkWritable() {
-
-    }
-    
-    public static void requireStudentWriteAccess() {
-
-        // 1. Check if Maintenance is ON in the database
-        if (maintenanceService.isMaintenanceOn()) {
-            
-            // 2. Admins are exempt (they can still edit things)
-            if (Session.hasRole("ADMIN")) {
-                return; 
-            }
-            
-            // 3. Everyone else gets blocked
-            throw new RuntimeException("System is under maintenance. Actions are temporarily disabled.");
+        if(maintenanceService.isMaintenanceOn() && !Session.hasRole("ADMIN")){
+            throw new RuntimeException("System is under maintenance. Actions are disabled");
         }
     }
     

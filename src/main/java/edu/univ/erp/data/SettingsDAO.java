@@ -12,11 +12,6 @@ public class SettingsDAO {
         //connect to the ERP Database
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
-        // --- FIX: Changed 'value' to 'v' to match the database ---
-        String command = "SELECT v FROM settings WHERE k = ?";
-        
-        try (Connection connection = ServerConnector.ERPConnection();
-             PreparedStatement ps = connection.prepareStatement(command)) {
             
             ps.setString(1, key);
 

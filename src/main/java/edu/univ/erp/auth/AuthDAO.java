@@ -72,13 +72,49 @@ public class AuthDAO {
 
     public void updateStatus(long userId, String status) throws SQLException {
         String sql = "UPDATE user_auth SET status = ? WHERE user_id = ?";
-        
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
             stmt.setString(1, status);
             stmt.setLong(2, userId);
             stmt.executeUpdate();
         }
     }
+
+    // Returns the stored login row for one username, or null if there is none
+    public AuthClass findByUsername(String username) throws SQLException {
+        String sql = "SELECT user_id, username, role, password_hash, status FROM user_auth WHERE username = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+                AuthClass u = new AuthClass();
+                u.user_id = rs.getLong("user_id");
+                u.username = rs.getString("username");
+                u.role = rs.getString("role");
+                u.password_hash = rs.getString("password_hash");
+                u.auth_status = rs.getString("status");
+                return u;
+            }
+        }
+    }
+
+    // Returns true if exactly one row was changed
+    public boolean updatePassword(long userId, String newHash) throws SQLException {
+        String sql = "UPDATE user_auth SET password_hash = ? WHERE user_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, newHash);
+            stmt.setLong(2, userId);
+            return stmt.executeUpdate() == 1;
+        }
+    }
+
 }
