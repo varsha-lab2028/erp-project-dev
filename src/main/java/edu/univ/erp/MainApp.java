@@ -7,7 +7,6 @@ import edu.univ.erp.auth.AuthenticationService;
 import edu.univ.erp.domain.AuthClass;
 import edu.univ.erp.ui.login.LoginPanel;
 import edu.univ.erp.ui.login.LoginController;
-import edu.univ.erp.auth.LoginManager;
 import edu.univ.erp.ui.dashboards.student.StudentDashboardPanel;
 import edu.univ.erp.ui.dashboards.admin.AdminDashboardPanel;
 import edu.univ.erp.ui.dashboards.instructor.InstructorDashboardPanel;

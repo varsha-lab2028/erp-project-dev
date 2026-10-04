@@ -33,7 +33,7 @@ public class SettingsDAO {
     }
 
     // Parse integer setting, will return null if empty or not valid integer
-    public Integer getInt(String key) throws SQLException {
+        Integer getInt(String key) throws SQLException {
         String v = get(key);
         if (v == null) {
             return null;

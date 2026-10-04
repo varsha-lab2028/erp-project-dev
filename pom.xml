@@ -89,9 +89,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.1</version>
-                <configuration>
-                    <mainClass>edu.univ.erp.ui.common.MainERPFrame</mainClass>
-                </configuration>
             </plugin>
 
             <!-- JUnit 5 -->
