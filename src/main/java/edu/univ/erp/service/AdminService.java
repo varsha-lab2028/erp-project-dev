@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AdminService {
-    private final UserDAO userDAO = new UserDAO();
     private final SectionDAO sectionDAO = new SectionDAO();
     private final AuthDAO auth_dao = new AuthDAO();
     private final CourseDAO course_dao = new CourseDAO();
@@ -55,12 +54,6 @@ public class AdminService {
             {"Dashboard Loaded", "System", "1 min ago"},
             {"Database Check", "System", "5 mins ago"}
         };
-    }
-
-    //user management
-    public List<User> getAllUsers() throws SQLException {
-        AccessControl.checkRole("ADMIN");
-        return userDAO.listAllUsers();
     }
 
     public List<AuthClass> listAuthUsers() throws Exception {

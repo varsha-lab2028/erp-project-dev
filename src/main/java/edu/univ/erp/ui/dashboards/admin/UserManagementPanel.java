@@ -70,10 +70,6 @@ public class UserManagementPanel extends JPanel {
 
         
         String[] cols = {"ID", "Username", "Role", "Status"};
-        Object[][] data = new Object[0][4]; 
-        
-        
-        String[] cols = {"ID", "Username", "Role", "Status"};
         Object[][] data = new Object[0][4];
 
         this.tablePanel = new DashboardComponents.TablePanel("All Users", cols, data);

@@ -12,11 +12,6 @@ public class SettingsDAO {
         //connect to the ERP Database
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(command)) {
-        // --- FIX: Changed 'value' to 'v' to match the database ---
-        String command = "SELECT v FROM settings WHERE k = ?";
-        
-        try (Connection connection = ServerConnector.ERPConnection();
-             PreparedStatement ps = connection.prepareStatement(command)) {
             
             ps.setString(1, key);
 
@@ -33,7 +28,7 @@ public class SettingsDAO {
     }
 
     // Parse integer setting, will return null if empty or not valid integer
-    public Integer getInt(String key) throws SQLException {
+        Integer getInt(String key) throws SQLException {
         String v = get(key);
         if (v == null) {
             return null;
