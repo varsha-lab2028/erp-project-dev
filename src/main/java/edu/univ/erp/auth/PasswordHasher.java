@@ -3,7 +3,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public final class PasswordHasher {
     public static String hash(String raw_password) {
-        return BCrypt.hashpw(raw_password, BCrypt.gensalt(15));
+        return BCrypt.hashpw(raw_password, BCrypt.gensalt(12));
     }
     public static boolean verifyHash(String raw_password, String hash){
         if (hash == null || hash.isBlank()) {
