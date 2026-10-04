@@ -1,0 +1,4 @@
+ ('admin1', 'ADMIN', '$2a$12$7xzFiEY1xuTgM1SGcdloJulF34B2NO8WA1tyIvlnnok.7CI5yAwrO'),
+ ('inst1', 'INSTRUCTOR', '$2a$12$wTLtS0dg4/CpbcmKS/BmHOEtZCLTPYQiMsAdXOmqw6R0AKYBaMbOO'),
+ ('stu1', 'STUDENT', '$2a$12$a2ThgpO./HQXWh/O/mCPbeG.N4MRyzSm878JEWkwkBH82v2UYosg6'),
+ ('stu2', 'STUDENT', '$2a$12$.ceGMY62SkpyHCHEc2p.yeg32jcrUSC4CS02Pyh3oGZ7MapgCLIqW');
