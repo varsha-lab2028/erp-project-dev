@@ -1,0 +1,7 @@
+auth.jdbc.url=jdbc:postgresql://<pooler-host>:5432/postgres?sslmode=require&currentSchema=authdb
+auth.jdbc.user=postgres.<project-ref>
+auth.jdbc.pass=<db-password>
+
+erp.jdbc.url=jdbc:postgresql://<pooler-host>:5432/postgres?sslmode=require&currentSchema=erp
+erp.jdbc.user=postgres.<project-ref>
+erp.jdbc.pass=<db-password>
