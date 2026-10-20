@@ -3,6 +3,7 @@ package edu.univ.erp.data;
 import edu.univ.erp.domain.Course;
 import edu.univ.erp.domain.Section;
 import org.junit.jupiter.api.Test;
+import edu.univ.erp.auth.AuthDAO;
 
 import java.util.List;
 
@@ -85,6 +86,46 @@ public class DaoSmokeTest {
         // one timetable row per REGISTERED section, no dropped or completed ones
         int registered = new EnrollmentDAO().listRegisteredSections(STU1).size();
         assertEquals(registered, TimeTableDAO.getTimetableForStudent(STU1).size());
+    }
+
+    @Test
+    void grades() throws Exception {
+        assertFalse(GradeDAO2.listGradeComponents(STU1, 1, "MONSOON", 2025).isEmpty());
+        assertEquals(1, GradeDAO2.listFinalGrades(STU1, 1, "MONSOON", 2025).size());   // the COMPLETED CSE101
+        assertFalse(new GradeDAO2().listGradesBySection(1).isEmpty());
+    }
+
+    @Test
+    void scoreEntryAndFinalGrade() throws Exception {
+        // stu1 in section 1 has Quizzes 80, Assignments 75, Midsem 68 and no Endsem yet
+        GradeDAO2 dao = new GradeDAO2();
+        dao.upsertComponentScore(1, STU1, "Endsem", 50);   // first time: INSERT
+        dao.upsertComponentScore(1, STU1, "Endsem", 70);   // second time: UPDATE, not a duplicate row
+        dao.calculateFinalGrades(1);
+        // 80*0.10 + 75*0.20 + 68*0.30 + 70*0.40 = 71.4 -> B+
+        Object[] stu1Row = dao.listGradesBySection(1).get(0);
+        assertEquals("B+", stu1Row[7]);
+    }
+
+    @Test
+    void transcript() throws Exception {
+        TranscriptDAO dao = new TranscriptDAO();
+        assertFalse(dao.fetchTranscript(STU1).isEmpty());
+        assertFalse(dao.listCurrentRegistrations(STU1).isEmpty());
+    }
+
+    @Test
+    void deletesRefusedWhenStudentsEnrolled() throws Exception {
+        assertThrows(IllegalStateException.class, () -> new SectionDAO().deleteSection(1));
+        assertThrows(IllegalStateException.class, () -> new CourseDAO().deleteCourse("CSE201"));
+        assertNotNull(new SectionDAO().findBySectionId(1));   // still there
+    }
+
+    @Test
+    void authReads() throws Exception {
+        AuthDAO dao = new AuthDAO();
+        assertNotNull(dao.findByUsername("stu1"));
+        assertTrue(dao.listUsers().size() >= 4);
     }
 
 }

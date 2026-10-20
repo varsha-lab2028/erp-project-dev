@@ -5,8 +5,6 @@ import edu.univ.erp.domain.*;
 import edu.univ.erp.auth.AuthDAO;
 import edu.univ.erp.access.AccessControl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +17,7 @@ public class AdminService {
     private final AuthDAO auth_dao = new AuthDAO();
     private final CourseDAO course_dao = new CourseDAO();
     private final MaintenanceService maintenanceService = new MaintenanceService();
+    private final ProfileDAO profileDAO = new ProfileDAO();
 
     //dashboard statistics
     public Map<String, String> getDashboardStats() {
@@ -75,30 +74,18 @@ public class AdminService {
         }
 
         //create login
-        auth_dao.insertUser(username.trim(), roleLabel.toUpperCase(), rawPassword);
+        long userId = auth_dao.insertUser(username.trim(), roleLabel.toUpperCase(), rawPassword);
         
         //auto sync
-        syncUserToERP(username.trim(), roleLabel.toUpperCase());
+        syncUserToERP(userId, username.trim(), roleLabel.toUpperCase());
     }
 
-    private void syncUserToERP(String username, String role) {
-        String sql = "";
-        if ("INSTRUCTOR".equals(role)) {
-            sql = "INSERT IGNORE INTO erp_db.instructors (instructor_id, name, email) " +
-                  "SELECT user_id, username, CONCAT(username, '@univ.edu') FROM auth_db.user_auth WHERE username = ?";
-        } else if ("STUDENT".equals(role)) {
-            sql = "INSERT IGNORE INTO erp_db.students (user_id, name, email) " +
-                  "SELECT user_id, username, CONCAT(username, '@univ.edu') FROM auth_db.user_auth WHERE username = ?";
-        } else {
-            return;
-        }
-
-        try (Connection conn = ServerConnector.ERPConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, username);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace(); 
+    private void syncUserToERP(long userId, String username, String role) throws SQLException {
+        String email = username + "@univ.edu";
+        if ("STUDENT".equals(role)) {
+            profileDAO.insertStudent(userId, username, email);
+        } else if ("INSTRUCTOR".equals(role)) {
+            profileDAO.insertInstructor(userId, username, email);
         }
     }
 
@@ -169,7 +156,7 @@ public class AdminService {
         AuthClass instructor = instructorOpt.get();
         
         //sync instructor
-        syncUserToERP(instructor.username, "INSTRUCTOR");
+        syncUserToERP(instructor.user_id, instructor.username,"INSTRUCTOR");
 
         Section s = new Section(
             0L,                 

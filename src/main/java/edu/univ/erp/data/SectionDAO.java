@@ -136,32 +136,23 @@ public class SectionDAO {
         }
     }
 
+    // Refuses if any student has ever enrolled. grade_components go automatically (ON DELETE CASCADE).
     public void deleteSection(long sectionId) throws SQLException {
-        String deleteGrades = "DELETE FROM grade_components WHERE section_id = ?";
-        String deleteEnrollments = "DELETE FROM enrollments WHERE section_id = ?";
-        String deleteSection = "DELETE FROM sections WHERE section_id = ?";
+        String check = "SELECT 1 FROM enrollments WHERE section_id = ? LIMIT 1";
+        String delete = "DELETE FROM sections WHERE section_id = ?";
 
         try (Connection conn = ServerConnector.ERPConnection()) {
-            conn.setAutoCommit(false);
-            try {
-                try(PreparedStatement ps = conn.prepareStatement(deleteGrades)){
-                    ps.setLong(1, sectionId);
-                    ps.executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement(check)) {
+                ps.setLong(1, sectionId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        throw new IllegalStateException("Section has enrolled students.");
+                    }
                 }
-                try(PreparedStatement ps = conn.prepareStatement(deleteEnrollments)){
-                    ps.setLong(1, sectionId);
-                    ps.executeUpdate();
-                }
-                try(PreparedStatement ps = conn.prepareStatement(deleteSection)){
-                    ps.setLong(1, sectionId);
-                    ps.executeUpdate();
-                }
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                throw e;
-            } finally {
-                conn.setAutoCommit(true);
+            }
+            try (PreparedStatement ps = conn.prepareStatement(delete)) {
+                ps.setLong(1, sectionId);
+                ps.executeUpdate();
             }
         }
     }

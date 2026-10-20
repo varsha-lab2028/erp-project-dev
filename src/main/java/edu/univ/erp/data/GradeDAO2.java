@@ -57,29 +57,26 @@ public class GradeDAO2 {
     //computing the final grades of the student, method is used by the Instructor
     public void calculateFinalGrades(long section_id) throws SQLException{
         String aggregate_command = """
-        SELECT
-            a.course_id,
-            a.section_id,
-            a.enrollment_id,
-            SUM(a.ass_score * gc.weightage / 100.0) AS final_score
-        FROM assessment_scores a
-        JOIN grade_components gc
-          ON gc.section_id = a.section_id
-         AND gc.course_id  = a.course_id
-         AND gc.assessment_name = a.assessment_name
-        WHERE a.section_id = ?
-        GROUP BY a.course_id, a.section_id, a.enrollment_id
-    """;
+            SELECT a.enrollment_id,
+                   SUM(a.ass_score * gc.weightage / 100.0) AS final_score
+            FROM assessment_scores a
+            JOIN enrollments e
+              ON e.enrollment_id = a.enrollment_id
+            JOIN grade_components gc
+              ON gc.section_id = e.section_id
+             AND gc.assessment_name = a.assessment_name
+            WHERE e.section_id = ? AND e.e_status = 'REGISTERED'
+            GROUP BY a.enrollment_id
+            """;
 
         //inserting into the final_grades table
         String upsert_command = """
-        INSERT INTO final_grades
-            (course_id, section_id, enrollment_id, grade_letter, course_cg)
-        VALUES (?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-            grade_letter = VALUES(grade_letter),
-            course_cg    = VALUES(course_cg)
-    """;
+            INSERT INTO final_grades (enrollment_id, grade_letter, course_cg)
+            VALUES (?, ?, ?)
+            ON CONFLICT (enrollment_id)
+            DO UPDATE SET grade_letter = EXCLUDED.grade_letter,
+                          course_cg    = EXCLUDED.course_cg
+            """;
 
         try (Connection conn = ServerConnector.ERPConnection()) {
             conn.setAutoCommit(false);
@@ -91,8 +88,6 @@ public class GradeDAO2 {
 
                 try (ResultSet rs = selectPs.executeQuery()) {
                     while (rs.next()) {
-                        long courseId     = rs.getLong("course_id");
-                        long secId        = rs.getLong("section_id");
                         long enrollmentId = rs.getLong("enrollment_id");
                         double finalScore = rs.getDouble("final_score");
 
@@ -101,11 +96,9 @@ public class GradeDAO2 {
                         double courseCg = finalScore / 10.0;
 
                         //upserting into final_grades table
-                        upsertPs.setLong(1, courseId);
-                        upsertPs.setLong(2, secId);
-                        upsertPs.setLong(3, enrollmentId);
-                        upsertPs.setString(4, letter);
-                        upsertPs.setDouble(5, courseCg);
+                        upsertPs.setLong(1, enrollmentId);
+                        upsertPs.setString(2, letter);
+                        upsertPs.setDouble(3, courseCg);
                         upsertPs.addBatch();
                     }
                 }
@@ -140,26 +133,17 @@ public class GradeDAO2 {
     //fetches the final grades of the student, used in Student UI
     public static List<FinalGrade> listFinalGrades(long student_id, int sem_no, String sem_season, int year) throws SQLException {
         String command = """
-            SELECT
-                                fg.course_id,
-                                fg.section_id,
-                                fg.enrollment_id,
-                                fg.grade_letter,
-                                fg.course_cg,
-                                c.course_code,
-                                c.name AS course_name,
-                                c.credits
-                            FROM enrollments e
-                            JOIN sections s ON e.section_id = s.section_id
-                            JOIN courses  c ON s.course_code = c.course_code
-                            JOIN final_grades fg ON fg.enrollment_id = e.enrollment_id
-                            WHERE e.student_id = ?
-                              AND e.e_status='COMPLETED'
-                              AND s.sem_no = ?
-                              AND s.sem_season = ?
-                              AND s.year = ?
-                            ORDER BY c.course_code
-        """;
+            SELECT s.section_id, fg.enrollment_id, fg.grade_letter, fg.course_cg
+            FROM enrollments e
+            JOIN sections s      ON e.section_id = s.section_id
+            JOIN final_grades fg ON fg.enrollment_id = e.enrollment_id
+            WHERE e.student_id = ?
+              AND e.e_status = 'COMPLETED'
+              AND s.sem_no = ?
+              AND s.sem_season = ?
+              AND s.year = ?
+            ORDER BY s.course_code
+            """;
 
         List<FinalGrade> final_grades = new ArrayList<>();
         try (Connection connection = ServerConnector.ERPConnection();
@@ -171,10 +155,10 @@ public class GradeDAO2 {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     final_grades.add(new FinalGrade(
-                            rs.getLong("course_id"),
+                            0L,   // courses have no numeric id; course_code is the key
                             rs.getLong("section_id"),
                             rs.getLong("enrollment_id"),
-                            LetterGrade.valueOf(rs.getString("letter_grade").toUpperCase()),
+                            LetterGrade.fromLabel(rs.getString("grade_letter")),
                             rs.getDouble("course_cg")
                     ));
                 }
@@ -238,18 +222,25 @@ public class GradeDAO2 {
     }
 
     public void upsertComponentScore(long sectionId, long studentId, String assessmentName, double score) throws SQLException {
+        // finds the student's enrollment in this section and saves the score against it;
+        // if a score for that assessment already exists, it is replaced
         String sql = """
-            INSERT INTO assessment_scores (section_id, student_id, assessment_name, score)
-            VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE score = VALUES(score)
+            INSERT INTO assessment_scores (enrollment_id, assessment_name, ass_score)
+            SELECT e.enrollment_id, ?, ?
+            FROM enrollments e
+            WHERE e.section_id = ? AND e.student_id = ? AND e.e_status = 'REGISTERED'
+            ON CONFLICT (enrollment_id, assessment_name)
+            DO UPDATE SET ass_score = EXCLUDED.ass_score
             """;
         try (Connection conn = ServerConnector.ERPConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, sectionId);
-            ps.setLong(2, studentId);
-            ps.setString(3, assessmentName);
-            ps.setDouble(4, score);
-            ps.executeUpdate();
+            ps.setString(1, assessmentName);
+            ps.setDouble(2, score);
+            ps.setLong(3, sectionId);
+            ps.setLong(4, studentId);
+            if (ps.executeUpdate() == 0) {
+                throw new IllegalStateException("Student is not registered in this section.");
+            }
         }
     }
 }

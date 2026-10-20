@@ -56,17 +56,25 @@ public class AuthDAO {
         return list;
     }
 
-    public void insertUser(String username, String role, String password) throws SQLException {
-        String sql = "INSERT INTO user_auth (username, password_hash, role, status) VALUES (?, ?, ?, 'ACTIVE')";
-        
+    // Returns the user_id the database gave the new row
+    public long insertUser(String username, String role, String password) throws SQLException {
+        String sql = """
+            INSERT INTO user_auth (username, password_hash, role, status)
+            VALUES (?, ?, ?, 'ACTIVE')
+            RETURNING user_id
+            """;
+
         try (Connection conn = ServerConnector.authConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+
             stmt.setString(1, username);
-            stmt.setString(2, password); 
+            stmt.setString(2, password);
             stmt.setString(3, role);
-            
-            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+                return rs.getLong("user_id");
+            }
         }
     }
 

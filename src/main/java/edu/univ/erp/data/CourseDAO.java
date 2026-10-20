@@ -110,37 +110,33 @@ public class CourseDAO {
         }
     }
 
-    //deleting method
+    // Refuses if any section of the course has students. Otherwise, deletes its sections, then the course.
     public void deleteCourse(String courseCode) throws SQLException {
-        String deleteGrades = "DELETE FROM grade_components WHERE section_id IN (SELECT section_id FROM sections WHERE course_code = ?)";
-        String deleteFinalGrades = "DELETE FROM final_grades WHERE section_id IN (SELECT section_id FROM sections WHERE course_code = ?)";
-        String deleteEnrollments = "DELETE FROM enrollments WHERE section_id IN (SELECT section_id FROM sections WHERE course_code = ?)";
+        String check = """
+            SELECT 1 FROM enrollments e
+            JOIN sections s ON s.section_id = e.section_id
+            WHERE s.course_code = ?
+            LIMIT 1
+            """;
         String deleteSections = "DELETE FROM sections WHERE course_code = ?";
         String deleteCourse = "DELETE FROM courses WHERE course_code = ?";
 
         try (Connection conn = ServerConnector.ERPConnection()) {
-            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement(check)) {
+                ps.setString(1, courseCode);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        throw new IllegalStateException("Course has sections with enrolled students.");
+                    }
+                }
+            }
+
+            conn.setAutoCommit(false);   // both deletes happen, or neither does
             try {
-                try (PreparedStatement ps = conn.prepareStatement(deleteGrades)) {
-                    ps.setString(1, courseCode);
-                    ps.executeUpdate();
-                }
-
-                try (PreparedStatement ps = conn.prepareStatement(deleteFinalGrades)) {
-                    ps.setString(1, courseCode);
-                    ps.executeUpdate();
-                }
-
-                try (PreparedStatement ps = conn.prepareStatement(deleteEnrollments)) {
-                    ps.setString(1, courseCode);
-                    ps.executeUpdate();
-                }
-
                 try (PreparedStatement ps = conn.prepareStatement(deleteSections)) {
                     ps.setString(1, courseCode);
                     ps.executeUpdate();
                 }
-
                 try (PreparedStatement ps = conn.prepareStatement(deleteCourse)) {
                     ps.setString(1, courseCode);
                     ps.executeUpdate();
