@@ -30,9 +30,9 @@ public class CourseDAO {
         String sql = """
             SELECT course_code, name, credits
             FROM courses
-            WHERE course_code LIKE ? OR name LIKE ?
+            WHERE course_code ILIKE ? OR name ILIKE ?
             ORDER BY course_code
-        """;
+        """; //ILIKE is for PostgreSQL, not mysql
         List<Course> courses = new ArrayList<>();
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -53,7 +53,7 @@ public class CourseDAO {
     }
 
     public Course findByCourseCode(String code) throws SQLException {
-        String sql = "SELECT course_code, name, credits FROM courses WHERE course_code = ?";
+        String sql = "SELECT name, course_code, credits FROM courses WHERE course_code = ?";
         try (Connection connection = ServerConnector.ERPConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, code);
@@ -61,8 +61,8 @@ public class CourseDAO {
                 if (rs.next()) {
                     return new Course(
                             0L,
-                            rs.getString("course_code"),
                             rs.getString("name"),
+                            rs.getString("course_code"),
                             rs.getInt("credits")
                     );
                 }

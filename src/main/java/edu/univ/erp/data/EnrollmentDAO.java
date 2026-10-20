@@ -114,13 +114,14 @@ public class EnrollmentDAO {
     //listing all actively registered sections of a student
     public List<Section> listRegisteredSections(long student_id) throws SQLException {
         String sql = """
-            SELECT s.section_id, s.course_code, s.instructor_id, s.instructor_name,
-                   s.day, s.timings, s.classroom,
-                   s.capacity, s.sem_no, s.sem_season, s.year
-            FROM enrollments e
-            JOIN sections s ON e.section_id = s.section_id
-            WHERE e.student_id = ? AND e.e_status = 'REGISTERED'
-            ORDER BY s.course_code, s.section_id
+            SELECT s.section_id, s.course_code, s.instructor_id, i.name AS instructor_name,
+                           s.day, s.timings, s.classroom,
+                           s.capacity, s.sem_no, s.sem_season, s.year
+                    FROM enrollments e
+                    JOIN sections s ON e.section_id = s.section_id
+                    JOIN instructors i ON s.instructor_id = i.instructor_id
+                    WHERE e.student_id = ? AND e.e_status = 'REGISTERED'
+                    ORDER BY s.course_code, s.section_id
         """;
 
         List<Section> registered_sections = new ArrayList<>();
