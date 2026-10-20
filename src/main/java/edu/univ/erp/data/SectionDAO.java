@@ -44,7 +44,7 @@ public class SectionDAO {
     }
 
     public List<Section> searchSection(String keyword) throws SQLException {
-        String command = BASE_QUERY + " WHERE s.course_code LIKE ? ORDER BY s.course_code, s.section_id";
+        String command = BASE_QUERY + " WHERE s.course_code ILIKE ? ORDER BY s.course_code, s.section_id";
         
         List<Section> searched_section = new ArrayList<>();
         try (Connection conn = ServerConnector.ERPConnection();
@@ -95,12 +95,9 @@ public class SectionDAO {
 
     //admin write methods for section
     public void insertSection(Section section) throws SQLException {
-        // FIXED: Column names in INSERT
         String sql = """
-            INSERT INTO sections (course_code, instructor_id, classroom, day, timings, 
-                                  capacity, sem_no, sem_season, `year`)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+        INSERT INTO sections (course_code, instructor_id, classroom, day, timings, capacity, sem_no, sem_season, year) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) """;
         try (Connection conn = ServerConnector.ERPConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, section.getCourseCode());
@@ -120,7 +117,7 @@ public class SectionDAO {
         String sql = """
             UPDATE sections
             SET course_code = ?, instructor_id = ?, classroom = ?, day = ?, timings = ?,
-                capacity = ?, sem_no = ?, sem_season = ?, `year` = ?
+                capacity = ?, sem_no = ?, sem_season = ?, year = ?
             WHERE section_id = ?
         """;
         try (Connection conn = ServerConnector.ERPConnection();

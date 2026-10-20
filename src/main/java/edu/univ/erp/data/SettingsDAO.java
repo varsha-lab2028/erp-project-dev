@@ -7,7 +7,7 @@ public class SettingsDAO {
     
     // Return raw value for key or null if not there
     public static String get(String key) throws SQLException {
-        String command = "SELECT value FROM settings WHERE k = ?";
+        String command = "SELECT v FROM settings WHERE k = ?"; // v = value
 
         //connect to the ERP Database
         try (Connection connection = ServerConnector.ERPConnection();
@@ -17,7 +17,6 @@ public class SettingsDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // --- FIX: Changed 'value' to 'v' here too ---
                     return rs.getString("v");
                 }
                 else {
@@ -55,10 +54,7 @@ public class SettingsDAO {
 
     // Upsert setting: if value doesn't exist insertion will occur, if it does, the value will get updated
     public void upsertSetting(String key, String value) throws SQLException {
-        final String sql = """
-            INSERT INTO settings(k,v) VALUES (?,?)
-            ON DUPLICATE KEY UPDATE v = VALUES(v)
-        """;
+        final String sql = "INSERT INTO settings(k,v) VALUES (?,?) ON CONFLICT (k) DO UPDATE SET v = EXCLUDED.v";
         try (Connection c = ServerConnector.ERPConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, key);
